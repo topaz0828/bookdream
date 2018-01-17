@@ -1,0 +1,27 @@
+server:
+  port: 8761
+  
+info:
+  component: Discovery Server
+  
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname:localhost}:${server.port:8761}/eureka/
+  instance:
+    hostname: localhost
+    status-page-url-path: /info
+    health-check-url-path: /health
+    prefer-ip-address: false
+    metadata-map:
+      instanceId: ${spring.application.name}:${server.port}
+  server:
+    enable-self-preservation: true
+    wait-time-in-ms-when-sync-empty: 0
+    response-cache-update-interval-ms: 1000
+    
+      
+    
