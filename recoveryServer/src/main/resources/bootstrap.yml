@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: recoveryServer
+    
+logging:
+  file: recoveryServer.log
+  path: ./data/logs
+  
