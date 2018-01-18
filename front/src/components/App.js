@@ -1,10 +1,14 @@
 import React from 'react';
+import Header from './Header';
+import Body from './Body';
 
 class App extends React.Component {
     render(){
-
         return (
-                <h1>Hello React Skeleton</h1>
+        		<div>
+	                <Header/>
+	                <Body/>
+	            </div>
         );
     }
 }
