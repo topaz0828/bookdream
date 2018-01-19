@@ -7,23 +7,20 @@ class Body extends React.Component {
 		this.state = {
 			list : []
 		}
-	}
-
-	componentDidMount() {
-		window.addEventListener('scroll', () => {
+		this.detectScrollPosition = () => {
 			if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)) {
 				this.getList();
 			}
-		}, false);
+		}
+	}
+
+	componentDidMount() {
+		window.addEventListener('scroll', this.detectScrollPosition, false);
 		this.getList();
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener('scroll', () => {
-			if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)) {
-				this.getList();
-			}
-		}, false);
+		window.removeEventListener('scroll', this.detectScrollPosition, false);
 	}
 
 	getList() {
