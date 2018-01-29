@@ -12,6 +12,8 @@ class Body extends React.Component {
 				this.getList();
 			}
 		}
+		this.maxColumnCount = 4;
+		this.lastColIndex = 0;
 	}
 
 	componentDidMount() {
@@ -25,52 +27,71 @@ class Body extends React.Component {
 
 	getList() {
 		var newList = [];
-		for (var i = 0; i < 50; ++i) {
-			newList.push(i);
+		for (var i = 0; i < 10; ++i) {
+			newList.push({
+				'nickname': 'nickname' + i,
+				'title': 'title' + i,
+				'author': 'author' + i,
+				'updateDate': 'updateDate' + i
+			});
 		}
 		
-		this.setState({
-			list : newList
-		});
+		this.setState({list : newList});
 	}
 
-	makeContentsCard(col, data) {
-		var key = "row-" + data;
+	makeContentsRow(col, data, contentsCount) {
+		this.lastColIndex = contentsCount % this.maxColumnCount;
+		data.key = 'contentsCard-' + contentsCount;
+		col[this.lastColIndex] = data;
+
 		var newRow = null;
-		if (data > 0 && data % 4 == 0) {
+		if (contentsCount > 0 && contentsCount % this.maxColumnCount == this.maxColumnCount - 1) {
 			newRow = (
-				<div className="row" key={key}>
-					{col[0]}
-					{col[1]}
-					{col[2]}
-					{col[3]}
+				<div className='row' key={'row-' + contentsCount}>
+					{this.makeContentsCard(col[0])}
+					{this.makeContentsCard(col[1])}
+					{this.makeContentsCard(col[2])}
+					{this.makeContentsCard(col[3])}
 				</div>
 			);
 		}
 
-		col[data % 4] = (
-			<div className="col col-3 contents">
-				<ContentsCard count={data}/>
-			</div>
-		);
-
 		return newRow;
 	}
 
+	makeContentsCard(data) {
+		return (
+			<div className='col-sm-6 col-md-3' key={'col-' + data.key}>
+				<ContentsCard key={data.key}
+					nickname={data.nickname}
+					title={data.title}
+					author={data.author}
+					updateDate={data.updateDate}/>
+			</div>
+		);
+	}
+
 	render() {
-		var currentRows = $("#contents").children();
-		var childCount = 0;
+		var currentRows = $('#contents').children();
+		var contentsCount = 0;
 		var colInfoArray = [];
 		var self = this;
 
 		return (
-			<div id="contents" style={{paddingTop:"10px"}}>
+			<div id='contents' style={{paddingTop:'10px', paddingLeft:'15px', paddingRight:'15px'}}>
 				{
 					currentRows.map(function(index) {
 						var resultRow = null;
 						var column = currentRows[index].firstChild;
 						while (column) {
-							var newRow = self.makeContentsCard(colInfoArray, childCount++);
+							var contentsParent = column.firstChild.firstChild;
+							var data = {};
+							data.title = $(contentsParent).children('input[name="title"]').val();
+							data.author = $(contentsParent).children('h5[name="author"]').text();
+							data.nickname = $(contentsParent).children('input[name="nickname"]').val();
+							data.updateDate = $(contentsParent).children('input[name="updateDate"]').val();
+							
+							var newRow = self.makeContentsRow(colInfoArray, data, contentsCount++);
 							if (newRow != null) {
 								resultRow = newRow;
 							}
@@ -80,10 +101,17 @@ class Body extends React.Component {
 					})
 				}
 				{
-					this.state.list.map(function(index) {
-						return self.makeContentsCard(colInfoArray, childCount + index);
+					this.state.list.map(function(data) {
+						return self.makeContentsRow(colInfoArray, data, contentsCount++);
 					})
 				}
+				<div className='row' key={'row-' + contentsCount}>
+					{
+						colInfoArray.slice(0, this.lastColIndex + 1).map(function(data) {
+							return self.makeContentsCard(data);
+						})
+					}
+				</div>
 			</div>
 		);
 	}
