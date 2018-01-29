@@ -1,0 +1,38 @@
+server:
+  port: 8889
+  
+security.basic.enabled: false
+#server.servlet-path: /admin
+
+
+
+#management:
+#  context-path: /admin
+  
+# Configuration of a local Git-repo for development locally without Docker
+# note that we are still using git; We just access the git-repo via file: protocol
+endpoints:
+  enabled: true
+  info:
+    enabled: true
+  metrics:
+    enabled: true
+  health:
+    enabled: true
+
+info:
+  component: Config Server
+  
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          clone-on-start: true
+          uri: ssh://git@bitbucket.org/hellobro/bookdream.git
+    bus:
+      enabled: true
+
+  rabbitmq:
+    host: 49.236.144.204
+    port: 5672
