@@ -32,7 +32,9 @@ class Body extends React.Component {
 				'nickname': 'nickname' + i,
 				'title': 'title' + i,
 				'author': 'author' + i,
-				'updateDate': 'updateDate' + i
+				'updateDate': 'updateDate' + i,
+				'image': 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
+				'impression': '핵 감명깊은 문구다.'
 			});
 		}
 		
@@ -40,8 +42,8 @@ class Body extends React.Component {
 	}
 
 	makeContentsRow(col, data, contentsCount) {
-		this.lastColIndex = contentsCount % this.maxColumnCount;
 		data.key = 'contentsCard-' + contentsCount;
+		this.lastColIndex = contentsCount % this.maxColumnCount;
 		col[this.lastColIndex] = data;
 
 		var newRow = null;
@@ -66,7 +68,9 @@ class Body extends React.Component {
 					nickname={data.nickname}
 					title={data.title}
 					author={data.author}
-					updateDate={data.updateDate}/>
+					updateDate={data.updateDate}
+					image={data.image}
+					impression={data.impression}/>
 			</div>
 		);
 	}
@@ -86,10 +90,12 @@ class Body extends React.Component {
 						while (column) {
 							var contentsParent = column.firstChild.firstChild;
 							var data = {};
-							data.title = $(contentsParent).children('input[name="title"]').val();
+							data.title = $(contentsParent).find('span[name="title"]').text();
 							data.author = $(contentsParent).children('h5[name="author"]').text();
-							data.nickname = $(contentsParent).children('input[name="nickname"]').val();
-							data.updateDate = $(contentsParent).children('input[name="updateDate"]').val();
+							data.nickname = $(contentsParent).find('span[name="nickname"]').text();
+							data.updateDate = $(contentsParent).find('span[name="updateDate"]').text();
+							data.image = $(contentsParent).find('img[name="image"]').attr('src');
+							data.impression = $(contentsParent).children('p[name="impression"]').text();
 							
 							var newRow = self.makeContentsRow(colInfoArray, data, contentsCount++);
 							if (newRow != null) {
