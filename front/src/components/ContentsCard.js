@@ -1,6 +1,22 @@
 import React from 'react';
 
 class ContentsCard extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	componentDidMount() {
+		$('.thumbnail').mouseover(function() {
+			$(this).addClass('alert-info');
+			$(this).css('cursor', 'pointer');
+
+		});
+		$('.thumbnail').mouseout(function() {
+			$(this).removeClass('alert-info');
+			$(this).css('cursor', 'arrow');
+		});
+	}
+
 	render() {
 		return (
 			<div className='thumbnail'>
