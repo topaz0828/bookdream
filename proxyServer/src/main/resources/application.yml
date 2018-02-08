@@ -1,0 +1,88 @@
+info:
+  component: Proxy Server
+  
+spring:
+  mvc:
+    static-path-pattern: /static/**
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true
+                  
+server:
+  port: 8088
+  undertow:
+    worker-threads: 128
+    io-threads: 16
+ 
+security:
+  require-ssl: false
+
+hystrix:
+  metrics:
+    enabled: false
+  
+
+
+endpoints:
+  env:
+    post:
+      enabled: false
+  shutdown:
+    enabled: false
+  enabled: false
+  sensitive: true
+
+   
+zuul:
+  ribbon-isolation-strategy: thread
+  retryable: true
+  host:
+    connect-timeout-millis: 60000
+    socket-timeout-millis:  10000
+ #   time-to-live: 500
+    max-per-route-connections: 20
+    max-total-connections: 200
+  ignoredServices: "*"
+  add-host-header: true
+  add-proxy-headers: true
+  routes:
+   register_user:
+      serviceId: register_user
+
+management:
+  add-application-context-header: false
+
+custom:
+  hystrix:
+    thread-timeout: 10000
+    read-timeout: 60000
+    connect-timeout: 60000
+    circuit-breaker:
+      enabled: true
+    timeout:
+      enabled: true
+    interrupt:
+      timeout:
+        enabled: true
+    threadpool:
+      default:
+        coreSize: 200
+        maximumSize: 200    
+  
+eureka:
+  port: 8761
+  instance:
+    preferIpAddress: true
+    hostname: localhost
+    statusPageUrlPath: /info
+    healthCheckUrlPath: /health
+    metadataMap:
+      instanceId: ${spring.application.name}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.port:8761}/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+    eureka-server-read-timeout-seconds: 8
+    eureka-server-connect-timeout-seconds: 5
