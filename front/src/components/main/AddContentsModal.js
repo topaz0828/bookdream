@@ -39,6 +39,8 @@ class AddContentsModal extends React.Component {
 		var inputValue = this.searchBookInput.val();
 		if (inputValue.length > 0) {
 			this.searchResultDropdown.addClass('open');
+			//서버와 통신해서 책정보를 검색해 운다.
+
 			// $.ajax({
 			// 	type: 'GET',
 			// 	url: 'https://dapi.kakao.com/v2/search/book',

@@ -10,6 +10,7 @@ class Body extends React.Component {
 				this.getList();
 			}
 		}
+		this.contents = props.contents;
 		this.maxColumnCount = 4;
 		this.lastColIndex = 0;
 		this.isRefresh = false;
@@ -26,15 +27,32 @@ class Body extends React.Component {
 	}
 
 	getList(isRefresh) {
+		//서버와 통신해서 컨텐츠를 가져온다.
+		// range 를 사용한다. all / my	
 		var newList = [];
-		for (var i = 0; i < 10; ++i) {
+		for (var i = 0; i < 5; ++i) {
 			newList.push({
-				'nickname': 'nickname' + i,
-				'title': 'title' + i,
-				'author': 'author' + i,
-				'updateDate': 'updateDate' + i,
-				'image': 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
-				'impression': '핵 감명깊은 문구다.'
+				reviewId: 'reviewId' + i,
+				nickname: 'nickname' + i,
+				title: 'title' + i,
+				author: 'author' + i,
+				updateDate: 'updateDate' + i,
+				image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
+				text: '핵 감명깊은 문구다.',
+				type: 'I' // I : impression, R : review
+			});
+		}
+
+		for (var i = 0; i < 5; ++i) {
+			newList.push({
+				reviewId: 'reviewId' + i,
+				nickname: 'nickname' + i,
+				title: 'title' + i,
+				author: 'author' + i,
+				updateDate: 'updateDate' + i,
+				image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
+				text: '핵 감명깊은 후기다.',
+				type: 'R' // I : impression, R : review
 			});
 		}
 		
@@ -66,12 +84,15 @@ class Body extends React.Component {
 		return (
 			<div className='col-sm-6 col-md-3' key={'col-' + data.key}>
 				<Card key={data.key}
+					reviewId={data.reviewId}
 					nickname={data.nickname}
 					title={data.title}
 					author={data.author}
 					updateDate={data.updateDate}
 					image={data.image}
-					impression={data.impression}/>
+					text={data.text}
+					type={data.type}
+					contents={this.contents}/>
 			</div>
 		);
 	}
@@ -114,7 +135,8 @@ class Body extends React.Component {
 								data.nickname = $(contentsParent).find('span[name="nickname"]').text();
 								data.updateDate = $(contentsParent).find('span[name="updateDate"]').text();
 								data.image = $(contentsParent).find('img[name="image"]').attr('src');
-								data.impression = $(contentsParent).children('p[name="impression"]').text();
+								data.text = $(contentsParent).children('p[name="text"]').text();
+								data.type = $(contentsParent).children('input[name="type"]').val();
 								
 								var newRow = self.makeContentsRow(colInfoArray, data, contentsCount++);
 								if (newRow != null) {
