@@ -1,30 +1,32 @@
 import React from 'react';
-import Header from './Header';
-import Body from './Body';
-import AddContentsModal from './AddContentsModal';
+import Contents from './main/Contents'
 import MyPage from './mypage/MyPage';
 
 class App extends React.Component {
+	componentDidMount() {
+		this.mainViewDiv = $('#mainView');
+		this.myPageDiv = $('#myPage');
+	}
+
 	moveMyPage() {
-		$('#mainView').hide();
-		$('#myPage').show();
+		this.mainViewDiv.hide();
+		this.myPageDiv.show();
+		this.myPage.getInfo();
 	}
 
 	moveMainView() {
-		$('#mainView').show();
-		$('#myPage').hide();
+		this.mainViewDiv.show();
+		this.myPageDiv.hide();
 	}
 
     render(){
         return (
-        		<div>
+        		<div className='container-fluid'>
         			<div id='mainView'>
-		                <Header moveMyPage={this.moveMyPage}/>
-		                <Body/>
-		                <AddContentsModal/>
+		                <Contents app={this} ref={(ref) => {this.contents = ref;}}/>
 		            </div>
 		            <div id='myPage' hidden='true'>
-		            	<MyPage moveMainView={this.moveMainView}/>
+		            	<MyPage app={this} ref={(ref) => {this.myPage = ref;}}/>
 		            </div>
 	            </div>
         );

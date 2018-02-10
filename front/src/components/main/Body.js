@@ -1,12 +1,10 @@
 import React from 'react';
-import ContentsCard from './ContentsCard'
+import Card from './Card'
 
 class Body extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			list : []
-		}
+		this.state = {list : []};
 		this.detectScrollPosition = () => {
 			if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)) {
 				this.getList();
@@ -14,18 +12,20 @@ class Body extends React.Component {
 		}
 		this.maxColumnCount = 4;
 		this.lastColIndex = 0;
+		this.isRefresh = false;
+		this.range = props.range;
+		this.contentsDivId = this.range + 'contents';
 	}
 
 	componentDidMount() {
 		window.addEventListener('scroll', this.detectScrollPosition, false);
-		this.getList();
 	}
 
 	componentWillUnmount() {
 		window.removeEventListener('scroll', this.detectScrollPosition, false);
 	}
 
-	getList() {
+	getList(isRefresh) {
 		var newList = [];
 		for (var i = 0; i < 10; ++i) {
 			newList.push({
@@ -38,6 +38,7 @@ class Body extends React.Component {
 			});
 		}
 		
+		this.isRefresh = isRefresh;
 		this.setState({list : newList});
 	}
 
@@ -64,7 +65,7 @@ class Body extends React.Component {
 	makeContentsCard(data) {
 		return (
 			<div className='col-sm-6 col-md-3' key={'col-' + data.key}>
-				<ContentsCard key={data.key}
+				<Card key={data.key}
 					nickname={data.nickname}
 					title={data.title}
 					author={data.author}
@@ -76,50 +77,69 @@ class Body extends React.Component {
 	}
 
 	render() {
-		var currentRows = $('#contents').children();
+		var currentRows = $('#' + this.contentsDivId).children();
 		var contentsCount = 0;
 		var colInfoArray = [];
 		var self = this;
 
-		return (
-			<div id='contents' style={{paddingTop:'10px', paddingLeft:'15px', paddingRight:'15px'}}>
-				{
-					currentRows.map(function(index) {
-						var resultRow = null;
-						var column = currentRows[index].firstChild;
-						while (column) {
-							var contentsParent = column.firstChild.firstChild;
-							var data = {};
-							data.title = $(contentsParent).find('span[name="title"]').text();
-							data.author = $(contentsParent).children('h5[name="author"]').text();
-							data.nickname = $(contentsParent).find('span[name="nickname"]').text();
-							data.updateDate = $(contentsParent).find('span[name="updateDate"]').text();
-							data.image = $(contentsParent).find('img[name="image"]').attr('src');
-							data.impression = $(contentsParent).children('p[name="impression"]').text();
-							
-							var newRow = self.makeContentsRow(colInfoArray, data, contentsCount++);
-							if (newRow != null) {
-								resultRow = newRow;
-							}
-							column = column.nextSibling;
-						}
-						return resultRow;
-					})
-				}
-				{
-					this.state.list.map(function(data) {
-						return self.makeContentsRow(colInfoArray, data, contentsCount++);
-					})
-				}
-				<div className='row' key={'row-' + contentsCount}>
+		if (this.isRefresh) {
+			return (
+				<div id={self.contentsDivId} style={{paddingTop:'10px', paddingLeft:'15px', paddingRight:'15px'}}>
+					{
+						this.state.list.map(function(data) {
+							return self.makeContentsRow(colInfoArray, data, contentsCount++);
+						})
+					}
+					<div className='row' key={'row-' + contentsCount}>
 					{
 						colInfoArray.slice(0, this.lastColIndex + 1).map(function(data) {
 							return self.makeContentsCard(data);
 						})
 					}
+					</div>
 				</div>
-			</div>
-		);
+			);
+		} else {
+			return (
+				<div id={self.contentsDivId} style={{paddingTop:'10px', paddingLeft:'15px', paddingRight:'15px'}}>
+					{
+						currentRows.map(function(index) {
+							var resultRow = null;
+							var column = currentRows[index].firstChild;
+							while (column) {
+								var contentsParent = column.firstChild.firstChild;
+								var data = {};
+								data.title = $(contentsParent).find('span[name="title"]').text();
+								data.author = $(contentsParent).children('h5[name="author"]').text();
+								data.nickname = $(contentsParent).find('span[name="nickname"]').text();
+								data.updateDate = $(contentsParent).find('span[name="updateDate"]').text();
+								data.image = $(contentsParent).find('img[name="image"]').attr('src');
+								data.impression = $(contentsParent).children('p[name="impression"]').text();
+								
+								var newRow = self.makeContentsRow(colInfoArray, data, contentsCount++);
+								if (newRow != null) {
+									resultRow = newRow;
+								}
+								column = column.nextSibling;
+							}
+							return resultRow;
+						})
+					}
+					{
+						this.state.list.map(function(data) {
+							return self.makeContentsRow(colInfoArray, data, contentsCount++);
+						})
+					}
+					<div className='row' key={'row-' + contentsCount}>
+					{
+						colInfoArray.slice(0, this.lastColIndex + 1).map(function(data) {
+							return self.makeContentsCard(data);
+						})
+					}
+					</div>
+				</div>
+			);
+		}
 	}
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-class ContentsCard extends React.Component {
+class Card extends React.Component {
 	constructor(props) {
 		super(props);
 	}
@@ -35,4 +35,4 @@ class ContentsCard extends React.Component {
 	}
 }
 
-export default ContentsCard;
+export default Card;

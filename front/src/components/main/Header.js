@@ -3,10 +3,7 @@ import React from 'react';
 class Header extends React.Component {
 	constructor(props) {
 		super(props);
-		this.app = props.app;
-		this.moveMyPage = () => {
-			this.app.moveMyPage();
-		}
+		this.moveMyPage = props.moveMyPage;
 	}
 
 	render() {
@@ -14,7 +11,7 @@ class Header extends React.Component {
 			<table width='100%'>
 				<tbody>
 					<tr>
-						<td className="h1" style={{paddingTop: '15px', paddingLeft: '30px'}}>
+						<td className="h1" style={{paddingTop: '15px', paddingLeft: '10px'}}>
 							Bookdream
 						</td>
 						<td align='right' style={{paddingTop: '15px'}}>
