@@ -1,0 +1,134 @@
+# ************************************************************
+# Sequel Pro SQL dump
+# Version 4541
+#
+# http://www.sequelpro.com/
+# https://github.com/sequelpro/sequelpro
+#
+# Host: 49.236.144.204 (MySQL 5.7.21-log)
+# Database: bookdream
+# Generation Time: 2018-02-13 14:41:05 +0000
+# ************************************************************
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+# Dump of table BOOK_CATEGORY
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `BOOK_CATEGORY`;
+
+CREATE TABLE `BOOK_CATEGORY` (
+  `ID` int(11) NOT NULL,
+  `NAME` text NOT NULL COMMENT '국내도서>만화>교향만화>만화작법',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table BOOK_INFO
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `BOOK_INFO`;
+
+CREATE TABLE `BOOK_INFO` (
+  `ID` int(11) NOT NULL COMMENT 'book id',
+  `PUB_ID` int(11) NOT NULL COMMENT '출판사',
+  `CATEGORY_ID` int(11) NOT NULL COMMENT 'CATEGORY',
+  `TITLE` varchar(100) NOT NULL COMMENT '제목',
+  `DESCRIPTION` text COMMENT '서평',
+  `IMAGE` varchar(100) DEFAULT NULL COMMENT 'IMAGE URL',
+  `AUTHOR` text COMMENT '저자',
+  `TRANSLATOR` text COMMENT '옮긴이',
+  `PRICE` varchar(100) DEFAULT NULL COMMENT '가격',
+  `RARITY` char(1) DEFAULT NULL COMMENT '1~9',
+  `PAGES` int(11) DEFAULT NULL COMMENT '쪽수',
+  `ISBN` varchar(45) DEFAULT NULL,
+  `UPDATE_DATE` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'UPDATE DATE',
+  PRIMARY KEY (`ID`,`PUB_ID`,`CATEGORY_ID`),
+  KEY `FK_PUBLISHER_INFO_TO_BOOK_INFO_1` (`PUB_ID`),
+  KEY `FK_BOOK_CATEGORY_TO_BOOK_INFO_1` (`CATEGORY_ID`),
+  CONSTRAINT `FK_BOOK_CATEGORY_TO_BOOK_INFO_1` FOREIGN KEY (`CATEGORY_ID`) REFERENCES `BOOK_CATEGORY` (`ID`),
+  CONSTRAINT `FK_PUBLISHER_INFO_TO_BOOK_INFO_1` FOREIGN KEY (`PUB_ID`) REFERENCES `PUBLISHER_INFO` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table BOOK_REVIEW
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `BOOK_REVIEW`;
+
+CREATE TABLE `BOOK_REVIEW` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT '책 리뷰 ID',
+  `USER_ID` varchar(100) NOT NULL COMMENT 'social id',
+  `BOOK_ID` int(11) NOT NULL COMMENT 'book id',
+  `TYPE` char(1) NOT NULL COMMENT '타입 I:인상깊은 구절 / R:리뷰',
+  `TEXT` text NOT NULL COMMENT '내용',
+  `UPDATE_DATE` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'UPDATE DATE',
+  PRIMARY KEY (`ID`),
+  KEY `BOOK_ID` (`BOOK_ID`),
+  KEY `USER_ID` (`USER_ID`),
+  CONSTRAINT `BOOK_REVIEW_ibfk_1` FOREIGN KEY (`BOOK_ID`) REFERENCES `BOOK_INFO` (`ID`),
+  CONSTRAINT `BOOK_REVIEW_ibfk_2` FOREIGN KEY (`USER_ID`) REFERENCES `USER_INFO` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table BOOKMARK
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `BOOKMARK`;
+
+CREATE TABLE `BOOKMARK` (
+  `USER_ID` varchar(100) NOT NULL,
+  `COUNT` varchar(45) NOT NULL,
+  PRIMARY KEY (`USER_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table PUBLISHER_INFO
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `PUBLISHER_INFO`;
+
+CREATE TABLE `PUBLISHER_INFO` (
+  `ID` int(11) NOT NULL,
+  `NAME` varchar(100) DEFAULT NULL COMMENT '출판사명',
+  `DESCRIPTION` text,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table USER_INFO
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `USER_INFO`;
+
+CREATE TABLE `USER_INFO` (
+  `ID` varchar(100) NOT NULL COMMENT 'social id',
+  `EMAIL` varchar(100) NOT NULL,
+  `NICKNAME` varchar(100) NOT NULL,
+  `OAUTH_SITE` varchar(50) NOT NULL COMMENT '가입사이트 (facebook)',
+  `UPDATE_DATE` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입일',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
