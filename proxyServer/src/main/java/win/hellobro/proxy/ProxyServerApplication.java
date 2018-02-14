@@ -54,7 +54,7 @@ public class ProxyServerApplication {
 	
 	@PostConstruct
 	void setPrep() {
-		
+		System.out.println("");
 		HystrixThreadPoolProperties.Setter().withMaxQueueSize(20).withAllowMaximumSizeToDivergeFromCoreSize(true);
 		
 		ConfigurationManager.getConfigInstance().setProperty("ribbon.ReadTimeout", ribbonReadTimeout);
