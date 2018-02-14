@@ -86,3 +86,5 @@ eureka:
     fetchRegistry: true
     eureka-server-read-timeout-seconds: 8
     eureka-server-connect-timeout-seconds: 5
+
+

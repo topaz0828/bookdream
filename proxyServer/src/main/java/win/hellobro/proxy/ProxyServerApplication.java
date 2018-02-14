@@ -53,7 +53,7 @@ public class ProxyServerApplication {
 	}
 	
 	@PostConstruct
-	void CustomSetZuulProp() {
+	void setPrep() {
 		
 		HystrixThreadPoolProperties.Setter().withMaxQueueSize(20).withAllowMaximumSizeToDivergeFromCoreSize(true);
 		
@@ -62,12 +62,12 @@ public class ProxyServerApplication {
 		
 		ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.circuitBreaker.enabled", hystrixCircuitBreakerEnable);
 		ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.timeout.enabled",hystrixTimeOutEnable);
-		
+
 		ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.interruptOnTimeout", hystrixInterruptTimeOutEnable);
 		ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", hystrixTimeOut);
 
-	    System.setProperty("hystrix.stream.endpoint.enabled", hystrixEndPonitEnable?"true":"false"); //disable hystrix.stream	
-		
+	    System.setProperty("hystrix.stream.endpoint.enabled", hystrixEndPonitEnable?"true":"false"); //disable hystrix.stream
+
 	    ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.coreSize", coreSize);
 		ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maximumSize", maximumSize);
 		ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", maxQueueSize);

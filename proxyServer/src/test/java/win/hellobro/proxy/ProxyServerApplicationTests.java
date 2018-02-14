@@ -11,6 +11,7 @@ public class ProxyServerApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		;
 	}
 
 }
