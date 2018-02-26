@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listener>
+	<port number="3001" type="console"/>
+	<port number="3002" type="deploy" id="test" password="S0p8q/ylzIXELzui1jrVlA=="/>
+    <port type="jetty" http="3003" maxIdleTime="30000" requestHeaderSize="8192"
+          descriptor="./webapp/WEB-INF/web.xml"
+          resourceBase="./webapp" contextPath="/"/>
+</listener>
