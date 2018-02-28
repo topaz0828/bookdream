@@ -1,4 +1,4 @@
-package win.hellobro.reviewDream;
+package win.hellobro.review;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package win.hellobro.reviewDream.controller;
+package win.hellobro.review.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
