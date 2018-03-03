@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html>
-	<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="/jui/ui.min.css" />
-	<link rel="stylesheet" href="/jui/ui-jennifer.min.css" />
-	
-	<head>
-		<meta charset="UTF-8">
-		<title>Bookdream</title>
-	</head>
-	<body class="jui">
-		<div align="center" style="padding-top: 150px;">
-			<h1>Welcome Bookdream!</h1>
-			<form name="signup" method="POST" action="/">
-				<input type="hidden" name="from" value="">
-				<table>
-					<tr>
-						<td>email<br><input class="input large" style="width: 250px;" name="email"></td>
-					</tr>
-					<tr>
-						<td style="padding-top:10px;">nickname<br><input class="input large" style="width: 250px;" name="nickname"></td>
-					</tr>
-					<tr>
-						<td align="center" colspan="2" style="padding-top:10px;"><a class="btn large focus" onclick="document.signup.submit();">Sign up</a></td>
-					</tr>
-				</table>
-			</form>
-		</div>
-		<script type="text/javascript">
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/jui/ui.min.css" />
+<link rel="stylesheet" href="/jui/ui-jennifer.min.css" />
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bookdream</title>
+</head>
+<body class="jui">
+<div align="center" style="padding-top: 150px;">
+    <h1>Welcome Bookdream!</h1>
+    <form name="signup" method="POST" action="/api/user/signup">
+        <input type="hidden" name="id" value="">
+        <input type="hidden" name="picture" value="">
+        <input type="hidden" name="from" value="">
+        <table>
+            <tr>
+                <td align="center"><img name="profilePicture" src=""></td>
+            </tr>
+            <tr>
+                <td>email<br><input class="input large" style="width: 250px;" name="email"></td>
+            </tr>
+            <tr>
+                <td style="padding-top:10px;">nickname<br><input class="input large" style="width: 250px;" name="nickname"></td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2" style="padding-top:10px;"><a class="btn large focus" onclick="document.signup.submit();">Sign up</a></td>
+            </tr>
+        </table>
+    </form>
+</div>
+<script type="text/javascript">
 			var url = new URL(document.location);
 			document.signup.from.value = url.searchParams.get("from");
 			document.signup.email.value = url.searchParams.get("email");
 			document.signup.nickname.value = url.searchParams.get("name");
+			document.signup.id.value = url.searchParams.get("id");
+			document.signup.picture.value = url.searchParams.get("picture");
+			document.signup.profilePicture.src = document.signup.picture.value;
 		</script>
-	</body>
+</body>
 </html>

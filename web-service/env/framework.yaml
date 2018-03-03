@@ -1,6 +1,6 @@
 framework :
    container :
-      #- a.b.c.Test
+      - win.hellobro.web.WebService
       
    autoReload :
       scheduler : yes
@@ -15,4 +15,6 @@ framework :
       org.quartz.jobStore.misfireThreshold : 60000
 
    external :
-      test : abcde
+      bookApi :
+         uri : https://dapi.kakao.com/v2/search/book
+         key : 7b15cef8dfbdedf8cd3fb26ae3262097

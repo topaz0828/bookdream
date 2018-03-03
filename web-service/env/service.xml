@@ -1,3 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services>
+    <serviceDirectory class="win.hellobro.web.service.Finder" path="/search"/>
+    <serviceDirectory class="win.hellobro.web.service.User" path="/user"/>
+    <serviceDirectory class="win.hellobro.web.service.FacebookSignin" path="/signin/facebook">
+        <serviceVariable serviceName="oauth-uri">
+            <variable name="loginUri" value="https://www.facebook.com/v2.12/dialog/oauth?"/>
+            <variable name="appId" value="242352022831116"/>
+            <variable name="redirectUri" value="http://localhost:3003/api/signin/facebook/callback"/>
+        </serviceVariable>
+        <serviceVariable serviceName="callback">
+            <variable name="accessTokenUri" value="https://graph.facebook.com/v2.12/oauth/access_token"/>
+            <variable name="clientSecretKey" value="0c6e534a8701920835150e679aed2191"/>
+            <variable name="userInfoUri" value="https://graph.facebook.com/me"/>
+        </serviceVariable>
+    </serviceDirectory>
 </services>
