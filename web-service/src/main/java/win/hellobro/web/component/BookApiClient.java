@@ -69,10 +69,20 @@ public class BookApiClient {
 
 		for (Map<String, Object> book : bookInfoList) {
 			BookSearchResult searchResult = new BookSearchResult();
-			searchResult.setAuthor(((List<String>) book.get("authors")).get(0));
+			List<String> authors = (List<String>) book.get("authors");
+			if (!authors.isEmpty()) {
+				searchResult.setAuthor(authors.get(0));
+			}
+			String[] isbn = ((String) book.get("isbn")).split(" ");
+			if (isbn.length > 0) {
+				searchResult.setIsbn(((String) book.get("isbn")).split(" ")[0]);
+			} else {
+				searchResult.setIsbn((String) book.get("isbn"));
+			}
+
+
 			searchResult.setCategory((String) book.get("category"));
 			searchResult.setContents((String) book.get("contents"));
-			searchResult.setIsbn(((String) book.get("isbn")).split(" ")[0]);
 			searchResult.setPublisher((String) book.get("publisher"));
 			searchResult.setThumbnail((String) book.get("thumbnail"));
 			searchResult.setTitle((String) book.get("title"));

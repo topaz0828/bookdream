@@ -18919,33 +18919,100 @@ var AddContentsModal = function (_React$Component) {
 				_this2.reviewBack.show();
 			});
 			this.searchResultDropdown = $('#searchResultDropdown');
-			// $('#addInputClearButton').on('click', () => {
-			// 	$('input[name=impressionInput]').val('');
-			// 	$('#reviewInput').val('');
-			// });
+			this.selectedBookView = $('#selectedBookView');
+			this.selectedBook = null;
 		}
 	}, {
 		key: 'findBook',
 		value: function findBook() {
+			var self = this;
 			var inputValue = this.searchBookInput.val();
 			if (inputValue.length > 0) {
-				this.searchResultDropdown.addClass('open');
-				//서버와 통신해서 책정보를 검색해 운다.
+				$.ajax({
+					type: 'GET',
+					url: '/api/search/book',
+					dataType: 'json',
+					data: { q: inputValue }
+				}).done(function (res) {
+					self.searchResultDropdown.empty();
 
-				// $.ajax({
-				// 	type: 'GET',
-				// 	url: 'https://dapi.kakao.com/v2/search/book',
-				// 	crossDomain: true,
-				// 	dataType: 'json',
-				// 	beforeSend: function(xhr) {
-				// 		xhr.setRequestHeader('Authorization', 'KakaoAK 7b15cef8dfbdedf8cd3fb26ae3262097');
-				// 	},
-				// 	data: {query: inputValue},
-				// 	success: function(res) { 
-				// 		console.log(res);
-				// 	}
-				// });
+					var ul = document.createElement('ul');
+					ul.className = 'dropdown-menu';
+					ul.setAttribute('role', 'menu');
+					ul.style.width = '100%';
+					for (var i in res) {
+						var a = document.createElement('a');
+						a.setAttribute('role', 'menuitem');
+						a.setAttribute('tabIndex', '-1');
+						a.style.fontSize = '17px';
+						a.style.cursor = 'pointer';
+						a.textContent = res[i].title;
+						a.searchInfo = res[i];
+						$(a).click(function (event) {
+							self.selectBook(event.target.searchInfo);
+						});
+						var li = document.createElement('li');
+						li.setAttribute('role', 'presentation');
+						$(li).append(a);
+						$(ul).append(li);
+					}
+
+					self.searchResultDropdown.append(ul);
+					self.searchResultDropdown.addClass('open');
+				}).fail(function () {
+					alert('Server error.');
+				});
 			}
+		}
+	}, {
+		key: 'selectBook',
+		value: function selectBook(book) {
+			console.log(book);
+			this.selectedBook = book;
+			this.selectedBookView.html('<table>' + '<tr><td><img src="' + book.thumbnail + '"/></td>' + '<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' + '</table>');
+
+			this.searchBookInput.val('');
+			this.searchResultDropdown.removeClass('open');
+		}
+	}, {
+		key: 'save',
+		value: function save() {
+			if (this.selectedBook != null) {
+				var url,
+				    data = {};
+				data.book = this.selectedBook;
+
+				if (this.impressionButton.hasClass('active')) {
+					data.impression = [];
+					url = '/api/user/impression';
+					var impressionInput = $('input[name=impressionInput]');
+					for (var i in impressionInput) {
+						data.impression.push(impressionInput[i].value);
+					}
+				} else {
+					url = '/api/user/review';
+					data.reivew = $('#reviewInput').val();
+				}
+
+				var self = this;
+				$.ajax({
+					type: 'POST',
+					url: url,
+					data: JSON.stringify(data)
+				}).done(function () {
+					self.close();
+				}).fail(function () {
+					alert('Server error.');
+				});
+			}
+		}
+	}, {
+		key: 'close',
+		value: function close() {
+			this.selectedBook = null;
+			this.selectedBookView.empty();
+			this.searchBookInput.val('');
+			this.searchResultDropdown.removeClass('open');
 		}
 	}, {
 		key: 'renderInputView',
@@ -18970,46 +19037,7 @@ var AddContentsModal = function (_React$Component) {
 				_react2.default.createElement(
 					'div',
 					{ id: 'searchResultDropdown', className: 'dropdown', width: '100%' },
-					_react2.default.createElement(
-						'ul',
-						{ className: 'dropdown-menu', style: { width: '100%' } },
-						_react2.default.createElement(
-							'li',
-							{ role: 'presentation' },
-							_react2.default.createElement(
-								'a',
-								{ role: 'menuitem', tabIndex: '-1', href: '#', style: { fontSize: '17px' } },
-								'Action'
-							)
-						),
-						_react2.default.createElement(
-							'li',
-							{ role: 'presentation' },
-							_react2.default.createElement(
-								'a',
-								{ role: 'menuitem', tabIndex: '-1', href: '#', style: { fontSize: '17px' } },
-								'Another action'
-							)
-						),
-						_react2.default.createElement(
-							'li',
-							{ role: 'presentation' },
-							_react2.default.createElement(
-								'a',
-								{ role: 'menuitem', tabIndex: '-1', href: '#', style: { fontSize: '17px' } },
-								'Something else here'
-							)
-						),
-						_react2.default.createElement(
-							'li',
-							{ role: 'presentation' },
-							_react2.default.createElement(
-								'a',
-								{ role: 'menuitem', tabIndex: '-1', href: '#', style: { fontSize: '17px' } },
-								'Separated link'
-							)
-						)
-					)
+					_react2.default.createElement('ul', { className: 'dropdown-menu', role: 'menu', style: { width: '100%' } })
 				)
 			);
 		}
@@ -19019,9 +19047,10 @@ var AddContentsModal = function (_React$Component) {
 			return _react2.default.createElement(
 				'div',
 				null,
+				_react2.default.createElement('div', { id: 'selectedBookView', style: { paddingTop: '10px' } }),
 				_react2.default.createElement(
 					'div',
-					{ style: { paddingTop: '30px', paddingBottom: '20px' } },
+					{ style: { paddingTop: '20px', paddingBottom: '10px' } },
 					_react2.default.createElement(
 						'ul',
 						{ className: 'nav nav-tabs' },
@@ -19051,27 +19080,27 @@ var AddContentsModal = function (_React$Component) {
 					_react2.default.createElement(
 						'div',
 						{ style: { paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 1st impression', 'aria-describedby': 'sizing-addon2' })
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 1st impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
 					),
 					_react2.default.createElement(
 						'div',
 						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 2nd impression', 'aria-describedby': 'sizing-addon2' })
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 2nd impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
 					),
 					_react2.default.createElement(
 						'div',
 						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 3rd impression', 'aria-describedby': 'sizing-addon2' })
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 3rd impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
 					),
 					_react2.default.createElement(
 						'div',
 						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 4st impression', 'aria-describedby': 'sizing-addon2' })
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 4st impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
 					),
 					_react2.default.createElement(
 						'div',
 						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 5st impression', 'aria-describedby': 'sizing-addon2' })
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 5st impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
 					)
 				),
 				_react2.default.createElement(
@@ -19084,6 +19113,8 @@ var AddContentsModal = function (_React$Component) {
 	}, {
 		key: 'render',
 		value: function render() {
+			var _this3 = this;
+
 			return _react2.default.createElement(
 				'div',
 				{ className: 'modal fade', id: 'addContentsModal', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'myModalLabel', 'aria-hidden': 'true' },
@@ -19122,12 +19153,16 @@ var AddContentsModal = function (_React$Component) {
 							{ className: 'modal-footer' },
 							_react2.default.createElement(
 								'button',
-								{ type: 'button', className: 'btn btn-default', 'data-dismiss': 'modal' },
+								{ type: 'button', className: 'btn btn-default', 'data-dismiss': 'modal', onClick: function onClick() {
+										return _this3.close();
+									} },
 								'Close'
 							),
 							_react2.default.createElement(
 								'button',
-								{ type: 'button', className: 'btn btn-primary', 'data-dismiss': 'modal' },
+								{ type: 'button', className: 'btn btn-primary', 'data-dismiss': 'modal', onClick: function onClick() {
+										return _this3.save();
+									} },
 								'Save'
 							)
 						)
