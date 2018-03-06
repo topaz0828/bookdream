@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hellobro.reviews.dao.ReviewDao">
+
+    <select id="select" resultType="map">
+        SELECT * FROM BOOK_REVIEW
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BOOK_REVIEW
+    </select>
+
+    <select id="selectOne" resultType="map">
+        SELECT * FROM BOOK_REVIEW WHERE idx = #{idx}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO BOOK_REVIEW ( user_name, subject, content, reg_datetime )
+        VALUES ( #{user_name}, #{subject}, #{content} , #{reg_datetime} )
+    </insert>
+
+    <update id="update">
+        UPDATE BOOK_REVIEW
+        SET user_name = #{user_name}, subject = #{subject}, content = #{content}, reg_datetime = #{reg_datetime}
+        WHERE idx = #{idx} LIMIT 1
+    </update>
+
+    <delete id="delete">
+        DELETE FROM BOOK_REVIEW WHERE idx = #{idx}
+    </delete>
+
+</mapper>
