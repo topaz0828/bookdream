@@ -78,7 +78,7 @@ class AddContentsModal extends React.Component {
 		console.log(book);
 		this.selectedBook = book;
 		this.selectedBookView.html('<table>' + 
-										'<tr><td><img src="' + book.thumbnail + '"/></td>' + 
+										'<tr><td style="padding-left: 20px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + 
 										'<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' +
 									'</table>');
 	
@@ -147,7 +147,7 @@ class AddContentsModal extends React.Component {
 			<div>
 				<div id='selectedBookView' style={{paddingTop: '10px'}}>
 				</div>
-				<div style={{paddingTop: '20px', paddingBottom: '10px'}}>
+				<div style={{paddingTop: '10px', paddingBottom: '10px'}}>
 					<ul className="nav nav-tabs">
 						<li role="presentation" className="active" id='impressionButton'><a href="#">Impression</a></li>
 						<li role="presentation" id='reviewButton'><a href="#">Review</a></li>

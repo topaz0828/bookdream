@@ -7,15 +7,19 @@ class Body extends React.Component {
 		this.state = {list : []};
 		this.detectScrollPosition = () => {
 			if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)) {
-				this.getList();
+				this.getListByScroll();
 			}
 		}
 		this.contents = props.contents;
 		this.maxColumnCount = 4;
 		this.lastColIndex = 0;
-		this.isRefresh = false;
-		this.range = props.range;
 		this.contentsDivId = this.range + 'contents';
+
+		this.isRefresh = false;
+		this.range = props.range; // all / my
+		this.pageIndex = 0;
+		this.query = ''; 
+		this.isbn = []; // 쿼리로 검색 후 검색에 사용된 isbn을 저장해 뒀다가 스크롤이동 시 재사용 한다.
 	}
 
 	componentDidMount() {
@@ -26,38 +30,42 @@ class Body extends React.Component {
 		window.removeEventListener('scroll', this.detectScrollPosition, false);
 	}
 
-	getList(isRefresh) {
-		//서버와 통신해서 컨텐츠를 가져온다.
-		// range 를 사용한다. all / my	
-		var newList = [];
-		for (var i = 0; i < 5; ++i) {
-			newList.push({
-				reviewId: 'reviewId' + i,
-				nickname: 'nickname' + i,
-				title: 'title' + i,
-				author: 'author' + i,
-				updateDate: 'updateDate' + i,
-				image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
-				text: '핵 감명깊은 문구다.',
-				type: 'I' // I : impression, R : review
-			});
-		}
+	getListByScroll() {
+		this.isRefresh = false;
+		this.getList({isbn: [], range: this.range, pageIndex: this.pageIndex});
+	}
 
-		for (var i = 0; i < 5; ++i) {
-			newList.push({
-				reviewId: 'reviewId' + i,
-				nickname: 'nickname' + i,
-				title: 'title' + i,
-				author: 'author' + i,
-				updateDate: 'updateDate' + i,
-				image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
-				text: '핵 감명깊은 후기다.',
-				type: 'R' // I : impression, R : review
+	getListBySearchInput(query) {
+		this.isRefresh = true;
+		this.getList({query: query, range: this.range, pageIndex: this.pageIndex});
+	}
+
+	getList(data) {
+		var self = this;
+		$.ajax({
+				type: 'GET',
+				url: '/api/search/contents-list',
+				dataType: 'json',
+				data: data,
+			}).done(function(res) {
+				var newList = [];
+				for (var i = 0; i < 5; ++i) {
+					newList.push({
+						reviewId: 'reviewId' + i,
+						nickname: 'nickname' + i,
+						title: 'title' + i,
+						author: 'author' + i,
+						updateDate: 'updateDate' + i,
+						image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
+						text: '핵 감명깊은 문구다.',
+						type: 'I' // I : impression, R : review
+					});
+				}
+				
+				self.setState({list : newList});
+			}).fail(function() {
+				alert('Server error.');
 			});
-		}
-		
-		this.isRefresh = isRefresh;
-		this.setState({list : newList});
 	}
 
 	makeContentsRow(col, data, contentsCount) {
@@ -105,7 +113,7 @@ class Body extends React.Component {
 
 		if (this.isRefresh) {
 			return (
-				<div id={self.contentsDivId} style={{paddingTop:'10px', paddingLeft:'15px', paddingRight:'15px'}}>
+				<div id={self.contentsDivId} style={{paddingTop:'20px', paddingLeft:'15px', paddingRight:'15px'}}>
 					{
 						this.state.list.map(function(data) {
 							return self.makeContentsRow(colInfoArray, data, contentsCount++);
@@ -122,7 +130,7 @@ class Body extends React.Component {
 			);
 		} else {
 			return (
-				<div id={self.contentsDivId} style={{paddingTop:'10px', paddingLeft:'15px', paddingRight:'15px'}}>
+				<div id={self.contentsDivId} style={{paddingTop:'20px', paddingLeft:'15px', paddingRight:'15px'}}>
 					{
 						currentRows.map(function(index) {
 							var resultRow = null;
