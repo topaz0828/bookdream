@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services>
-    <serviceDirectory class="win.hellobro.web.service.Finder" path="/search"/>
     <serviceDirectory class="win.hellobro.web.service.User" path="/user"/>
+    <serviceDirectory class="win.hellobro.web.service.Finder" path="/search">
+        <serviceVariable serviceName="book">
+            <variable name="kakaoApiUri" value="https://dapi.kakao.com/v2/search/book"/>
+            <variable name="kakaoApiKey" value="7b15cef8dfbdedf8cd3fb26ae3262097"/>
+        </serviceVariable>
+    </serviceDirectory>
     <serviceDirectory class="win.hellobro.web.service.FacebookSignin" path="/signin/facebook">
         <serviceVariable serviceName="oauth-uri">
             <variable name="loginUri" value="https://www.facebook.com/v2.12/dialog/oauth?"/>

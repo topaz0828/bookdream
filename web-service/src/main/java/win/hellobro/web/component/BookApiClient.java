@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringEncoder;
 import io.netty.util.CharsetUtil;
+import io.netty.util.internal.StringUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import team.balam.exof.client.Client;
 import team.balam.exof.client.DefaultClient;
@@ -16,22 +17,18 @@ import win.hellobro.web.component.part.HttpsClientCodec;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class BookApiClient {
-	private static final String API_URI;
-	private static final String API_KEY;
-	static {
-		Map<String, String> bookApiInfo = WebService.getConfig("bookApi");
-		API_URI = bookApiInfo.get("uri");
-		API_KEY = "KakaoAK " + bookApiInfo.get("key");
-	}
-
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
 	private BookApiClient() {
+	}
 
+	public static List<BookSearchResult> search(String apiUri, String apiKey, String query) throws Exception {
+		return search(apiUri, apiKey, query, 10);
 	}
 
 	/**
@@ -41,19 +38,19 @@ public class BookApiClient {
 	 * @throws Exception api 요청 실패 시 발생
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<BookSearchResult> search(String query) throws Exception {
-		URI uri = new URI(API_URI);
+	public static List<BookSearchResult> search(String apiUri, String apiKey, String query, int resultCount) throws Exception {
+		URI uri = new URI(apiUri);
 		QueryStringEncoder queryStringEncoder = new QueryStringEncoder(uri.getPath());
 		queryStringEncoder.addParam("query", query);
 		queryStringEncoder.addParam("sort", "accuracy");
-		queryStringEncoder.addParam("size", "10");
+		queryStringEncoder.addParam("size", String.valueOf(resultCount));
 
 		FullHttpResponse response;
 
 		try (Client client = new DefaultClient(new HttpsClientCodec())) {
 			HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, queryStringEncoder.toString());
 			httpRequest.headers().set(HttpHeaderNames.HOST, uri.getHost());
-			httpRequest.headers().set("Authorization", API_KEY);
+			httpRequest.headers().set("Authorization", apiKey);
 
 			client.connect(uri.getHost(), 443);
 			response = client.sendAndWait(httpRequest);
@@ -65,6 +62,10 @@ public class BookApiClient {
 	@SuppressWarnings("unchecked")
 	private static List<BookSearchResult> convertResult(Map<String, Object> jsonResult) {
 		List<Map<String, Object>> bookInfoList = (List<Map<String, Object>>) jsonResult.get("documents");
+		if (bookInfoList == null) {
+			return Collections.emptyList();
+		}
+
 		List<BookSearchResult> searchResults = new ArrayList<>(bookInfoList.size());
 
 		for (Map<String, Object> book : bookInfoList) {
@@ -73,13 +74,12 @@ public class BookApiClient {
 			if (!authors.isEmpty()) {
 				searchResult.setAuthor(authors.get(0));
 			}
-			String[] isbn = ((String) book.get("isbn")).split(" ");
-			if (isbn.length > 0) {
-				searchResult.setIsbn(((String) book.get("isbn")).split(" ")[0]);
-			} else {
-				searchResult.setIsbn((String) book.get("isbn"));
-			}
 
+			String isbn = (String) book.get("isbn");
+			if (!StringUtil.isNullOrEmpty(isbn)) {
+				String[] isbnArray = isbn.split(" ");
+				searchResult.setIsbn(isbnArray[0]);
+			}
 
 			searchResult.setCategory((String) book.get("category"));
 			searchResult.setContents((String) book.get("contents"));

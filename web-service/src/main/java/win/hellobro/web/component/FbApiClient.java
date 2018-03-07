@@ -20,7 +20,6 @@ public class FbApiClient {
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
 	private FbApiClient() {
-
 	}
 
 	@SuppressWarnings("unchecked")

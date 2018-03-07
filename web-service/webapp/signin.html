@@ -8,7 +8,7 @@
 <!-- <script src="/oauth/facebook.js"></script> -->
 <script type="text/javascript">
 		function login() {
-			$.get( "/api/signin/facebook/oauth-uri", function(data) {
+			$.get("/api/signin/facebook/oauth-uri", function(data) {
 				document.location = data;
 			});
 		}

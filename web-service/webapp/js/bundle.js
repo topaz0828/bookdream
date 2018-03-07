@@ -973,15 +973,19 @@ var Body = function (_React$Component) {
 		_this.state = { list: [] };
 		_this.detectScrollPosition = function () {
 			if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-				_this.getList();
+				_this.getListByScroll();
 			}
 		};
 		_this.contents = props.contents;
 		_this.maxColumnCount = 4;
 		_this.lastColIndex = 0;
-		_this.isRefresh = false;
-		_this.range = props.range;
 		_this.contentsDivId = _this.range + 'contents';
+
+		_this.isRefresh = false;
+		_this.range = props.range; // all / my
+		_this.pageIndex = 0;
+		_this.query = '';
+		_this.isbn = []; // 쿼리로 검색 후 검색에 사용된 isbn을 저장해 뒀다가 스크롤이동 시 재사용 한다.
 		return _this;
 	}
 
@@ -996,39 +1000,45 @@ var Body = function (_React$Component) {
 			window.removeEventListener('scroll', this.detectScrollPosition, false);
 		}
 	}, {
+		key: 'getListByScroll',
+		value: function getListByScroll() {
+			this.isRefresh = false;
+			this.getList({ isbn: [], range: this.range, pageIndex: this.pageIndex });
+		}
+	}, {
+		key: 'getListBySearchInput',
+		value: function getListBySearchInput(query) {
+			this.isRefresh = true;
+			this.getList({ query: query, range: this.range, pageIndex: this.pageIndex });
+		}
+	}, {
 		key: 'getList',
-		value: function getList(isRefresh) {
-			//서버와 통신해서 컨텐츠를 가져온다.
-			// range 를 사용한다. all / my	
-			var newList = [];
-			for (var i = 0; i < 5; ++i) {
-				newList.push({
-					reviewId: 'reviewId' + i,
-					nickname: 'nickname' + i,
-					title: 'title' + i,
-					author: 'author' + i,
-					updateDate: 'updateDate' + i,
-					image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
-					text: '핵 감명깊은 문구다.',
-					type: 'I' // I : impression, R : review
-				});
-			}
+		value: function getList(data) {
+			var self = this;
+			$.ajax({
+				type: 'GET',
+				url: '/api/search/contents-list',
+				dataType: 'json',
+				data: data
+			}).done(function (res) {
+				var newList = [];
+				for (var i = 0; i < 5; ++i) {
+					newList.push({
+						reviewId: 'reviewId' + i,
+						nickname: 'nickname' + i,
+						title: 'title' + i,
+						author: 'author' + i,
+						updateDate: 'updateDate' + i,
+						image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
+						text: '핵 감명깊은 문구다.',
+						type: 'I' // I : impression, R : review
+					});
+				}
 
-			for (var i = 0; i < 5; ++i) {
-				newList.push({
-					reviewId: 'reviewId' + i,
-					nickname: 'nickname' + i,
-					title: 'title' + i,
-					author: 'author' + i,
-					updateDate: 'updateDate' + i,
-					image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
-					text: '핵 감명깊은 후기다.',
-					type: 'R' // I : impression, R : review
-				});
-			}
-
-			this.isRefresh = isRefresh;
-			this.setState({ list: newList });
+				self.setState({ list: newList });
+			}).fail(function () {
+				alert('Server error.');
+			});
 		}
 	}, {
 		key: 'makeContentsRow',
@@ -1080,7 +1090,7 @@ var Body = function (_React$Component) {
 			if (this.isRefresh) {
 				return _react2.default.createElement(
 					'div',
-					{ id: self.contentsDivId, style: { paddingTop: '10px', paddingLeft: '15px', paddingRight: '15px' } },
+					{ id: self.contentsDivId, style: { paddingTop: '20px', paddingLeft: '15px', paddingRight: '15px' } },
 					this.state.list.map(function (data) {
 						return self.makeContentsRow(colInfoArray, data, contentsCount++);
 					}),
@@ -1095,7 +1105,7 @@ var Body = function (_React$Component) {
 			} else {
 				return _react2.default.createElement(
 					'div',
-					{ id: self.contentsDivId, style: { paddingTop: '10px', paddingLeft: '15px', paddingRight: '15px' } },
+					{ id: self.contentsDivId, style: { paddingTop: '20px', paddingLeft: '15px', paddingRight: '15px' } },
 					currentRows.map(function (index) {
 						var resultRow = null;
 						var column = currentRows[index].firstChild;
@@ -18621,12 +18631,12 @@ var Contents = function (_React$Component) {
 	_createClass(Contents, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			this.contentsView.getList();
+			this.contentsView.getListBySearchInput('');
 		}
 	}, {
 		key: 'getList',
-		value: function getList() {
-			this.contentsView.getList();
+		value: function getList(query) {
+			this.contentsView.getListBySearchInput(query);
 		}
 	}, {
 		key: 'showDetailModal',
@@ -18641,7 +18651,7 @@ var Contents = function (_React$Component) {
 			return _react2.default.createElement(
 				'div',
 				null,
-				_react2.default.createElement(_Header2.default, { app: this, moveMyPage: this.moveMyPage }),
+				_react2.default.createElement(_Header2.default, { app: this, moveMyPage: this.moveMyPage, getList: this.getList }),
 				_react2.default.createElement(_Body2.default, { range: 'all', ref: function ref(_ref) {
 						_this2.contentsView = _ref;
 					}, contents: this }),
@@ -18692,44 +18702,62 @@ var Header = function (_React$Component) {
 		var _this = _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this, props));
 
 		_this.moveMyPage = props.moveMyPage;
+		_this.getList = props.getList;
 		return _this;
 	}
 
 	_createClass(Header, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			var _this2 = this;
+
+			this.searchContentsInput = $('#searchContentsInput');
+			$('searchContentsButton').on('click', function () {
+				_this2.getList(_this2.searchContents.val());
+			});
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			return _react2.default.createElement(
-				'table',
-				{ width: '100%' },
+				'div',
+				{ className: 'row' },
 				_react2.default.createElement(
-					'tbody',
-					null,
+					'div',
+					{ className: 'col-sm-6 col-md-3 h1', align: 'center' },
+					'Bookdream'
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'col-sm-12 col-md-6', style: { paddingTop: '25px' }, align: 'center' },
 					_react2.default.createElement(
-						'tr',
-						null,
+						'div',
+						{ className: 'input-group', style: { maxWidth: '450px' } },
+						_react2.default.createElement('input', { id: 'searchContentsInput', type: 'text', className: 'form-control', 'aria-describedby': 'sizing-addon2' }),
 						_react2.default.createElement(
-							'td',
-							{ className: 'h1', style: { paddingTop: '15px', paddingLeft: '10px' } },
-							'Bookdream'
-						),
-						_react2.default.createElement(
-							'td',
-							{ align: 'right', style: { paddingTop: '15px' } },
+							'span',
+							{ className: 'input-group-btn' },
 							_react2.default.createElement(
 								'button',
-								{ type: 'button', className: 'btn btn-info', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
-								_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus', 'aria-hidden': 'true' })
-							)
-						),
-						_react2.default.createElement(
-							'td',
-							{ align: 'left', style: { paddingTop: '15px', paddingLeft: '10px' }, width: '70px' },
-							_react2.default.createElement(
-								'button',
-								{ type: 'button', className: 'btn btn-info', onClick: this.moveMyPage },
-								_react2.default.createElement('span', { className: 'glyphicon glyphicon-user', 'aria-hidden': 'true' })
+								{ id: 'searchContentsButton', className: 'btn btn-default', type: 'button', onClick: this.getList },
+								_react2.default.createElement('span', { className: 'glyphicon glyphicon-search', 'aria-hidden': 'true' })
 							)
 						)
+					)
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'col-sm-6 col-md-3', style: { paddingTop: '25px', paddingRight: '70px' }, align: 'right' },
+					_react2.default.createElement(
+						'button',
+						{ type: 'button', className: 'btn btn-info', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
+						_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus', 'aria-hidden': 'true' })
+					),
+					'\xA0\xA0',
+					_react2.default.createElement(
+						'button',
+						{ type: 'button', className: 'btn btn-info', onClick: this.moveMyPage },
+						_react2.default.createElement('span', { className: 'glyphicon glyphicon-user', 'aria-hidden': 'true' })
 					)
 				)
 			);
@@ -18969,7 +18997,7 @@ var AddContentsModal = function (_React$Component) {
 		value: function selectBook(book) {
 			console.log(book);
 			this.selectedBook = book;
-			this.selectedBookView.html('<table>' + '<tr><td><img src="' + book.thumbnail + '"/></td>' + '<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' + '</table>');
+			this.selectedBookView.html('<table>' + '<tr><td style="padding-left: 20px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + '<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' + '</table>');
 
 			this.searchBookInput.val('');
 			this.searchResultDropdown.removeClass('open');
@@ -19050,7 +19078,7 @@ var AddContentsModal = function (_React$Component) {
 				_react2.default.createElement('div', { id: 'selectedBookView', style: { paddingTop: '10px' } }),
 				_react2.default.createElement(
 					'div',
-					{ style: { paddingTop: '20px', paddingBottom: '10px' } },
+					{ style: { paddingTop: '10px', paddingBottom: '10px' } },
 					_react2.default.createElement(
 						'ul',
 						{ className: 'nav nav-tabs' },
@@ -19504,12 +19532,16 @@ var State = function (_React$Component) {
 	_createClass(State, [{
 		key: 'getState',
 		value: function getState() {
-			this.setState({
-				email: 'kwonsm@icloud.com',
-				nickname: 'KNero',
-				image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
-				reviewCount: 5,
-				impressionCount: 11
+			var self = this;
+			$.get("/api/user/profile", function (data) {
+				var info = JSON.parse(data);
+				self.setState({
+					email: info.email,
+					nickname: info.nickname,
+					image: info.image,
+					reviewCount: info.reviewCount,
+					impressionCount: info.impressionCount
+				});
 			});
 		}
 	}, {
