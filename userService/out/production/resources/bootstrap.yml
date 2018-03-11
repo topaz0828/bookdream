@@ -1,0 +1,30 @@
+info:
+  component: user
+
+spring:
+  application:
+    name: user-service
+  cloud:
+    config:
+      uri: http://loalhost:88890/admin
+      profile: dev
+      fail-fast: false
+      retry:
+        max-attempts: 10
+      name: user-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+#    virtual-host: 
+#    username: 
+#    password: 
+
+management:
+  health:
+    refresh:
+      enabled: true
+      
+logging:
+  file:  user-service.log
+  path: ./data/logs
+ 
