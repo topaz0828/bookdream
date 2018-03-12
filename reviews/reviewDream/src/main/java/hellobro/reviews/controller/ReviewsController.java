@@ -1,47 +1,56 @@
 package hellobro.reviews.controller;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import hellobro.reviews.dao.ReviewDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @RestController
 public class ReviewsController {
 
+    final private int DEFAULT_OFFSET = 0;
+    final private int DEFAULT_LIMIT = 25;
+    Gson gson = new GsonBuilder().create();
     @Autowired
     private ReviewDao dao;
 
-    @RequestMapping(value = "/reviews", method = RequestMethod.GET)
+    @RequestMapping(value = {"user/{uid}/review", "book/{bid}/review"}, method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    public String getReviews() {
-        ArrayList<HashMap<String, Object>> reviews = (ArrayList) dao.select();
-
-        JsonArray jsonArray = new JsonArray();
-        for (int i = 0 ; i < reviews.size() ; i++){
-            HashMap<String, Object> map = reviews.get(i);
-            JsonObject json = makeMap2Json(map);
-            jsonArray.add(json);
-        }
-        return jsonArray.toString();
+    public ResponseEntity<String> getReviewReq(@PathVariable("uid") String userid,
+                                               @PathVariable("bid") String bookid,
+                                               @RequestParam(value = "type", required = false) String type,
+                                               @RequestParam(value = "isbn", required = false) String isbn,
+                                               @RequestParam(value = "offset", required = false) Integer offset,
+                                               @RequestParam(value = "limit", required = false) Integer limit) {
+        return getReview(userid, bookid, type, isbn, offset, limit);
     }
 
-    private JsonObject makeMap2Json(HashMap<String, Object> map) {
-        JsonObject json = new JsonObject();
-        for( HashMap.Entry<String, Object> entry : map.entrySet() ) {
-            json.addProperty(entry.getKey(), entry.getValue().toString());
-        }
-        return json;
+    @RequestMapping(value = {"/review"}, method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    public ResponseEntity<String> getReviewReq2(@RequestParam(value = "userid", required = false) String userid,
+                                                @RequestParam(value = "bookid", required = false) String bookid,
+                                                @RequestParam(value = "type", required = false) String type,
+                                                @RequestParam(value = "isbn", required = false) String isbn,
+                                                @RequestParam(value = "offset", required = false) Integer offset,
+                                                @RequestParam(value = "limit", required = false) Integer limit) {
+        return getReview(userid, bookid, type, isbn, offset, limit);
+    }
+
+    private ResponseEntity<String> getReview(@PathVariable("uid") String userid, @PathVariable("bid") String bookid, @RequestParam(value = "type", required = false) String type, @RequestParam(value = "isbn", required = false) String isbn, @RequestParam(value = "offset", required = false) Integer offset, @RequestParam(value = "limit", required = false) Integer limit) {
+        if (offset == null)
+            offset = DEFAULT_OFFSET;
+        if (limit == null)
+            limit = DEFAULT_LIMIT;
+        ArrayList<Object> reviews = (ArrayList) dao.select(userid, bookid, type, isbn, offset, limit);
+        JsonArray jsonArray = gson.toJsonTree(reviews).getAsJsonArray();
+        return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
     }
 
 }

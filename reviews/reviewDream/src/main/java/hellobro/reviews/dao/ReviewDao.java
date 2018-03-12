@@ -22,8 +22,15 @@ public class ReviewDao {
     private SqlSession sqlSession;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public List<Object> select() {
-        return sqlSession.selectList("select");
+    public List<Object> select(String userid, String bookid, String type, String isbn, Integer offset, Integer limit) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("USER_ID", userid);
+        map.put("BOOK_ID", bookid);
+        map.put("TYPE", type);
+        map.put("ISBN", isbn);
+        map.put("offset", offset);
+        map.put("limit", limit);
+        return sqlSession.selectList("select", map);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
