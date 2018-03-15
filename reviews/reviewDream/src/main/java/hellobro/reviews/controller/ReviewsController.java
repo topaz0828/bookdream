@@ -26,7 +26,7 @@ public class ReviewsController {
     public ResponseEntity<String> getReviewReq(@PathVariable("uid") String userid,
                                                @PathVariable("bid") String bookid,
                                                @RequestParam(value = "type", required = false) String type,
-                                               @RequestParam(value = "isbn", required = false) String isbn,
+                                               @RequestParam(value = "isbn", required = false) String[] isbn,
                                                @RequestParam(value = "offset", required = false) Integer offset,
                                                @RequestParam(value = "limit", required = false) Integer limit) {
         return getReview(userid, bookid, type, isbn, offset, limit);
@@ -37,13 +37,13 @@ public class ReviewsController {
     public ResponseEntity<String> getReviewReq2(@RequestParam(value = "userid", required = false) String userid,
                                                 @RequestParam(value = "bookid", required = false) String bookid,
                                                 @RequestParam(value = "type", required = false) String type,
-                                                @RequestParam(value = "isbn", required = false) String isbn,
+                                                @RequestParam(value = "isbn", required = false) String[] isbn,
                                                 @RequestParam(value = "offset", required = false) Integer offset,
                                                 @RequestParam(value = "limit", required = false) Integer limit) {
         return getReview(userid, bookid, type, isbn, offset, limit);
     }
 
-    private ResponseEntity<String> getReview(@PathVariable("uid") String userid, @PathVariable("bid") String bookid, @RequestParam(value = "type", required = false) String type, @RequestParam(value = "isbn", required = false) String isbn, @RequestParam(value = "offset", required = false) Integer offset, @RequestParam(value = "limit", required = false) Integer limit) {
+    private ResponseEntity<String> getReview(String userid, String bookid, String type, String[] isbn, Integer offset, Integer limit) {
         if (offset == null)
             offset = DEFAULT_OFFSET;
         if (limit == null)

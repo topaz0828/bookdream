@@ -22,7 +22,7 @@ public class ReviewDao {
     private SqlSession sqlSession;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public List<Object> select(String userid, String bookid, String type, String isbn, Integer offset, Integer limit) {
+    public List<Object> select(String userid, String bookid, String type, String[] isbn, Integer offset, Integer limit) {
         Map<String, Object> map = new HashMap<>();
         map.put("USER_ID", userid);
         map.put("BOOK_ID", bookid);
