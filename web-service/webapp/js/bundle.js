@@ -985,7 +985,7 @@ var Body = function (_React$Component) {
 		_this.range = props.range; // all / my
 		_this.pageIndex = 0;
 		_this.query = '';
-		_this.isbn = []; // 쿼리로 검색 후 검색에 사용된 isbn을 저장해 뒀다가 스크롤이동 시 재사용 한다.
+		_this.isbn = ''; // 쿼리로 검색 후 검색에 사용된 isbn을 저장해 뒀다가 스크롤이동 시 재사용 한다.
 		return _this;
 	}
 
@@ -1003,7 +1003,7 @@ var Body = function (_React$Component) {
 		key: 'getListByScroll',
 		value: function getListByScroll() {
 			this.isRefresh = false;
-			this.getList({ isbn: [], range: this.range, pageIndex: this.pageIndex });
+			this.getList({ isbn: this.isbn, range: this.range, pageIndex: this.pageIndex });
 		}
 	}, {
 		key: 'getListBySearchInput',
@@ -1014,6 +1014,12 @@ var Body = function (_React$Component) {
 	}, {
 		key: 'getList',
 		value: function getList(data) {
+			if ($('#mainView').is(":visible") && this.range === 'my') {
+				return;
+			} else if (!$('#mainView').is(":visible") && this.range === 'all') {
+				return;
+			}
+
 			var self = this;
 			$.ajax({
 				type: 'GET',
@@ -1022,16 +1028,18 @@ var Body = function (_React$Component) {
 				data: data
 			}).done(function (res) {
 				var newList = [];
-				for (var i = 0; i < 5; ++i) {
+				for (var i in res.list) {
+					var d = res.list[i];
+					console.log(d);
 					newList.push({
-						reviewId: 'reviewId' + i,
-						nickname: 'nickname' + i,
-						title: 'title' + i,
-						author: 'author' + i,
-						updateDate: 'updateDate' + i,
-						image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
-						text: '핵 감명깊은 문구다.',
-						type: 'I' // I : impression, R : review
+						reviewId: d.ID,
+						nickname: d.NICKNAME,
+						title: d.TITLE,
+						author: d.AUTHOR,
+						updateDate: d.UPDATE_DATE,
+						image: d.IMAGE,
+						text: d.TEXT,
+						type: d.TYPE // C : Coment, R : review
 					});
 				}
 
@@ -18651,7 +18659,7 @@ var Contents = function (_React$Component) {
 			return _react2.default.createElement(
 				'div',
 				null,
-				_react2.default.createElement(_Header2.default, { app: this, moveMyPage: this.moveMyPage, getList: this.getList }),
+				_react2.default.createElement(_Header2.default, { moveMyPage: this.moveMyPage, getList: this.getList }),
 				_react2.default.createElement(_Body2.default, { range: 'all', ref: function ref(_ref) {
 						_this2.contentsView = _ref;
 					}, contents: this }),

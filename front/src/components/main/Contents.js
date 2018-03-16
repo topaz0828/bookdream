@@ -28,7 +28,7 @@ class Contents extends React.Component {
 	render() {
 		return (
 			<div>
-				<Header app={this} moveMyPage={this.moveMyPage} getList={this.getList}/>
+				<Header moveMyPage={this.moveMyPage} getList={this.getList}/>
 		        <Body range='all' ref={(ref) => {this.contentsView = ref;}} contents={this}/>
 		        <AddContentsModal/>
 		        <DetailModal ref={(ref) => {this.detailModal = ref;}}/>
