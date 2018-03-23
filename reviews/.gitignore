@@ -3,6 +3,5 @@
 *.iws
 *.iml
 *.ipr
-
 reviewDream/out
-
+reviewDream/.gradle

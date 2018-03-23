@@ -11,7 +11,8 @@
 
     <!--SELECT r.ID, r.USER_ID, r.BOOK_ID, r.TYPE, r.TEXT, r.`UPDATE_DATE`, b.`AUTHOR`, b.`CATEGORY_ID`, b.`DESCRIPTION`, b.`IMAGE`, b.`ISBN`, b.`PAGES`, b.`PRICE`, b.`PUB_ID`, b.`RARITY`, b.`TITLE`, b.`TRANSLATOR`-->
     <select id="select" parameterType="map" resultType="map">
-        SELECT r.ID, u.`NICKNAME`, r.BOOK_ID, r.TYPE, r.TEXT, r.`UPDATE_DATE`, b.`AUTHOR`, b.`CATEGORY_ID`, b.`DESCRIPTION`, b.`IMAGE`, b.`ISBN`, b.`PAGES`, b.`PRICE`, b.`PUB_ID`, b.`RARITY`, b.`TITLE`, b.`TRANSLATOR`
+        SELECT r.ID, u.`NICKNAME`, r.BOOK_ID, r.TYPE, r.TEXT, r.`UPDATE_DATE`, b.`AUTHOR`, b.`CATEGORY_ID`,
+        b.`DESCRIPTION`, b.`IMAGE`, b.`ISBN`, b.`PAGES`, b.`PRICE`, b.`PUB_ID`, b.`RARITY`, b.`TITLE`, b.`TRANSLATOR`
         FROM `BOOK_REVIEW` r, `BOOK_INFO` b, `USER_INFO` u
         WHERE r.`BOOK_ID` = b.`ID` AND r.`USER_ID` = u.`ID`
         <if test="BOOK_ID != null">
@@ -65,41 +66,58 @@
         LIMIT #{offset}, #{limit};
     </select>
 
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM BOOK_REVIEW
-    </select>
-
-    <select id="countByUserid" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM BOOK_REVIEW
-        WHERE USER_ID = #{user_id}
-        AND TYPE = #{type}
-        LIMIT #{offset}, #{limit};
-    </select>
-
-    <select id="countByBookid" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM BOOK_REVIEW
-        WHERE BOOK_ID = #{book_id}
-        AND TYPE = #{type}
-        LIMIT #{offset}, #{limit};
-    </select>
-
     <select id="selectOne" resultType="map">
         SELECT * FROM BOOK_REVIEW WHERE ID = #{id}
     </select>
 
+
+    <select id="count" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BOOK_REVIEW
+        <if test="type != null">
+            WHERE TYPE = #{TYPE}
+        </if>
+    </select>
+
+    <select id="countByUserId" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BOOK_REVIEW
+        WHERE USER_ID = #{user_id}
+        <if test="type != null">
+            AND TYPE = #{TYPE}
+        </if>
+    </select>
+
+    <select id="countByBookId" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BOOK_REVIEW
+        WHERE BOOK_ID = #{book_id}
+        <if test="type != null">
+            AND TYPE = #{TYPE}
+        </if>
+    </select>
+
+
     <insert id="insert">
-        INSERT INTO BOOK_REVIEW ( user_name, subject, content, reg_datetime )
-        VALUES ( #{user_name}, #{subject}, #{content} , #{reg_datetime} )
+        INSERT INTO BOOK_REVIEW ( USER_ID, BOOK_ID, TYPE, TEXT )
+        VALUES ( #{USER_ID}, #{BOOK_ID}, #{TYPE} , #{TEXT} )
     </insert>
+
 
     <update id="update">
         UPDATE BOOK_REVIEW
-        SET user_name = #{user_name}, subject = #{subject}, content = #{content}, reg_datetime = #{reg_datetime}
-        WHERE idx = #{idx} LIMIT 1
+        SET USER_ID = #{USER_ID}, BOOK_ID = #{BOOK_ID}, TYPE = #{TYPE}, TEXT = #{TEXT}
+        WHERE ID = #{ID} LIMIT 1
     </update>
 
+
     <delete id="delete">
-        DELETE FROM BOOK_REVIEW WHERE idx = #{idx}
+        DELETE FROM BOOK_REVIEW WHERE ID = #{ID}
+    </delete>
+
+    <delete id="deleteByUserID">
+        DELETE FROM BOOK_REVIEW USER_ID = #{USER_ID}
+    </delete>
+
+    <delete id="deleteByBookID">
+        DELETE FROM BOOK_REVIEW BOOK_ID = #{BOOK_ID}
     </delete>
 
 </mapper>
