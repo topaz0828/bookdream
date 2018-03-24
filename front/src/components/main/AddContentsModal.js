@@ -29,32 +29,98 @@ class AddContentsModal extends React.Component {
 			this.reviewBack.show();
 		});
 		this.searchResultDropdown = $('#searchResultDropdown');
-		// $('#addInputClearButton').on('click', () => {
-		// 	$('input[name=impressionInput]').val('');
-		// 	$('#reviewInput').val('');
-		// });
+		this.selectedBookView = $('#selectedBookView');
+		this.selectedBook = null;
 	}
 
 	findBook() {
+		var self = this;
 		var inputValue = this.searchBookInput.val();
 		if (inputValue.length > 0) {
-			this.searchResultDropdown.addClass('open');
-			//서버와 통신해서 책정보를 검색해 운다.
+			$.ajax({
+				type: 'GET',
+				url: '/api/search/book',
+				dataType: 'json',
+				data: {q: inputValue},
+			}).done(function(res) {
+				self.searchResultDropdown.empty();
 
-			// $.ajax({
-			// 	type: 'GET',
-			// 	url: 'https://dapi.kakao.com/v2/search/book',
-			// 	crossDomain: true,
-			// 	dataType: 'json',
-			// 	beforeSend: function(xhr) {
-			// 		xhr.setRequestHeader('Authorization', 'KakaoAK 7b15cef8dfbdedf8cd3fb26ae3262097');
-			// 	},
-			// 	data: {query: inputValue},
-			// 	success: function(res) { 
-			// 		console.log(res);
-			// 	}
-			// });
+				var ul = document.createElement('ul');
+				ul.className = 'dropdown-menu';
+				ul.setAttribute('role', 'menu');
+				ul.style.width = '100%';
+				for (var i in res) {
+					var a = document.createElement('a');
+					a.setAttribute('role', 'menuitem');
+					a.setAttribute('tabIndex', '-1');
+					a.style.fontSize = '17px';
+					a.style.cursor = 'pointer';
+					a.textContent = res[i].title;
+					a.searchInfo = res[i];
+					$(a).click(function(event) {
+						self.selectBook(event.target.searchInfo);
+					});
+					var li = document.createElement('li');
+					li.setAttribute('role', 'presentation');
+					$(li).append(a);
+					$(ul).append(li);
+				}
+
+				self.searchResultDropdown.append(ul);
+				self.searchResultDropdown.addClass('open');
+			}).fail(function() {
+				alert('Server error.');
+			});
 		}
+	}
+
+	selectBook(book) {
+		console.log(book);
+		this.selectedBook = book;
+		this.selectedBookView.html('<table>' + 
+										'<tr><td style="padding-left: 20px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + 
+										'<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' +
+									'</table>');
+	
+		this.searchBookInput.val('');
+		this.searchResultDropdown.removeClass('open');
+	}
+
+	save() {
+		if (this.selectedBook != null) {
+			var url, data = {};
+			data.book = this.selectedBook;
+
+			if (this.impressionButton.hasClass('active')) {
+				data.impression = [];
+				url = '/api/user/impression';
+				var impressionInput = $('input[name=impressionInput]');
+				for (var i in impressionInput) {
+					data.impression.push(impressionInput[i].value);
+				}
+			} else {
+				url = '/api/user/review';
+				data.reivew = $('#reviewInput').val();
+			}
+			
+			var self = this;
+			$.ajax({
+				type: 'POST',
+				url: url,
+				data: JSON.stringify(data),
+			}).done(function() {
+				self.close();
+			}).fail(function() {
+				alert('Server error.');
+			});
+		}
+	}
+
+	close() {
+		this.selectedBook = null;
+		this.selectedBookView.empty()
+		this.searchBookInput.val('');
+		this.searchResultDropdown.removeClass('open');
 	}
 
 	renderInputView() {
@@ -69,11 +135,7 @@ class AddContentsModal extends React.Component {
 					</span>
 				</div>
 				<div id='searchResultDropdown' className="dropdown" width='100%'>
-					<ul className="dropdown-menu" style={{width:'100%'}}>
-						<li role="presentation"><a role="menuitem" tabIndex="-1" href="#" style={{fontSize:'17px'}}>Action</a></li>
-						<li role="presentation"><a role="menuitem" tabIndex="-1" href="#" style={{fontSize:'17px'}}>Another action</a></li>
-						<li role="presentation"><a role="menuitem" tabIndex="-1" href="#" style={{fontSize:'17px'}}>Something else here</a></li>
-						<li role="presentation"><a role="menuitem" tabIndex="-1" href="#" style={{fontSize:'17px'}}>Separated link</a></li>
+					<ul className="dropdown-menu" role="menu" style={{width:'100%'}}>
 					</ul>
 				</div>
 			</div>
@@ -83,7 +145,9 @@ class AddContentsModal extends React.Component {
 	renderImpressionAndReviewView() {
 		return (
 			<div>
-				<div style={{paddingTop: '30px', paddingBottom: '20px'}}>
+				<div id='selectedBookView' style={{paddingTop: '10px'}}>
+				</div>
+				<div style={{paddingTop: '10px', paddingBottom: '10px'}}>
 					<ul className="nav nav-tabs">
 						<li role="presentation" className="active" id='impressionButton'><a href="#">Impression</a></li>
 						<li role="presentation" id='reviewButton'><a href="#">Review</a></li>
@@ -91,19 +155,19 @@ class AddContentsModal extends React.Component {
 				</div>
 				<div id='impressionBack' className='form-group'>
 					<div style={{paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 1st impression' aria-describedby="sizing-addon2"/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 1st impression' aria-describedby="sizing-addon2" maxLength='100'/>
 					</div>
 					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 2nd impression' aria-describedby="sizing-addon2"/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 2nd impression' aria-describedby="sizing-addon2" maxLength='100'/>
 					</div>
 					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 3rd impression' aria-describedby="sizing-addon2"/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 3rd impression' aria-describedby="sizing-addon2" maxLength='100'/>
 					</div>
 					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 4st impression' aria-describedby="sizing-addon2"/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 4st impression' aria-describedby="sizing-addon2" maxLength='100'/>
 					</div>
 					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 5st impression' aria-describedby="sizing-addon2"/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 5st impression' aria-describedby="sizing-addon2" maxLength='100'/>
 					</div>
 				</div>
 				<div id='reviewBack' hidden='true' className='form-group'>
@@ -127,8 +191,8 @@ class AddContentsModal extends React.Component {
 							{this.renderImpressionAndReviewView()}
 						</div>
 						<div className="modal-footer">
-							<button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-							<button type="button" className="btn btn-primary" data-dismiss="modal">Save</button>
+							<button type="button" className="btn btn-default" data-dismiss="modal" onClick={() => this.close()}>Close</button>
+							<button type="button" className="btn btn-primary" data-dismiss="modal" onClick={() => this.save()}>Save</button>
 						</div>
 					</div>
 				</div>

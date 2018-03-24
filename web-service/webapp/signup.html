@@ -11,10 +11,7 @@
 <body class="jui">
 <div align="center" style="padding-top: 150px;">
     <h1>Welcome Bookdream!</h1>
-    <form name="signup" method="POST" action="/api/user/signup">
-        <input type="hidden" name="id" value="">
-        <input type="hidden" name="picture" value="">
-        <input type="hidden" name="from" value="">
+    <form name="signUp" method="POST" action="/api/user/signUp">
         <table>
             <tr>
                 <td align="center"><img name="profilePicture" src=""></td>
@@ -33,12 +30,9 @@
 </div>
 <script type="text/javascript">
 			var url = new URL(document.location);
-			document.signup.from.value = url.searchParams.get("from");
-			document.signup.email.value = url.searchParams.get("email");
-			document.signup.nickname.value = url.searchParams.get("name");
-			document.signup.id.value = url.searchParams.get("id");
-			document.signup.picture.value = url.searchParams.get("picture");
-			document.signup.profilePicture.src = document.signup.picture.value;
+			document.signUp.email.value = url.searchParams.get("email");
+			document.signUp.nickname.value = url.searchParams.get("name");
+			document.signUp.profilePicture.src = url.searchParams.get("picture");
 		</script>
 </body>
 </html>

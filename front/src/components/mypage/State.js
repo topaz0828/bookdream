@@ -13,12 +13,17 @@ class State extends React.Component {
 	}
 
 	getState() {
-		this.setState({
-			email: 'kwonsm@icloud.com',
-			nickname: 'KNero',
-			image: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3',
-			reviewCount: 5,
-			impressionCount: 11
+		var self = this;
+		$.get("/api/user/profile", function(data) {
+			var info = JSON.parse(data);
+			self.setState({
+				email: info.email,
+				nickname: info.nickname,
+				image: info.image,
+				reviewCount: info.reviewCount,
+				impressionCount: info.impressionCount
+			});
+
 		});
 	}
 

@@ -1,8 +1,9 @@
 package win.hellobro.web.component;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class FbUserInfo {
+public class FbUserInfo implements Serializable {
 	private Map<String, Object> userInfo;
 
 	FbUserInfo(Map<String, Object> userInfo) {
