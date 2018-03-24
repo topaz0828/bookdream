@@ -1,15 +1,17 @@
 package win.hellobro.user.controller;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import win.hellobro.user.exception.UserServiceException;
 import win.hellobro.user.datahandler.UserDataHandler;
 import win.hellobro.user.datahandler.entity.UserInfo;
+import win.hellobro.user.exception.UserServiceException;
+import win.hellobro.user.vaildator.DataVaildator;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 
@@ -22,39 +24,47 @@ public class UserController {
     @Autowired
     UserDataHandler userDataHandler;
 
-    @RequestMapping(value = "user/{ID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Autowired
+    DataVaildator dataVaildator;
+
+    @RequestMapping(value = "user/{ID}", method = RequestMethod.GET)
     public UserInfo getUserInfo(@PathVariable String ID) throws UserServiceException {
         return userDataHandler.getUserInfo(ID);
     }
 
-    //페이징 처리   (limit) /
-    @RequestMapping(value = "users", method = RequestMethod.GET)
-    public List<UserInfo> getAllUsers() {
-        return userDataHandler.getAllUserInfo();
+    @RequestMapping(value = "user", method = RequestMethod.GET)
+    public UserInfo getUserInfoByEmailnFrom(@RequestParam(name = "email", required = true) String eMail,
+                                            @RequestParam(name = "from", required = true) String from) throws UserServiceException {
+
+       return userDataHandler.getUserInfo(eMail, from);
     }
 
-    //가입 : POST
-    //email=ksm@test.com&nickname=nero&from=facebook (querystring)
+
+    @RequestMapping(value = "users", method = RequestMethod.GET)
+    public List<UserInfo> getAllUsers(@RequestParam(name = "start", defaultValue = "0") String start,
+                                      @RequestParam(name = "count", defaultValue = "10") String count) {
+        return userDataHandler.getAllUserInfo(start, count);
+    }
+
     @RequestMapping(value = "user", method = RequestMethod.POST)
-    public ResponseEntity<Void> addUser(@RequestParam(name = "ID", required = true) String ID,
+    public ResponseEntity<Void> addUser(@RequestParam(name = "id", required = false) String ID,
                                         @RequestParam(name = "nickname", required = true) String nickName,
                                         @RequestParam(name = "email", required = true) String eMail,
-                                        @RequestParam(name = "from", required = false) String from) {
-
-        LOGGER.info("input : [{}/{}/{}/{}]", ID, nickName, eMail, from);
-        userDataHandler.addUserInfo(ID, nickName, eMail, from);
+                                        @RequestParam(name = "image", required = false) String image,
+                                        @RequestParam(name = "from", required = true) String from) throws UnsupportedEncodingException, UserServiceException {
+        userDataHandler.addUserInfo(ID, nickName, eMail, from, image);
         return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
-   /* @RequestMapping(value = "/{ID}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "user/{ID}", method = RequestMethod.PUT)
     public ResponseEntity<UserInfo> updateArticle(@RequestBody UserInfo userInfo) {
-        articleService.updateArticle(article);
-        return new ResponseEntity<Article>(article, HttpStatus.OK);
-    }*/
+        return new ResponseEntity<>(userInfo, HttpStatus.OK);
+    }
 
-    @RequestMapping(value = "user/{ID}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteUserInfo(@PathVariable String ID) throws UserServiceException {
-        userDataHandler.removeUserinfo(ID);
+    @RequestMapping(value = "userss", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteUserInfo(@RequestParam(name = "email", required = true) String eMail,
+                                               @RequestParam(name = "from", required = true) String from) throws UserServiceException {
+        userDataHandler.removeUserinfo(eMail, from);
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
 

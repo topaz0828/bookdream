@@ -5,9 +5,10 @@ import win.hellobro.user.datahandler.entity.UserInfo;
 import java.util.List;
 
 public interface IUserInfoService {
-    List<UserInfo> getAllUserInfo();
+    List<UserInfo> getAllUserInfo(int start, int pageCount);
     UserInfo getUserinfoById(String ID);
     boolean addUserinfo(UserInfo user);
     void updateUserInfo(UserInfo user);
-    void deleteUserInfo(String ID);
+    boolean deleteUserInfo(String eMail, String from);
+    UserInfo getUserinfoByEmailAndOAuthSite(String eMail, String from);
 }

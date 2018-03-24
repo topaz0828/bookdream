@@ -1,9 +1,11 @@
 package win.hellobro.user.datahandler.entity;
 
 import lombok.Data;
-import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -17,26 +19,29 @@ public class UserInfo implements Serializable {
     public UserInfo() {}
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="ID")
-    private String ID;
+    private String id;
 
     @Column(name="EMAIL")
-    private String EMail;
+    private String eMail;
 
     @Column(name="NICKNAME")
-    private String NickName;
+    private String nickName;
+
+    @Column(name="IMAGE")
+    private String image;
+
 
     @Column(name="OAUTH_SITE")
     private String OAuthSite;
 
     @Column(name="UPDATE_DATE")
-    private Date UpdateDate;
+    private Date updateDate;
 
     @Override
     public String toString() {
-        return "user [ID:" + ID + "EMAIL:" + EMail + "NICKNAME:" +
-                NickName + "OAUTH_SITE:" + OAuthSite + "UPDATE_DATE" + UpdateDate + "]";
+        return "user [ID:" + id + "EMAIL:" + eMail + "NICKNAME:" +
+                nickName + "OAUTH_SITE:" + OAuthSite + "UPDATE_DATE" + updateDate +  "IMAGE" + image +"]";
     }
 
 

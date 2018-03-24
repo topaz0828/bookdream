@@ -6,14 +6,14 @@ import java.util.List;
 
 public interface IUserInfoDAO {
 
-    List<UserInfo> getAllUserInfoDAO();
+    List<UserInfo> getAllUserInfoDAO(int start, int pageCount);
     UserInfo getUserInfoById(String ID);
     void addUserInfo(UserInfo user);
     void updateUserinfo(UserInfo user);
-    void deleteUserlInfo(String ID);
+    void deleteUserlInfo(String eMail, String ID);
     boolean existNickName(String nickName);
-    boolean existUserID(String ID);
-
+    boolean existEMailAndOAuthSite(String eMail, String OAuth_Site);
+    UserInfo getUserInfoByEmailAndOAuthSite(String eMail, String OAuth_Site);
 }
 
 

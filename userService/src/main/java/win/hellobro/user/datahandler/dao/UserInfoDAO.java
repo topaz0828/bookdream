@@ -22,10 +22,11 @@ public class UserInfoDAO implements IUserInfoDAO{
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<UserInfo> getAllUserInfoDAO() {
-        String hql = "FROM UserInfo users ORDER BY users.ID";
-
-        return (List<UserInfo>) entityManager.createQuery(hql, UserInfo.class).getResultList();
+    public List<UserInfo> getAllUserInfoDAO(int start, int pageCount) {
+        LOGGER.info("{}/{}", start, pageCount);
+        String hql = "FROM UserInfo users ORDER BY 1";
+         return (List<UserInfo>) entityManager.createQuery(hql, UserInfo.class)
+                 .setFirstResult(start).setMaxResults(pageCount).getResultList();
     }
 
     @Override
@@ -36,12 +37,14 @@ public class UserInfoDAO implements IUserInfoDAO{
 
     @Override
     public void addUserInfo(UserInfo user) {
-        entityManager.persist(user);
+        //entityManager.remove(user);
+        entityManager.merge(user);
+
     }
 
     @Override
     public void updateUserinfo(UserInfo user) {
-        UserInfo updateUser = getUserInfoById(user.getID());
+        UserInfo updateUser = getUserInfoById(user.getId());
         updateUser.setEMail(user.getEMail());
         updateUser.setNickName(user.getNickName());
         updateUser.setOAuthSite(user.getOAuthSite());
@@ -49,22 +52,29 @@ public class UserInfoDAO implements IUserInfoDAO{
     }
 
     @Override
-    public void deleteUserlInfo(String ID) {
-        entityManager.remove(getUserInfoById(ID));
+    public void deleteUserlInfo(String eMail, String OAuth_Site) {
+        entityManager.remove(getUserInfoByEmailAndOAuthSite(eMail,OAuth_Site));
     }
 
     @Override
     public boolean existNickName(String nickName) {
-        String hql = "FROM UserInfo users WHERE users.NICKNAME = ?";
+        String hql = "FROM UserInfo users WHERE users.nickName = ?";
         int count = entityManager.createQuery(hql).setParameter(1, nickName).getResultList().size();
         return count > 0 ? true : false;
     }
 
     @Override
-    public boolean existUserID(String ID) {
-        String hql = "FROM UserInfo users WHERE users.ID = :userID";
-        int count = entityManager.createQuery(hql).setParameter("userID", ID).getResultList().size();
+    public boolean existEMailAndOAuthSite(String eMail, String OAuth_Site) {
+        String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
+        int count = entityManager.createQuery(hql).setParameter("EMAIL",eMail).setParameter("OAUTH_SITE", OAuth_Site).
+                getResultList().size();
         return count > 0 ? true : false;
+    }
+
+    @Override
+    public UserInfo getUserInfoByEmailAndOAuthSite(String eMail, String OAuth_Site) {
+        String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
+        return  (UserInfo)entityManager.createQuery(hql).setParameter("EMAIL",eMail).setParameter("OAUTH_SITE", OAuth_Site).getSingleResult();
     }
 }
 

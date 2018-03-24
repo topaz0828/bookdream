@@ -19,8 +19,8 @@ public class UserInfoService implements  IUserInfoService{
     private static final Logger LOGGER = LoggerFactory.getLogger(UserInfoService.class);
 
     @Override
-    public List<UserInfo> getAllUserInfo() {
-        return userInfoDAO.getAllUserInfoDAO();
+    public List<UserInfo> getAllUserInfo(int start, int pageCount) {
+        return userInfoDAO.getAllUserInfoDAO(start, pageCount);
     }
 
     @Override
@@ -28,9 +28,15 @@ public class UserInfoService implements  IUserInfoService{
        return  userInfoDAO.getUserInfoById(ID);
     }
 
+
+    @Override
+    public UserInfo getUserinfoByEmailAndOAuthSite(String eMail, String from) {
+        return userInfoDAO.getUserInfoByEmailAndOAuthSite(eMail, from);
+    }
+
     @Override
     public synchronized boolean addUserinfo(UserInfo userInfo) {
-        if (userInfoDAO.existUserID(userInfo.getID())) {
+        if (userInfoDAO.existEMailAndOAuthSite(userInfo.getEMail(), userInfo.getOAuthSite())) {
             return false;
         } else {
             userInfoDAO.addUserInfo(userInfo);
@@ -44,9 +50,14 @@ public class UserInfoService implements  IUserInfoService{
     }
 
     @Override
-    public void deleteUserInfo(String ID) {
-        userInfoDAO.deleteUserlInfo(ID);
+    public synchronized boolean deleteUserInfo(String eMail, String from) {
+        if (userInfoDAO.existEMailAndOAuthSite(eMail, from)) {
+            userInfoDAO.deleteUserlInfo(eMail, from);
+            return true;
+        }
+        return true;
     }
+
 }
 
 
