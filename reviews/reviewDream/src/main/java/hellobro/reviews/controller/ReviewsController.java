@@ -103,12 +103,11 @@ public class ReviewsController {
     }
 
     private String verifyString(String key, String checkValue, JsonObject json) {
-        if (json == null) {
+        if (json == null || json.get(key) == null) {
             return checkValue;
         }
-        String jsonValue = json.get(key).getAsString();
         if (checkValue == null) {
-            checkValue = jsonValue;
+            return json.get(key).getAsString();
         }
         return checkValue;
     }
