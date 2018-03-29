@@ -22,5 +22,6 @@
 
     <mappers>
         <mapper resource="mapper/reviewMapper.xml"/>
+        <mapper resource="mapper/bookMapper.xml"/>
     </mappers>
 </configuration>
