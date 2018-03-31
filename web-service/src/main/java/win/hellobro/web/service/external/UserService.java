@@ -10,6 +10,7 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringEncoder;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.balam.exof.client.Client;
@@ -22,15 +23,19 @@ import team.balam.exof.module.service.annotation.Startup;
 import team.balam.exof.module.service.annotation.Variable;
 import win.hellobro.web.UserInfo;
 
+import java.nio.charset.Charset;
+import java.util.Map;
+
 @ServiceDirectory
 public class UserService {
 	private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
-	@Variable("save") private String address;
-	@Variable("save") private int readTimeout;
-	@Variable("save") private int maxPoolSize;
+	@Variable private String address;
+	@Variable private int readTimeout;
+	@Variable private int maxPoolSize;
 
 	private ClientPool clientPool;
+	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
 	@Startup
 	public void init() {
@@ -44,11 +49,11 @@ public class UserService {
 				.build();
 	}
 
-	@Service
-	public void save(UserInfo userInfo) throws UserServiceException {
+	@Service(internal = true)
+	public boolean save(UserInfo userInfo) {
 		QueryStringEncoder queryStringEncoder = new QueryStringEncoder("/user");
 		queryStringEncoder.addParam("id", userInfo.getId());
-		queryStringEncoder.addParam("nickname", userInfo.getNickname());
+		queryStringEncoder.addParam("nickname", userInfo.getNickName());
 		queryStringEncoder.addParam("email", userInfo.getEmail());
 		queryStringEncoder.addParam("from", userInfo.getOauthSite().val());
 		queryStringEncoder.addParam("image", userInfo.getImage());
@@ -59,34 +64,47 @@ public class UserService {
 		try (Client client = this.clientPool.get()) {
 			FullHttpResponse signInResponse = client.sendAndWait(saveRequest);
 			if (signInResponse.status().code() != HttpResponseStatus.CREATED.code()) {
-				throw new UserServiceException("Fail to save user. http status code : " + signInResponse.status().code());
+				LOG.error("UserService ======> Fail to save user. http status code : {}", signInResponse.status().code());
+				return false;
 			}
 		} catch (Exception e) {
-			throw new UserServiceException("UserService error.", e);
+			LOG.error("user service error.", e);
+			return false;
 		}
+
+		return true;
 	}
 
-	@Service
-	public UserInfo get(String userId) throws UserServiceException {
-		int status;
+	@Service(internal = true)
+	public UserInfo get(String userId) {
+		int status = -1;
 		HttpRequest saveRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/user/" + userId);
 		saveRequest.headers().set(HttpHeaderNames.HOST, this.address);
 
+		String body = null;
 		try (Client client = this.clientPool.get()) {
 			FullHttpResponse response = client.sendAndWait(saveRequest);
 			status = response.status().code();
 
 			if (status == HttpResponseStatus.OK.code()) {
-				//todo 응답으로 온 데이터를 세팅해 준다.
-				return new UserInfo();
+				body = response.content().toString(Charset.defaultCharset());
+				Map<String, Object> data = JSON_MAPPER.readValue(body, Map.class);
+				UserInfo userInfo = new UserInfo();
+				userInfo.setId((String) data.get("id"));
+				userInfo.setNickName((String) data.get("nickName"));
+				userInfo.setEmail((String) data.get("email"));
+				userInfo.setImage((String) data.get("image"));
+				userInfo.setOauthSite((String) data.get("oauthSite"));
+				return userInfo;
 			} else if (status == HttpResponseStatus.NOT_FOUND.code()) {
-				return null;
+				return UserInfo.NOT_FOUND_USER;
 			}
 		} catch (Exception e) {
-			throw new UserServiceException("UserService error.", e);
+			LOG.error("user service error. \nbody:" + body, e);
 		}
 
-		throw new UserServiceException("Can not get user. Http status code : " + status);
+		LOG.error("UserService ======> Can not get user. Http status code : {}", status);
+		return null;
 	}
 
 	@Shutdown

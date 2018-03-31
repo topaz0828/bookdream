@@ -1,35 +1,22 @@
 package win.hellobro.web.service;
 
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.QueryStringEncoder;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import team.balam.exof.client.Client;
-import team.balam.exof.client.DefaultClient;
-import team.balam.exof.client.component.HttpClientCodec;
 import team.balam.exof.module.listener.RequestContext;
-import team.balam.exof.module.service.ServiceNotFoundException;
-import team.balam.exof.module.service.ServiceProvider;
+import team.balam.exof.module.service.ServiceObject;
 import team.balam.exof.module.service.ServiceWrapper;
 import team.balam.exof.module.service.annotation.Inbound;
 import team.balam.exof.module.service.annotation.Service;
 import team.balam.exof.module.service.annotation.ServiceDirectory;
-import team.balam.exof.module.service.annotation.Startup;
 import team.balam.exof.module.service.component.http.HttpGet;
 import team.balam.exof.module.service.component.http.HttpPost;
 import team.balam.exof.module.service.component.http.JsonToMap;
 import win.hellobro.web.SessionKey;
 import win.hellobro.web.UserInfo;
 import win.hellobro.web.component.part.QueryStringToMap;
-import win.hellobro.web.service.external.UserService;
-import win.hellobro.web.service.external.UserServiceException;
+import win.hellobro.web.service.vo.BookInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,78 +29,101 @@ public class User {
 	private static final Logger LOG = LoggerFactory.getLogger(User.class);
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
-	private UserService userService;
+	@Service("/external/user-service/save")
+	private ServiceWrapper userSaver;
 
-	@Startup
-	public void init() {
-		try {
-			ServiceWrapper service = ServiceProvider.lookup("/external/user-service/get");
-			this.userService = service.getHost();
-		} catch (ServiceNotFoundException e) {
-			LOG.error(e.getMessage(), e);
-		}
-	}
+	@Service("/external/review-service/saveImpression")
+	private ServiceWrapper impressionSaver;
+
+	@Service("/external/review-service/saveReview")
+	private ServiceWrapper reviewSaver;
+
+	@Service("/external/review-service/getReviewCount")
+	private ServiceWrapper reviewCountGetter;
+
+	@Service("/external/review-service/getImpressionCount")
+	private ServiceWrapper impressionCountGetter;
 
 	@Service
 	@Inbound({HttpPost.class, QueryStringToMap.class})
 	public void signUp(Map<String, Object> request) throws IOException {
-		HttpServletRequest servletRequest = RequestContext.get(RequestContext.HTTP_SERVLET_REQ);
-		HttpServletResponse response = RequestContext.get(RequestContext.HTTP_SERVLET_RES);
+		HttpServletRequest servletRequest = RequestContext.getServletRequest();
+		HttpServletResponse response = RequestContext.getServletResponse();
 		UserInfo signUpInfo = (UserInfo) servletRequest.getSession().getAttribute(SessionKey.SIGN_UP_INFO);
-		signUpInfo.setNickname((String) request.get("nickname"));
+		signUpInfo.setNickName((String) request.get("nickname"));
 		signUpInfo.setEmail((String) request.get("email"));
 
 		try {
-			this.userService.save(signUpInfo);
+			ServiceObject serviceObject = new ServiceObject();
+			serviceObject.setServiceParameter(signUpInfo);
 
-			LOG.info("sign up BookDream. :) {}.", signUpInfo.getEmail());
-			response.sendRedirect("/");
-		} catch (UserServiceException e) {
+			boolean isSuccess = this.userSaver.call(serviceObject);
+			if (isSuccess) {
+				LOG.info("SIGN UP BookDream. :) {}.", signUpInfo.getEmail());
+				servletRequest.getSession().setAttribute(SessionKey.USER_INFO, signUpInfo);
+				response.sendRedirect("/");
+			} else {
+				response.sendRedirect("/signin.html");
+			}
+		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			response.sendRedirect("/signin.html");
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Service("impression")
 	@Inbound({HttpPost.class, JsonToMap.class})
 	public void saveImpression(Map<String, Object> request) throws IOException {
-		//todo 받은 데이터 저장
+		HttpServletRequest frontRequest = RequestContext.getServletRequest();
+		UserInfo user = (UserInfo) frontRequest.getSession().getAttribute(SessionKey.USER_INFO);
+		BookInfo book = new BookInfo((Map<String, Object>) request.get("book"));
+
+		LOG.info("save impression. book[{}] impression:{}", book.getTitle(), request.get("impression"));
+
+		boolean isSuccess = this.impressionSaver.call(new ServiceObject(user.getId(), book, request.get("impression")));
+		if (!isSuccess) {
+			HttpServletResponse response = RequestContext.getServletResponse();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Service("review")
 	@Inbound({HttpPost.class, JsonToMap.class})
 	public void saveReview(Map<String, Object> request) throws IOException {
-		//todo 받은 데이터 저장
+		HttpServletRequest frontRequest = RequestContext.getServletRequest();
+		UserInfo user = (UserInfo) frontRequest.getSession().getAttribute(SessionKey.USER_INFO);
+		BookInfo book = new BookInfo((Map<String, Object>) request.get("book"));
+		String review = (String) request.get("review");
+
+		LOG.info("save review. book[{}] review:{}", book.getTitle(), review);
+
+		boolean isSuccess = this.reviewSaver.call(new ServiceObject(user.getId(), book, review));
+		if (!isSuccess) {
+			HttpServletResponse response = RequestContext.getServletResponse();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@Service("profile")
 	@Inbound(HttpGet.class)
 	public void getProfile() throws IOException {
-		HttpServletRequest frontRequest = RequestContext.get(RequestContext.HTTP_SERVLET_REQ);
+		HttpServletRequest frontRequest = RequestContext.getServletRequest();
 		UserInfo user = (UserInfo) frontRequest.getSession().getAttribute(SessionKey.USER_INFO);
+		ServiceObject serviceObject = new ServiceObject();
+		serviceObject.setServiceParameter(user.getId());
 
-//		try (Client client = new DefaultClient(new HttpClientCodec())) {
-//			QueryStringEncoder queryStringEncoder = new QueryStringEncoder("/test/receiveHttp");
-//			queryStringEncoder.addParam("id", user);
-//			URI uri = new URI("/test/receiveHttp?message=response");
-//			HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
-//
-//			client.setConnectTimeout(3000);
-//			client.connect("192.168.1.158", 9004);
-//			client.sendAndWait(request);
-//		} catch (Exception e) {
-//
-//		}
+		int reviewCount = this.reviewCountGetter.call(serviceObject);
+		int impressionCount = this.impressionCountGetter.call(serviceObject);
 
-		//todo id 를 통해서 정보를 가져온다.
 		Map<String, Object> info = new HashMap<>();
-		info.put("email", "nerobian@naver.com");
-		info.put("nickname", "KNero");
-		info.put("image", "https://scontent.xx.fbcdn.net/v/t1.0-1/p100x100/15094935_1225609307512845_7310823645782503183_n.jpg?oh=697e14377cecfe09c81a08c85cd7576e&oe=5AD98CB3");
-		info.put("reviewCount", 15);
-		info.put("impressionCount",12);
+		info.put("email", user.getEmail());
+		info.put("nickname", user.getNickName());
+		info.put("image", user.getImage());
+		info.put("reviewCount", reviewCount);
+		info.put("impressionCount",impressionCount);
 
-		HttpServletResponse response = RequestContext.get(RequestContext.HTTP_SERVLET_RES);
+		HttpServletResponse response = RequestContext.getServletResponse();
 		JSON_MAPPER.writeValue(response.getWriter(), info);
 	}
 }

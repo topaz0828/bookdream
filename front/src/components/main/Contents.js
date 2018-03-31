@@ -14,11 +14,11 @@ class Contents extends React.Component {
 	}
 
 	componentDidMount() {
-		this.contentsView.getListBySearchInput('');
+		this.body.getListBySearchInput('');
 	}
 
 	getList(query) {
-		this.contentsView.getListBySearchInput(query);
+		this.body.getListBySearchInput(query);
 	}
 
 	showDetailModal(info) {
@@ -28,8 +28,8 @@ class Contents extends React.Component {
 	render() {
 		return (
 			<div>
-				<Header moveMyPage={this.moveMyPage} getList={this.getList}/>
-		        <Body range='all' ref={(ref) => {this.contentsView = ref;}} contents={this}/>
+				<Header moveMyPage={this.moveMyPage} contents={this}/>
+		        <Body range='all' ref={(ref) => {this.body = ref;}} contents={this}/>
 		        <AddContentsModal/>
 		        <DetailModal ref={(ref) => {this.detailModal = ref;}}/>
 			</div>

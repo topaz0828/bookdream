@@ -4,14 +4,25 @@ class Header extends React.Component {
 	constructor(props) {
 		super(props);
 		this.moveMyPage = props.moveMyPage;
-		this.getList = props.getList;
+		this.contents = props.contents;
 	}
 
 	componentDidMount() {
-		this.searchContentsInput = $('#searchContentsInput');
-		$('searchContentsButton').on('click', () => {
-			this.getList(this.searchContents.val());
+		$('#searchContentsButton').on('click', () => {
+			this.getList();
 		});
+		$('#searchContentsInput').keypress((event) => {
+			if (event.which == 13) {
+				this.getList();
+			}
+		});
+	}
+
+	getList() {
+		var query = $('#searchContentsInput').val().trim();
+		if (query.length > 0) {
+			this.contents.getList(query);
+		}
 	}
 
 	render() {
@@ -22,7 +33,7 @@ class Header extends React.Component {
 					<div className="input-group" style={{maxWidth: '450px'}}>
 						<input id='searchContentsInput' type="text" className="form-control" aria-describedby="sizing-addon2"/>
 						<span className="input-group-btn">
-							<button id='searchContentsButton' className="btn btn-default" type="button" onClick={this.getList}>
+							<button id='searchContentsButton' className="btn btn-default" type="button">
 								<span className='glyphicon glyphicon-search' aria-hidden='true'></span>
 							</button>
 						</span>

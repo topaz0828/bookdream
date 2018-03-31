@@ -96,11 +96,21 @@ class AddContentsModal extends React.Component {
 				url = '/api/user/impression';
 				var impressionInput = $('input[name=impressionInput]');
 				for (var i in impressionInput) {
-					data.impression.push(impressionInput[i].value);
+					var text = impressionInput[i].value;
+					if (text && text.length > 0) {
+						data.impression.push(text);
+					}
+				}
+				
+				if (data.impression.length == 0) {
+					return;
 				}
 			} else {
 				url = '/api/user/review';
-				data.reivew = $('#reviewInput').val();
+				data.review = $('#reviewInput').val();
+				if (data.review.length ==  0) {
+					return;
+				}
 			}
 			
 			var self = this;

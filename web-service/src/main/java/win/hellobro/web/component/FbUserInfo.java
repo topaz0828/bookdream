@@ -22,6 +22,7 @@ public class FbUserInfo implements Serializable {
 		return (String) this.userInfo.get("email");
 	}
 
+	@SuppressWarnings("unchecked")
 	public String getPicture() {
 		Map<String, Object> picture = (Map<String, Object>) this.userInfo.get("picture");
 		if (picture != null) {

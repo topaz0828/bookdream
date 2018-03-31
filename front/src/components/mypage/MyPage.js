@@ -14,7 +14,7 @@ class MyPage extends React.Component {
 
 	getInfo() {
 		this.myState.getState();
-        this.myContents.getList(true);
+        this.myContents.refresh();
 	}
 
     render(){

@@ -1,6 +1,5 @@
 framework :
    container :
-      - win.hellobro.web.WebService
       
    autoReload :
       scheduler : yes

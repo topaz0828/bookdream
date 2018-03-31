@@ -1,6 +1,8 @@
 package win.hellobro.web.service.external;
 
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpRequest;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
@@ -19,16 +21,18 @@ import team.balam.exof.module.service.annotation.ServiceDirectory;
 import team.balam.exof.module.service.annotation.Shutdown;
 import team.balam.exof.module.service.annotation.Startup;
 import team.balam.exof.module.service.annotation.Variable;
+import win.hellobro.web.service.vo.BookInfo;
 
 import java.nio.charset.Charset;
+import java.util.List;
 
 @ServiceDirectory
 public class ReviewService {
 	private static final Logger LOG = LoggerFactory.getLogger(ReviewService.class);
 
-	@Variable("searchContentsList") private String address;
-	@Variable("searchContentsList") private int readTimeout;
-	@Variable("searchContentsList") private int maxPoolSize;
+	@Variable private String address;
+	@Variable private int readTimeout;
+	@Variable private int maxPoolSize;
 
 	private ClientPool clientPool;
 
@@ -44,20 +48,26 @@ public class ReviewService {
 				.build();
 	}
 
-	@Service
-	public String searchContentsList(String isbn, String pageIndex) {
-		return this.sendSearchRequest("/review", isbn, pageIndex);
+	@Service(internal = true)
+	public String searchContentsList(String isbn, String pageIndex, String pageSize) {
+		return this.sendSearchRequest(null, isbn, pageIndex, pageSize);
 	}
 
-	@Service
-	public String searchMyContentsList(String userId, String isbn, String pageIndex) {
-		return this.sendSearchRequest("user/" + userId + "/review", isbn, pageIndex);
+	@Service(internal = true)
+	public String searchMyContentsList(String userId, String isbn, String pageIndex, String pageSize) {
+		return this.sendSearchRequest(userId, isbn, pageIndex, pageSize);
 	}
 
-	private String sendSearchRequest(String path, String isbn, String pageIndex) {
-		QueryStringEncoder query = new QueryStringEncoder(path);
+	private String sendSearchRequest(String userId, String isbn, String pageIndex, String pageSize) {
+		QueryStringEncoder query = new QueryStringEncoder("/review");
+		query.addParam("offset", pageIndex);
+		query.addParam("limit", pageSize);
 		if (!StringUtil.isNullOrEmpty(isbn)) {
 			query.addParam("isbn", isbn);
+		}
+
+		if (!StringUtil.isNullOrEmpty(userId)) {
+			query.addParam("userId", userId);
 		}
 
 		HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, query.toString());
@@ -70,7 +80,7 @@ public class ReviewService {
 				data += "\"list\":" + saveResponse.content().toString(Charset.defaultCharset()) + "}";
 				return data;
 			} else {
-				LOG.warn("Http status code : {}", saveResponse.status().code());
+				printHttpStatusCode(saveResponse);
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -79,10 +89,145 @@ public class ReviewService {
 		return "{\"isbn\":" + "\"" + isbn + "\", \"list\":[]}";
 	}
 
+	@Service(internal = true)
+	public boolean saveReview(String userId, BookInfo bookInfo, String review) {
+		long bookId;
+		try {
+			bookId = this.getBookId(bookInfo);
+		} catch (Exception e) {
+			return false;
+		}
+
+		return this.saveReviewAndImpression(userId, bookId, review, "R");
+	}
+
+	@Service(internal = true)
+	public boolean saveImpression(String userId, BookInfo bookInfo, List<String> impression) {
+		long bookId;
+		try {
+			bookId = this.getBookId(bookInfo);
+		} catch (Exception e) {
+			return false;
+		}
+
+		for (String text : impression) {
+			this.saveReviewAndImpression(userId, bookId, text, "C");
+		}
+
+		return true;
+	}
+
+	private long getBookId(BookInfo bookInfo) throws Exception {
+		QueryStringEncoder encoder = new QueryStringEncoder("/book-id");
+		encoder.addParam("isbn", bookInfo.getIsbn());
+		HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, encoder.toString());
+		request.headers().set(HttpHeaderNames.HOST, this.address);
+		boolean isSaveNewBook = false;
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse response = client.sendAndWait(request);
+			if (response.status().code() == HttpResponseStatus.OK.code()) {
+				return Integer.parseInt(response.content().toString(Charset.defaultCharset()));
+			} else if (response.status().code() == HttpResponseStatus.NOT_FOUND.code()) {
+				isSaveNewBook = true;
+			} else {
+				printHttpStatusCode(response);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			throw e;
+		}
+
+		if (isSaveNewBook) {
+			return this.saveBookInfo(bookInfo);
+		} else {
+			throw new Exception("Fail to save book info.");
+		}
+	}
+
+	private long saveBookInfo(BookInfo bookInfo) throws Exception {
+		byte[] content = RequestConverter.convert(bookInfo);
+
+		FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/book");
+		request.headers().set(HttpHeaderNames.HOST, this.address);
+		request.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.length);
+		request.content().writeBytes(content);
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse saveResponse = client.sendAndWait(request);
+			if (saveResponse.status().code() == HttpResponseStatus.OK.code()) {
+				return Integer.parseInt(saveResponse.content().toString(Charset.defaultCharset()));
+			} else {
+				printHttpStatusCode(saveResponse);
+				throw new Exception("Fail to save book info.");
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	private boolean saveReviewAndImpression(String userId, long bookId, String text, String type) {
+		byte[] content = RequestConverter.convert(bookId, userId, text, type);
+
+		FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/review");
+		request.headers().set(HttpHeaderNames.HOST, this.address);
+		request.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.length);
+		request.content().writeBytes(content);
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse saveResponse = client.sendAndWait(request);
+			if (saveResponse.status().code() == HttpResponseStatus.OK.code()) {
+				return true;
+			} else {
+				printHttpStatusCode(saveResponse);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+
+		return false;
+	}
+
+	@Service(internal = true)
+	public int getReviewCount(String userId) {
+		return this.getCount(userId, "R"); // review
+	}
+
+	@Service(internal = true)
+	public int getImpressionCount(String userId) {
+		return this.getCount(userId, "C"); // comment
+	}
+
+	private int getCount(String userId, String type) {
+		QueryStringEncoder encoder = new QueryStringEncoder("/user/" + userId + "/review/count");
+		encoder.addParam("type", type);
+
+		HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, encoder.toString());
+		request.headers().set(HttpHeaderNames.HOST, this.address);
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse response = client.sendAndWait(request);
+			if (response.status().code() == HttpResponseStatus.OK.code()) {
+				return Integer.parseInt(response.content().toString(Charset.defaultCharset()));
+			} else {
+				printHttpStatusCode(response);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+
+		return 0;
+	}
+
 	@Shutdown
 	public void stop() {
 		if (this.clientPool != null) {
 			this.clientPool.destroy();
 		}
+	}
+
+	private static void printHttpStatusCode(FullHttpResponse response) {
+		LOG.warn("Http status code : {}", response.status().code());
 	}
 }

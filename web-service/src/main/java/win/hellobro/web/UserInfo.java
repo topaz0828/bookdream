@@ -3,8 +3,10 @@ package win.hellobro.web;
 import java.io.Serializable;
 
 public class UserInfo implements Serializable {
+	public static final UserInfo NOT_FOUND_USER = new UserInfo();
+
 	private String id;
-	private String nickname;
+	private String nickName;
 	private String email;
 	private OAuthSite oauthSite;
 	private String image;
@@ -17,12 +19,12 @@ public class UserInfo implements Serializable {
 		this.id = id;
 	}
 
-	public String getNickname() {
-		return nickname;
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
+	public String getNickName() {
+		return nickName;
 	}
 
 	public String getEmail() {
@@ -37,8 +39,12 @@ public class UserInfo implements Serializable {
 		return oauthSite;
 	}
 
-	public void setOauthSte(OAuthSite oauthSite) {
+	public void setOauthSite(OAuthSite oauthSite) {
 		this.oauthSite = oauthSite;
+	}
+
+	public void setOauthSite(String oauthSite) {
+		this.oauthSite = OAuthSite.get(oauthSite);
 	}
 
 	public String getImage() {
@@ -53,7 +59,7 @@ public class UserInfo implements Serializable {
 	public String toString() {
 		return "UserInfo{" +
 				"id='" + id + '\'' +
-				", nickname='" + nickname + '\'' +
+				", nickname='" + nickName + '\'' +
 				", email='" + email + '\'' +
 				'}';
 	}

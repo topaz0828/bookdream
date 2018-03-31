@@ -971,45 +971,50 @@ var Body = function (_React$Component) {
 		var _this = _possibleConstructorReturn(this, (Body.__proto__ || Object.getPrototypeOf(Body)).call(this, props));
 
 		_this.state = { list: [] };
-		_this.detectScrollPosition = function () {
-			if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-				_this.getListByScroll();
-			}
-		};
 		_this.contents = props.contents;
 		_this.maxColumnCount = 4;
 		_this.lastColIndex = 0;
-		_this.contentsDivId = _this.range + 'contents';
 
-		_this.isRefresh = false;
 		_this.range = props.range; // all / my
+		_this.contentsDivId = _this.range + 'contents';
 		_this.pageIndex = 0;
 		_this.query = '';
 		_this.isbn = ''; // 쿼리로 검색 후 검색에 사용된 isbn을 저장해 뒀다가 스크롤이동 시 재사용 한다.
+
+		_this.isLoading = false;
+		_this.isRefresh = false;
+		_this.isLastPage = false;
+		_this.pageSize = 30;
+
+		setInterval(function () {
+			if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+				_this.getListByScroll();
+			}
+		}, 500);
 		return _this;
 	}
 
 	_createClass(Body, [{
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			window.addEventListener('scroll', this.detectScrollPosition, false);
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			window.removeEventListener('scroll', this.detectScrollPosition, false);
-		}
-	}, {
 		key: 'getListByScroll',
 		value: function getListByScroll() {
-			this.isRefresh = false;
-			this.getList({ isbn: this.isbn, range: this.range, pageIndex: this.pageIndex });
+			if (!this.isLoading) {
+				this.isRefresh = false;
+				this.getList({ isbn: this.isbn, range: this.range, pageIndex: this.pageIndex, pageSize: this.pageSize });
+			}
+		}
+	}, {
+		key: 'refresh',
+		value: function refresh() {
+			this.isLastPage = false;
+			this.isRefresh = true;
+			this.getList({ isbn: this.isbn, range: this.range, pageIndex: 0, pageSize: this.pageSize });
 		}
 	}, {
 		key: 'getListBySearchInput',
 		value: function getListBySearchInput(query) {
+			this.isLastPage = false;
 			this.isRefresh = true;
-			this.getList({ query: query, range: this.range, pageIndex: this.pageIndex });
+			this.getList({ query: query, range: this.range, pageIndex: 0, pageSize: this.pageSize });
 		}
 	}, {
 		key: 'getList',
@@ -1020,6 +1025,11 @@ var Body = function (_React$Component) {
 				return;
 			}
 
+			if (this.isLastPage) {
+				return;
+			}
+
+			this.isLoading = true;
 			var self = this;
 			$.ajax({
 				type: 'GET',
@@ -1027,10 +1037,12 @@ var Body = function (_React$Component) {
 				dataType: 'json',
 				data: data
 			}).done(function (res) {
+				self.isbn = res.isbn;
+
 				var newList = [];
 				for (var i in res.list) {
 					var d = res.list[i];
-					console.log(d);
+
 					newList.push({
 						reviewId: d.ID,
 						nickname: d.NICKNAME,
@@ -1044,7 +1056,11 @@ var Body = function (_React$Component) {
 				}
 
 				self.setState({ list: newList });
+				self.isLoading = false;
+				++self.pageIndex;
+				self.isLastPage = res.list.length < self.pageSize;
 			}).fail(function () {
+				self.isLoading = false;
 				alert('Server error.');
 			});
 		}
@@ -18639,12 +18655,12 @@ var Contents = function (_React$Component) {
 	_createClass(Contents, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			this.contentsView.getListBySearchInput('');
+			this.body.getListBySearchInput('');
 		}
 	}, {
 		key: 'getList',
 		value: function getList(query) {
-			this.contentsView.getListBySearchInput(query);
+			this.body.getListBySearchInput(query);
 		}
 	}, {
 		key: 'showDetailModal',
@@ -18659,9 +18675,9 @@ var Contents = function (_React$Component) {
 			return _react2.default.createElement(
 				'div',
 				null,
-				_react2.default.createElement(_Header2.default, { moveMyPage: this.moveMyPage, getList: this.getList }),
+				_react2.default.createElement(_Header2.default, { moveMyPage: this.moveMyPage, contents: this }),
 				_react2.default.createElement(_Body2.default, { range: 'all', ref: function ref(_ref) {
-						_this2.contentsView = _ref;
+						_this2.body = _ref;
 					}, contents: this }),
 				_react2.default.createElement(_AddContentsModal2.default, null),
 				_react2.default.createElement(_DetailModal2.default, { ref: function ref(_ref2) {
@@ -18710,7 +18726,7 @@ var Header = function (_React$Component) {
 		var _this = _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this, props));
 
 		_this.moveMyPage = props.moveMyPage;
-		_this.getList = props.getList;
+		_this.contents = props.contents;
 		return _this;
 	}
 
@@ -18719,10 +18735,22 @@ var Header = function (_React$Component) {
 		value: function componentDidMount() {
 			var _this2 = this;
 
-			this.searchContentsInput = $('#searchContentsInput');
-			$('searchContentsButton').on('click', function () {
-				_this2.getList(_this2.searchContents.val());
+			$('#searchContentsButton').on('click', function () {
+				_this2.getList();
 			});
+			$('#searchContentsInput').keypress(function (event) {
+				if (event.which == 13) {
+					_this2.getList();
+				}
+			});
+		}
+	}, {
+		key: 'getList',
+		value: function getList() {
+			var query = $('#searchContentsInput').val().trim();
+			if (query.length > 0) {
+				this.contents.getList(query);
+			}
 		}
 	}, {
 		key: 'render',
@@ -18747,7 +18775,7 @@ var Header = function (_React$Component) {
 							{ className: 'input-group-btn' },
 							_react2.default.createElement(
 								'button',
-								{ id: 'searchContentsButton', className: 'btn btn-default', type: 'button', onClick: this.getList },
+								{ id: 'searchContentsButton', className: 'btn btn-default', type: 'button' },
 								_react2.default.createElement('span', { className: 'glyphicon glyphicon-search', 'aria-hidden': 'true' })
 							)
 						)
@@ -19023,11 +19051,21 @@ var AddContentsModal = function (_React$Component) {
 					url = '/api/user/impression';
 					var impressionInput = $('input[name=impressionInput]');
 					for (var i in impressionInput) {
-						data.impression.push(impressionInput[i].value);
+						var text = impressionInput[i].value;
+						if (text && text.length > 0) {
+							data.impression.push(text);
+						}
+					}
+
+					if (data.impression.length == 0) {
+						return;
 					}
 				} else {
 					url = '/api/user/review';
-					data.reivew = $('#reviewInput').val();
+					data.review = $('#reviewInput').val();
+					if (data.review.length == 0) {
+						return;
+					}
 				}
 
 				var self = this;
@@ -19394,7 +19432,7 @@ var MyPage = function (_React$Component) {
         key: 'getInfo',
         value: function getInfo() {
             this.myState.getState();
-            this.myContents.getList(true);
+            this.myContents.refresh();
         }
     }, {
         key: 'render',

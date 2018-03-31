@@ -1,39 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services>
-    <serviceDirectory class="win.hellobro.web.service.User" path="/user"/>
+    <serviceDirectory class="win.hellobro.web.service.User" path="/user">
+        <variable name="helper" value="helper"/>
+    </serviceDirectory>
 
     <serviceDirectory class="win.hellobro.web.service.Finder" path="/search">
-        <serviceVariable serviceName="book">
-            <variable name="kakaoApiUri" value="https://dapi.kakao.com/v2/search/book"/>
-            <variable name="kakaoApiKey" value="7b15cef8dfbdedf8cd3fb26ae3262097"/>
-        </serviceVariable>
+        <variable name="kakaoApiUri" value="https://dapi.kakao.com/v2/search/book"/>
+        <variable name="kakaoApiKey" value="KakaoAK 7b15cef8dfbdedf8cd3fb26ae3262097"/>
     </serviceDirectory>
 
     <serviceDirectory class="win.hellobro.web.service.FacebookSignIn" path="/signin/facebook">
-        <serviceVariable serviceName="oauth-uri">
-            <variable name="loginUri" value="https://www.facebook.com/v2.12/dialog/oauth?"/>
-            <variable name="appId" value="242352022831116"/>
-            <variable name="redirectUri" value="http://localhost:3003/api/signin/facebook/callback"/>
-        </serviceVariable>
-        <serviceVariable serviceName="callback">
-            <variable name="accessTokenUri" value="https://graph.facebook.com/v2.12/oauth/access_token"/>
-            <variable name="clientSecretKey" value="0c6e534a8701920835150e679aed2191"/>
-            <variable name="userInfoUri" value="https://graph.facebook.com/me"/>
-        </serviceVariable>
+        <variable name="loginUri" value="https://www.facebook.com/v2.12/dialog/oauth?"/>
+        <variable name="appId" value="242352022831116"/>
+        <variable name="clientSecretKey" value="0c6e534a8701920835150e679aed2191"/>
+
+        <variable name="redirectUri" value="http://localhost:3003/api/signin/facebook/callback"/>
+        <variable name="accessTokenUri" value="https://graph.facebook.com/v2.12/oauth/access_token"/>
+        <variable name="userInfoUri" value="https://graph.facebook.com/me"/>
     </serviceDirectory>
 
     <serviceDirectory class="win.hellobro.web.service.external.UserService" path="/external/user-service">
-        <serviceVariable serviceName="save">
-            <variable name="address" value="127.0.0.1:8080"/>
-            <variable name="readTimeout" value="5000"/>
-            <variable name="maxPoolSize" value="1"/>
-        </serviceVariable>
+        <variable name="address" value="127.0.0.1:9004"/>
+        <variable name="readTimeout" value="5000"/>
+        <variable name="maxPoolSize" value="1"/>
     </serviceDirectory>
+
     <serviceDirectory class="win.hellobro.web.service.external.ReviewService" path="/external/review-service">
-        <serviceVariable serviceName="searchContentsList">
-            <variable name="address" value="127.0.0.1:8080"/>
-            <variable name="readTimeout" value="5000"/>
-            <variable name="maxPoolSize" value="1"/>
-        </serviceVariable>
+        <variable name="address" value="127.0.0.1:8080"/>
+        <variable name="readTimeout" value="5000"/>
+        <variable name="maxPoolSize" value="1"/>
     </serviceDirectory>
 </services>

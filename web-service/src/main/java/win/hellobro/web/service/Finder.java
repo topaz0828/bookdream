@@ -5,13 +5,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.balam.exof.module.listener.RequestContext;
-import team.balam.exof.module.service.ServiceNotFoundException;
-import team.balam.exof.module.service.ServiceProvider;
+import team.balam.exof.module.service.ServiceObject;
 import team.balam.exof.module.service.ServiceWrapper;
 import team.balam.exof.module.service.annotation.Inbound;
 import team.balam.exof.module.service.annotation.Service;
 import team.balam.exof.module.service.annotation.ServiceDirectory;
-import team.balam.exof.module.service.annotation.Startup;
 import team.balam.exof.module.service.annotation.Variable;
 import team.balam.exof.module.service.component.http.HttpGet;
 import win.hellobro.web.SessionKey;
@@ -19,7 +17,6 @@ import win.hellobro.web.UserInfo;
 import win.hellobro.web.component.BookApiClient;
 import win.hellobro.web.component.BookSearchResult;
 import win.hellobro.web.component.part.QueryStringToMap;
-import win.hellobro.web.service.external.ReviewService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,20 +29,14 @@ public class Finder {
 	private static final Logger LOG = LoggerFactory.getLogger(Finder.class);
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
-	@Variable("book") private String kakaoApiUri;
-	@Variable("book") private String kakaoApiKey;
+	@Variable private String kakaoApiUri;
+	@Variable private String kakaoApiKey;
 
-	private ReviewService reviewService;
+	@Service("/external/review-service/searchMyContentsList")
+	private ServiceWrapper myContentsGetter;
 
-	@Startup
-	public void init() {
-		try {
-			ServiceWrapper service = ServiceProvider.lookup("/external/review-service/searchContentsList");
-			this.reviewService = service.getHost();
-		} catch (ServiceNotFoundException e) {
-			LOG.error(e.getMessage(), e);
-		}
-	}
+	@Service("/external/review-service/searchContentsList")
+	private ServiceWrapper allContentsGetter;
 
 	@Service("book")
 	@Inbound({HttpGet.class, QueryStringToMap.class})
@@ -53,7 +44,7 @@ public class Finder {
 		String query = (String) param.get("q");
 		LOG.info("query for searching book : {}", query);
 
-		HttpServletResponse response = RequestContext.get(RequestContext.HTTP_SERVLET_RES);
+		HttpServletResponse response = RequestContext.getServletResponse();
 		response.setCharacterEncoding("UTF-8");
 
 		try {
@@ -79,23 +70,26 @@ public class Finder {
 		String isbn = (String) param.get("isbn");
 		String range = (String) param.get("range");
 		String pageIndex = (String) param.get("pageIndex");
+		String pageSize = (String) param.get("pageSize");
+		String query = (String) param.get("query");
 
-		if (StringUtil.isNullOrEmpty(isbn)) {
-			isbn = this.findIsbnFromBookApi((String) param.get("query"));
+		if (!StringUtil.isNullOrEmpty(query)) {
+			isbn = this.findIsbnFromBookApi(query);
 		}
 
 		String resultList;
+
 		if ("my".equals(range)) {
-			HttpServletRequest servletRequest = RequestContext.get(RequestContext.HTTP_SERVLET_REQ);
+			HttpServletRequest servletRequest = RequestContext.getServletRequest();
 			UserInfo user = (UserInfo) servletRequest.getSession().getAttribute(SessionKey.USER_INFO);
-			resultList = this.reviewService.searchMyContentsList(user.getId(), isbn, pageIndex);
+			resultList = this.myContentsGetter.call(new ServiceObject(user.getId(), isbn, pageIndex, pageSize));
 		} else {
-			resultList = this.reviewService.searchContentsList(isbn, pageIndex);
+			resultList = this.allContentsGetter.call(new ServiceObject(isbn, pageIndex, pageSize));
 		}
 
-		HttpServletResponse response = RequestContext.get(RequestContext.HTTP_SERVLET_RES);
+		HttpServletResponse response = RequestContext.getServletResponse();
 		response.setCharacterEncoding("UTF-8");
-		response.getWriter().write(resultList);
+		response.getWriter().write(resultList != null ? resultList : "");
 	}
 
 	private String findIsbnFromBookApi(String query) {

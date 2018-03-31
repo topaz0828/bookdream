@@ -5,39 +5,45 @@ class Body extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {list : []};
-		this.detectScrollPosition = () => {
-			if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)) {
-				this.getListByScroll();
-			}
-		}
 		this.contents = props.contents;
 		this.maxColumnCount = 4;
 		this.lastColIndex = 0;
-		this.contentsDivId = this.range + 'contents';
 
-		this.isRefresh = false;
 		this.range = props.range; // all / my
+		this.contentsDivId = this.range + 'contents';
 		this.pageIndex = 0;
 		this.query = ''; 
 		this.isbn = ''; // 쿼리로 검색 후 검색에 사용된 isbn을 저장해 뒀다가 스크롤이동 시 재사용 한다.
-	}
 
-	componentDidMount() {
-		window.addEventListener('scroll', this.detectScrollPosition, false);
-	}
+		this.isLoading = false;
+		this.isRefresh = false;
+		this.isLastPage = false;
+		this.pageSize = 30;
 
-	componentWillUnmount() {
-		window.removeEventListener('scroll', this.detectScrollPosition, false);
+		setInterval(() => {
+			if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)) {
+				this.getListByScroll();
+			}
+		}, 500);
 	}
 
 	getListByScroll() {
-		this.isRefresh = false;
-		this.getList({isbn: this.isbn, range: this.range, pageIndex: this.pageIndex});
+		if (!this.isLoading) {
+			this.isRefresh = false;
+			this.getList({isbn: this.isbn, range: this.range, pageIndex: this.pageIndex, pageSize: this.pageSize});
+		}
+	}
+
+	refresh() {
+		this.isLastPage = false;
+		this.isRefresh = true;
+		this.getList({isbn: this.isbn, range: this.range, pageIndex: 0, pageSize: this.pageSize});
 	}
 
 	getListBySearchInput(query) {
+		this.isLastPage = false;
 		this.isRefresh = true;
-		this.getList({query: query, range: this.range, pageIndex: this.pageIndex});
+		this.getList({query: query, range: this.range, pageIndex: 0, pageSize: this.pageSize});
 	}
 
 	getList(data) {
@@ -47,6 +53,11 @@ class Body extends React.Component {
 			return;
 		}
 
+		if (this.isLastPage) {
+			return;
+		}
+
+		this.isLoading = true;
 		var self = this;
 		$.ajax({
 				type: 'GET',
@@ -59,7 +70,7 @@ class Body extends React.Component {
 				var newList = [];
 				for (var i in res.list) {
 					var d = res.list[i];
-					console.log(d);
+					
 					newList.push({
 						reviewId: d.ID,
 						nickname: d.NICKNAME,
@@ -73,7 +84,11 @@ class Body extends React.Component {
 				}
 				
 				self.setState({list : newList});
+				self.isLoading = false;
+				++self.pageIndex;
+				self.isLastPage = res.list.length < self.pageSize;
 			}).fail(function() {
+				self.isLoading = false;
 				alert('Server error.');
 			});
 	}

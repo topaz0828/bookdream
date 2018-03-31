@@ -10,9 +10,10 @@ import io.netty.handler.codec.http.QueryStringEncoder;
 import io.netty.util.CharsetUtil;
 import io.netty.util.internal.StringUtil;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import team.balam.exof.client.Client;
 import team.balam.exof.client.DefaultClient;
-import win.hellobro.web.WebService;
 import win.hellobro.web.component.part.HttpsClientCodec;
 
 import java.net.URI;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BookApiClient {
+	private static final Logger LOG = LoggerFactory.getLogger(BookApiClient.class);
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
 	private BookApiClient() {
@@ -63,6 +65,7 @@ public class BookApiClient {
 	private static List<BookSearchResult> convertResult(Map<String, Object> jsonResult) {
 		List<Map<String, Object>> bookInfoList = (List<Map<String, Object>>) jsonResult.get("documents");
 		if (bookInfoList == null) {
+			LOG.warn("Response : {}", jsonResult);
 			return Collections.emptyList();
 		}
 
@@ -76,9 +79,13 @@ public class BookApiClient {
 			}
 
 			String isbn = (String) book.get("isbn");
-			if (!StringUtil.isNullOrEmpty(isbn)) {
+			if (isbn != null && !isbn.trim().isEmpty()) {
 				String[] isbnArray = isbn.split(" ");
-				searchResult.setIsbn(isbnArray[0]);
+				for (String saveIsbn : isbnArray) {
+					if (!saveIsbn.trim().isEmpty()) {
+						searchResult.setIsbn(saveIsbn);
+					}
+				}
 			}
 
 			searchResult.setCategory((String) book.get("category"));
