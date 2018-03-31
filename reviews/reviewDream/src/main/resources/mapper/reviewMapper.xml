@@ -21,7 +21,7 @@
         <if test="USER_ID != null">
             AND r.USER_ID = #{USER_ID}
         </if>
-        <if test="type != null">
+        <if test="TYPE != null">
             AND r.TYPE = #{TYPE}
         </if>
         <if test="ISBN != null">
@@ -30,6 +30,7 @@
                 #{item}
             </foreach>
         </if>
+        ORDER BY UPDATE_DATE DESC
         LIMIT #{offset}, #{limit};
     </select>
 
@@ -45,7 +46,7 @@
         <if test="USER_ID != null">
             AND r.USER_ID = #{USER_ID}
         </if>
-        <if test="type != null">
+        <if test="TYPE != null">
             AND r.TYPE = #{TYPE}
         </if>
         <if test="ISBN != null">
@@ -73,23 +74,23 @@
 
     <select id="count" parameterType="map" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM BOOK_REVIEW
-        <if test="type != null">
+        <if test="TYPE != null">
             WHERE TYPE = #{TYPE}
         </if>
     </select>
 
     <select id="countByUserId" parameterType="map" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM BOOK_REVIEW
-        WHERE USER_ID = #{user_id}
-        <if test="type != null">
+        WHERE USER_ID = #{USER_ID}
+        <if test="TYPE != null">
             AND TYPE = #{TYPE}
         </if>
     </select>
 
     <select id="countByBookId" parameterType="map" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM BOOK_REVIEW
-        WHERE BOOK_ID = #{book_id}
-        <if test="type != null">
+        WHERE BOOK_ID = #{BOOK_ID}
+        <if test="TYPE != null">
             AND TYPE = #{TYPE}
         </if>
     </select>

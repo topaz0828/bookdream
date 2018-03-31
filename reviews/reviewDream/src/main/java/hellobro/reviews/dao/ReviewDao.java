@@ -1,6 +1,8 @@
 package hellobro.reviews.dao;
 
 import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 @Component
 public class ReviewDao {
+    private static final Logger log = LoggerFactory.getLogger(ReviewDao.class);
 
     @Autowired
     private SqlSession sqlSession;
@@ -25,13 +28,13 @@ public class ReviewDao {
         map.put("ISBN", isbn);
         map.put("offset", offset);
         map.put("limit", limit);
-
-	    System.out.println("select parameter : " + map);
+        log.info("select parameter {}", map);
         return sqlSession.selectList("select", map);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Integer count(String type) {
+        log.info("count {}", type);
         return sqlSession.selectOne("count", type);
     }
 
@@ -40,6 +43,7 @@ public class ReviewDao {
         Map<String, Object> map = new HashMap<>();
         map.put("USER_ID", userId);
         map.put("TYPE", type);
+        log.info("countByUserId {}", map);
         return sqlSession.selectOne("countByUserId", map);
     }
 
@@ -48,6 +52,7 @@ public class ReviewDao {
         Map<String, Object> map = new HashMap<>();
         map.put("BOOK_ID", bookId);
         map.put("TYPE", type);
+        log.info("countByBookId {}", map);
         return sqlSession.selectOne("countByBookId", map);
     }
 
@@ -60,11 +65,11 @@ public class ReviewDao {
         map.put("TEXT", text);
         try {
             sqlSession.insert("insert", map);
-        }
-        catch (Exception e){
-        	e.printStackTrace();
+        } catch (Exception e) {
+            log.error("insert Exception{}", e);
             return false;
         }
+        log.info("insert {}", map);
         return true;
     }
 
@@ -77,10 +82,10 @@ public class ReviewDao {
         map.put("TYPE", type);
         map.put("TEXT", text);
         try {
+            log.info("update {}", map);
             sqlSession.update("update", map);
-        }
-        catch (Exception e){
-	        e.printStackTrace();
+        } catch (Exception e) {
+            log.error("update Exception{}", e);
             return false;
         }
         return true;
@@ -89,20 +94,23 @@ public class ReviewDao {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Boolean delete(String reviewId, String userId, String bookId) {
         try {
-            if(reviewId != null){
+            if (reviewId != null) {
+                log.info("delete reviewId={}", reviewId);
                 sqlSession.delete("delete", reviewId);
             }
-            if(userId != null){
+            if (userId != null) {
+                log.info("deleteByUserId userId={}", userId);
                 sqlSession.delete("deleteByUserId", userId);
             }
-            if(bookId != null){
+            if (bookId != null) {
+                log.info("deleteByBookId bookId={}", bookId);
                 sqlSession.delete("deleteByBookId", bookId);
             }
-        }
-        catch (Exception e){
-	        e.printStackTrace();
+        } catch (Exception e) {
+            log.error("delete Exception{}", e);
             return false;
         }
+
         return true;
     }
 

@@ -15,15 +15,52 @@
     </insert>
 
     <select id="selectBookId" parameterType="string" resultType="integer">
-        SELECT ID FROM BOOK_INFO WHERE ISBN=#{isbn}
+        SELECT ID FROM BOOK_INFO WHERE ISBN=#{isbn} LIMIT 1;
     </select>
 
     <select id="selectBookCategory" parameterType="string" resultType="integer">
-        SELECT ID FROM BOOK_CATEGORY WHERE NAME=#{name}
+        SELECT ID FROM BOOK_CATEGORY WHERE NAME=#{name} LIMIT 1;
     </select>
 
     <insert id="insertBookCategory" parameterType="string">
-        INSERT INTO BOOK_CATEGORY (NAME) VALUES (#{name})
+        INSERT INTO BOOK_CATEGORY (NAME) VALUES (#{name});
     </insert>
+
+    <select id="selectBookId2" parameterType="map" resultType="Integer">
+        SELECT ID
+        FROM BOOK_INFO
+        WHERE ID > 0
+        <if test="pub_id != null">
+            AND pub_id = #{pub_id}
+        </if>
+        <if test="CATEGORY_ID != null">
+            AND CATEGORY_ID = #{CATEGORY_ID}
+        </if>
+        <if test="TITLE != null">
+            AND TITLE = #{TITLE}
+        </if>
+        <if test="DESCRIPTION != null">
+            AND DESCRIPTION = #{DESCRIPTION}
+        </if>
+        <if test="AUTHOR != null">
+            AND AUTHOR = #{AUTHOR}
+        </if>
+        <if test="TRANSLATOR != null">
+            AND TRANSLATOR = #{TRANSLATOR}
+        </if>
+        <if test="PRICE != null">
+            AND PRICE = #{PRICE}
+        </if>
+        <if test="RARITY != null">
+            AND RARITY = #{RARITY}
+        </if>
+        <if test="PAGES != null">
+            AND PAGES = #{PAGES}
+        </if>
+        <if test="ISBN != null">
+            AND ISBN = #{ISBN}
+        </if>
+        LIMIT 1;
+    </select>
 
 </mapper>
