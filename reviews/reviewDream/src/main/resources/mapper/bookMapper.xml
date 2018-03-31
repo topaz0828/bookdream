@@ -14,4 +14,16 @@
         ;
     </insert>
 
+    <select id="selectBookId" parameterType="string" resultType="integer">
+        SELECT ID FROM BOOK_INFO WHERE ISBN=#{isbn}
+    </select>
+
+    <select id="selectBookCategory" parameterType="string" resultType="integer">
+        SELECT ID FROM BOOK_CATEGORY WHERE NAME=#{name}
+    </select>
+
+    <insert id="insertBookCategory" parameterType="string">
+        INSERT INTO BOOK_CATEGORY (NAME) VALUES (#{name})
+    </insert>
+
 </mapper>

@@ -25,6 +25,8 @@ public class ReviewDao {
         map.put("ISBN", isbn);
         map.put("offset", offset);
         map.put("limit", limit);
+
+	    System.out.println("select parameter : " + map);
         return sqlSession.selectList("select", map);
     }
 
@@ -60,6 +62,7 @@ public class ReviewDao {
             sqlSession.insert("insert", map);
         }
         catch (Exception e){
+        	e.printStackTrace();
             return false;
         }
         return true;
@@ -77,6 +80,7 @@ public class ReviewDao {
             sqlSession.update("update", map);
         }
         catch (Exception e){
+	        e.printStackTrace();
             return false;
         }
         return true;
@@ -96,6 +100,7 @@ public class ReviewDao {
             }
         }
         catch (Exception e){
+	        e.printStackTrace();
             return false;
         }
         return true;

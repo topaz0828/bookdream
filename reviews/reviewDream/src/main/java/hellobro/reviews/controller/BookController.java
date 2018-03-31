@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -36,7 +37,27 @@ public class BookController {
         return insertBook(map);
     }
 
+	@RequestMapping(value = {"/book-id"}, method = RequestMethod.GET)
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResponseEntity<Integer> getBookId(@RequestParam(value = "isbn", required = false) String isbn) {
+    	Integer bookId = this.dao.selectBookId(isbn);
+    	if (bookId == null) {
+    		return new ResponseEntity<>(0, HttpStatus.NOT_FOUND);
+	    } else {
+		    return new ResponseEntity<>(bookId, HttpStatus.OK);
+	    }
+	}
+
     private ResponseEntity<Boolean> insertBook(Map<String, Object> map) {
+    	String category = (String) map.get("CATEGORY");
+	    Integer categoryId = this.dao.selectCategoryId(category);
+    	if (categoryId == null) {
+    		this.dao.insertCategory(category);
+		    categoryId = this.dao.selectCategoryId(category);
+	    }
+
+	    map.remove("CATEGORY");
+	    map.put("CATEGORY_ID", categoryId);
         return new ResponseEntity<>(dao.insert2(map), HttpStatus.OK);
     }
 

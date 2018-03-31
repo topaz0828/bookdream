@@ -42,4 +42,30 @@ public class BookDao {
         }
         return true;
     }
+
+    public Integer selectCategoryId(String name) {
+	    try {
+		    return sqlSession.selectOne("selectBookCategory", name);
+	    } catch (Exception e) {
+		    System.out.println(e);
+		    return null;
+	    }
+    }
+
+    public void insertCategory(String name) {
+	    try {
+		    sqlSession.insert("insertBookCategory", name);
+	    } catch (Exception e) {
+		    System.out.println(e);
+	    }
+    }
+
+    public Integer selectBookId(String isbn) {
+	    try {
+		    return sqlSession.selectOne("selectBookId", isbn);
+	    } catch (Exception e) {
+		    System.out.println(e);
+		    return null;
+	    }
+    }
 }
