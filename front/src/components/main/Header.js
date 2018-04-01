@@ -20,16 +20,14 @@ class Header extends React.Component {
 
 	getList() {
 		var query = $('#searchContentsInput').val().trim();
-		if (query.length > 0) {
-			this.contents.getList(query);
-		}
+		this.contents.getList(query);
 	}
 
 	render() {
 		return (
 			<div className='row'>
-				<div className='col-sm-6 col-md-3 h1' align='center'>Bookdream</div>
-				<div className='col-sm-12 col-md-6' style={{paddingTop: '25px'}} align='center'>
+				<div className='col-sm-6 col-md-3' align='center'><h1>Marker</h1><h6><strong>Mark</strong> the moments of your life.</h6></div>
+				<div className='col-sm-12 col-md-6' style={{paddingTop: '40px'}} align='center'>
 					<div className="input-group" style={{maxWidth: '450px'}}>
 						<input id='searchContentsInput' type="text" className="form-control" aria-describedby="sizing-addon2"/>
 						<span className="input-group-btn">
@@ -39,12 +37,12 @@ class Header extends React.Component {
 						</span>
 					</div>
 				</div>
-				<div className='col-sm-6 col-md-3' style={{paddingTop: '25px', paddingRight: '70px'}} align='right'>
-					<button type='button' className='btn btn-info' data-toggle='modal' data-target='#addContentsModal'>
+				<div className='col-sm-6 col-md-3' style={{paddingTop: '35px', paddingRight: '70px'}} align='right'>
+					<button type='button' className='btn btn-info btn-lg' data-toggle='modal' data-target='#addContentsModal'>
 						<span className='glyphicon glyphicon-plus' aria-hidden='true'></span>
 					</button>
 					&nbsp;&nbsp;
-					<button type='button' className='btn btn-info' onClick={this.moveMyPage}>
+					<button type='button' className='btn btn-info btn-lg' onClick={this.moveMyPage}>
 						<span className='glyphicon glyphicon-user' aria-hidden='true'></span>
 					</button>
 				</div>

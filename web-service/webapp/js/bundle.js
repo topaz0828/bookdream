@@ -971,7 +971,7 @@ var Body = function (_React$Component) {
 		var _this = _possibleConstructorReturn(this, (Body.__proto__ || Object.getPrototypeOf(Body)).call(this, props));
 
 		_this.state = { list: [] };
-		_this.contents = props.contents;
+		_this.parent = props.parent;
 		_this.maxColumnCount = 4;
 		_this.lastColIndex = 0;
 
@@ -1100,7 +1100,7 @@ var Body = function (_React$Component) {
 					image: data.image,
 					text: data.text,
 					type: data.type,
-					contents: this.contents })
+					parent: this.parent })
 			);
 		}
 	}, {
@@ -18525,9 +18525,13 @@ var _Contents = __webpack_require__(29);
 
 var _Contents2 = _interopRequireDefault(_Contents);
 
-var _MyPage = __webpack_require__(34);
+var _MyPage = __webpack_require__(33);
 
 var _MyPage2 = _interopRequireDefault(_MyPage);
+
+var _DetailModal = __webpack_require__(36);
+
+var _DetailModal2 = _interopRequireDefault(_DetailModal);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18566,6 +18570,11 @@ var App = function (_React$Component) {
 			this.myPageDiv.hide();
 		}
 	}, {
+		key: 'showDetailModal',
+		value: function showDetailModal(info) {
+			this.detailModal.show(info);
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			var _this2 = this;
@@ -18586,7 +18595,10 @@ var App = function (_React$Component) {
 					_react2.default.createElement(_MyPage2.default, { app: this, ref: function ref(_ref2) {
 							_this2.myPage = _ref2;
 						} })
-				)
+				),
+				_react2.default.createElement(_DetailModal2.default, { ref: function ref(_ref3) {
+						_this2.detailModal = _ref3;
+					} })
 			);
 		}
 	}]);
@@ -18625,10 +18637,6 @@ var _AddContentsModal = __webpack_require__(32);
 
 var _AddContentsModal2 = _interopRequireDefault(_AddContentsModal);
 
-var _DetailModal = __webpack_require__(33);
-
-var _DetailModal2 = _interopRequireDefault(_DetailModal);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -18663,11 +18671,6 @@ var Contents = function (_React$Component) {
 			this.body.getListBySearchInput(query);
 		}
 	}, {
-		key: 'showDetailModal',
-		value: function showDetailModal(info) {
-			this.detailModal.show(info);
-		}
-	}, {
 		key: 'render',
 		value: function render() {
 			var _this2 = this;
@@ -18678,11 +18681,8 @@ var Contents = function (_React$Component) {
 				_react2.default.createElement(_Header2.default, { moveMyPage: this.moveMyPage, contents: this }),
 				_react2.default.createElement(_Body2.default, { range: 'all', ref: function ref(_ref) {
 						_this2.body = _ref;
-					}, contents: this }),
-				_react2.default.createElement(_AddContentsModal2.default, null),
-				_react2.default.createElement(_DetailModal2.default, { ref: function ref(_ref2) {
-						_this2.detailModal = _ref2;
-					} })
+					}, parent: this }),
+				_react2.default.createElement(_AddContentsModal2.default, null)
 			);
 		}
 	}]);
@@ -18748,9 +18748,7 @@ var Header = function (_React$Component) {
 		key: 'getList',
 		value: function getList() {
 			var query = $('#searchContentsInput').val().trim();
-			if (query.length > 0) {
-				this.contents.getList(query);
-			}
+			this.contents.getList(query);
 		}
 	}, {
 		key: 'render',
@@ -18760,12 +18758,26 @@ var Header = function (_React$Component) {
 				{ className: 'row' },
 				_react2.default.createElement(
 					'div',
-					{ className: 'col-sm-6 col-md-3 h1', align: 'center' },
-					'Bookdream'
+					{ className: 'col-sm-6 col-md-3', align: 'center' },
+					_react2.default.createElement(
+						'h1',
+						null,
+						'Marker'
+					),
+					_react2.default.createElement(
+						'h6',
+						null,
+						_react2.default.createElement(
+							'strong',
+							null,
+							'Mark'
+						),
+						' the moments of your life.'
+					)
 				),
 				_react2.default.createElement(
 					'div',
-					{ className: 'col-sm-12 col-md-6', style: { paddingTop: '25px' }, align: 'center' },
+					{ className: 'col-sm-12 col-md-6', style: { paddingTop: '40px' }, align: 'center' },
 					_react2.default.createElement(
 						'div',
 						{ className: 'input-group', style: { maxWidth: '450px' } },
@@ -18783,16 +18795,16 @@ var Header = function (_React$Component) {
 				),
 				_react2.default.createElement(
 					'div',
-					{ className: 'col-sm-6 col-md-3', style: { paddingTop: '25px', paddingRight: '70px' }, align: 'right' },
+					{ className: 'col-sm-6 col-md-3', style: { paddingTop: '35px', paddingRight: '70px' }, align: 'right' },
 					_react2.default.createElement(
 						'button',
-						{ type: 'button', className: 'btn btn-info', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
+						{ type: 'button', className: 'btn btn-info btn-lg', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
 						_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus', 'aria-hidden': 'true' })
 					),
 					'\xA0\xA0',
 					_react2.default.createElement(
 						'button',
-						{ type: 'button', className: 'btn btn-info', onClick: this.moveMyPage },
+						{ type: 'button', className: 'btn btn-info btn-lg', onClick: this.moveMyPage },
 						_react2.default.createElement('span', { className: 'glyphicon glyphicon-user', 'aria-hidden': 'true' })
 					)
 				)
@@ -18838,9 +18850,9 @@ var Card = function (_React$Component) {
 
 		var _this = _possibleConstructorReturn(this, (Card.__proto__ || Object.getPrototypeOf(Card)).call(this, props));
 
-		_this.contents = props.contents;
+		_this.parent = props.parent;
 		_this.showDetailModal = function () {
-			_this.contents.showDetailModal(_this.props);
+			_this.parent.app.showDetailModal(_this.props);
 		};
 		_this.colorClass = 'thumbnail alert-success';
 		if (_this.props.type === 'R') {
@@ -18872,19 +18884,39 @@ var Card = function (_React$Component) {
 					'div',
 					{ className: 'caption' },
 					_react2.default.createElement(
-						'h3',
-						{ style: { paddingRight: '20px' } },
+						'div',
+						{ style: { paddingBottom: '10px' } },
 						_react2.default.createElement(
-							'span',
-							{ name: 'title' },
-							this.props.title
-						),
-						_react2.default.createElement('img', { name: 'image', className: 'navbar-right', src: this.props.image, width: '50px', style: { float: 'right' } })
-					),
-					_react2.default.createElement(
-						'h5',
-						{ name: 'author' },
-						this.props.author
+							'table',
+							{ width: '100%' },
+							_react2.default.createElement(
+								'tbody',
+								null,
+								_react2.default.createElement(
+									'tr',
+									null,
+									_react2.default.createElement(
+										'td',
+										{ valign: 'top' },
+										_react2.default.createElement(
+											'h4',
+											{ style: { paddingRight: '20px' } },
+											this.props.title
+										),
+										_react2.default.createElement(
+											'h5',
+											{ name: 'author' },
+											this.props.author
+										)
+									),
+									_react2.default.createElement(
+										'td',
+										{ style: { paddingRight: '10px' } },
+										_react2.default.createElement('img', { name: 'image', src: this.props.image, width: '50px', style: { float: 'right' } })
+									)
+								)
+							)
+						)
 					),
 					_react2.default.createElement(
 						'p',
@@ -18892,18 +18924,22 @@ var Card = function (_React$Component) {
 						this.props.text
 					),
 					_react2.default.createElement(
-						'p',
-						null,
+						'div',
+						{ align: 'right' },
 						_react2.default.createElement(
-							'span',
-							{ name: 'nickname' },
-							this.props.nickname
-						),
-						' ',
-						_react2.default.createElement(
-							'span',
-							{ name: 'updateDate' },
-							this.props.updateDate
+							'p',
+							null,
+							_react2.default.createElement(
+								'span',
+								{ name: 'nickname' },
+								this.props.nickname
+							),
+							_react2.default.createElement('br', null),
+							_react2.default.createElement(
+								'span',
+								{ name: 'updateDate' },
+								this.props.updateDate
+							)
 						)
 					),
 					_react2.default.createElement('input', { type: 'hidden', name: 'type', value: this.props.type })
@@ -19259,131 +19295,6 @@ exports.default = AddContentsModal;
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var DetailModal = function (_React$Component) {
-	_inherits(DetailModal, _React$Component);
-
-	function DetailModal(props) {
-		_classCallCheck(this, DetailModal);
-
-		var _this = _possibleConstructorReturn(this, (DetailModal.__proto__ || Object.getPrototypeOf(DetailModal)).call(this, props));
-
-		_this.state = {
-			text: '',
-			title: '',
-			author: '',
-			nickname: ''
-		};
-		return _this;
-	}
-
-	_createClass(DetailModal, [{
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			this.modal = $('#detailModal');
-		}
-	}, {
-		key: 'show',
-		value: function show(info) {
-			//서버와 통신에서 내용을 가져온다.
-			this.setState({
-				text: info.text,
-				title: info.title,
-				author: info.author,
-				nickname: info.nickname
-			});
-			this.modal.modal();
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return _react2.default.createElement(
-				'div',
-				{ className: 'modal fade', id: 'detailModal', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'detailModalLabel', 'aria-hidden': 'true' },
-				_react2.default.createElement(
-					'div',
-					{ className: 'modal-dialog' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'modal-content' },
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-header' },
-							_react2.default.createElement(
-								'button',
-								{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
-								_react2.default.createElement(
-									'span',
-									{ 'aria-hidden': 'true' },
-									'\xD7'
-								)
-							),
-							_react2.default.createElement(
-								'h4',
-								{ className: 'modal-title', id: 'detailModalLabel' },
-								this.state.title
-							)
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-body' },
-							_react2.default.createElement(
-								'p',
-								null,
-								this.state.text
-							),
-							_react2.default.createElement(
-								'div',
-								{ align: 'right' },
-								'- ',
-								this.state.nickname,
-								' -'
-							)
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-footer' },
-							_react2.default.createElement(
-								'button',
-								{ type: 'button', className: 'btn btn-default', 'data-dismiss': 'modal' },
-								'Close'
-							)
-						)
-					)
-				)
-			);
-		}
-	}]);
-
-	return DetailModal;
-}(_react2.default.Component);
-
-exports.default = DetailModal;
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
@@ -19393,11 +19304,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _Header = __webpack_require__(35);
+var _Header = __webpack_require__(34);
 
 var _Header2 = _interopRequireDefault(_Header);
 
-var _State = __webpack_require__(36);
+var _State = __webpack_require__(35);
 
 var _State2 = _interopRequireDefault(_State);
 
@@ -19448,7 +19359,7 @@ var MyPage = function (_React$Component) {
                     } }),
                 _react2.default.createElement(_Body2.default, { range: 'my', ref: function ref(_ref2) {
                         _this2.myContents = _ref2;
-                    } })
+                    }, parent: this })
             );
         }
     }]);
@@ -19459,7 +19370,7 @@ var MyPage = function (_React$Component) {
 exports.default = MyPage;
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19533,7 +19444,7 @@ var Header = function (_React$Component) {
 exports.default = Header;
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19667,6 +19578,131 @@ var State = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = State;
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DetailModal = function (_React$Component) {
+	_inherits(DetailModal, _React$Component);
+
+	function DetailModal(props) {
+		_classCallCheck(this, DetailModal);
+
+		var _this = _possibleConstructorReturn(this, (DetailModal.__proto__ || Object.getPrototypeOf(DetailModal)).call(this, props));
+
+		_this.state = {
+			text: '',
+			title: '',
+			author: '',
+			nickname: ''
+		};
+		return _this;
+	}
+
+	_createClass(DetailModal, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			this.modal = $('#detailModal');
+		}
+	}, {
+		key: 'show',
+		value: function show(info) {
+			//서버와 통신에서 내용을 가져온다.
+			this.setState({
+				text: info.text,
+				title: info.title,
+				author: info.author,
+				nickname: info.nickname
+			});
+			this.modal.modal();
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			return _react2.default.createElement(
+				'div',
+				{ className: 'modal fade', id: 'detailModal', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'detailModalLabel', 'aria-hidden': 'true' },
+				_react2.default.createElement(
+					'div',
+					{ className: 'modal-dialog' },
+					_react2.default.createElement(
+						'div',
+						{ className: 'modal-content' },
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-header' },
+							_react2.default.createElement(
+								'button',
+								{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+								_react2.default.createElement(
+									'span',
+									{ 'aria-hidden': 'true' },
+									'\xD7'
+								)
+							),
+							_react2.default.createElement(
+								'h4',
+								{ className: 'modal-title', id: 'detailModalLabel' },
+								this.state.title
+							)
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-body' },
+							_react2.default.createElement(
+								'p',
+								null,
+								this.state.text
+							),
+							_react2.default.createElement(
+								'div',
+								{ align: 'right' },
+								'- ',
+								this.state.nickname,
+								' -'
+							)
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-footer' },
+							_react2.default.createElement(
+								'button',
+								{ type: 'button', className: 'btn btn-default', 'data-dismiss': 'modal' },
+								'Close'
+							)
+						)
+					)
+				)
+			);
+		}
+	}]);
+
+	return DetailModal;
+}(_react2.default.Component);
+
+exports.default = DetailModal;
 
 /***/ })
 /******/ ]);

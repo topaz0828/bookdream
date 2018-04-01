@@ -5,7 +5,7 @@ class Body extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {list : []};
-		this.contents = props.contents;
+		this.parent = props.parent;
 		this.maxColumnCount = 4;
 		this.lastColIndex = 0;
 
@@ -125,7 +125,7 @@ class Body extends React.Component {
 					image={data.image}
 					text={data.text}
 					type={data.type}
-					contents={this.contents}/>
+					parent={this.parent}/>
 			</div>
 		);
 	}

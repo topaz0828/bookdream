@@ -22,7 +22,7 @@ class MyPage extends React.Component {
     		<div>
     			<Header moveMainView={this.moveMainView}/>
     			<State ref={(ref) => {this.myState = ref;}}/>
-    			<Body range='my' ref={(ref) => {this.myContents = ref;}}/>
+    			<Body range='my' ref={(ref) => {this.myContents = ref;}} parent={this}/>
             </div>
         );
     }

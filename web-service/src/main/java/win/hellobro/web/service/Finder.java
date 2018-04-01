@@ -73,7 +73,7 @@ public class Finder {
 		String pageSize = (String) param.get("pageSize");
 		String query = (String) param.get("query");
 
-		if (!StringUtil.isNullOrEmpty(query)) {
+		if (StringUtil.isNullOrEmpty(isbn)) {
 			isbn = this.findIsbnFromBookApi(query);
 		}
 

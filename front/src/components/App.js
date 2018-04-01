@@ -1,6 +1,7 @@
 import React from 'react';
 import Contents from './main/Contents'
 import MyPage from './mypage/MyPage';
+import DetailModal from './DetailModal';
 
 class App extends React.Component {
 	componentDidMount() {
@@ -19,6 +20,10 @@ class App extends React.Component {
 		this.myPageDiv.hide();
 	}
 
+	showDetailModal(info) {
+		this.detailModal.show(info);
+	}
+
     render(){
         return (
         		<div className='container-fluid'>
@@ -28,6 +33,7 @@ class App extends React.Component {
 		            <div id='myPage' hidden='true'>
 		            	<MyPage app={this} ref={(ref) => {this.myPage = ref;}}/>
 		            </div>
+		            <DetailModal ref={(ref) => {this.detailModal = ref;}}/>
 	            </div>
         );
     }
