@@ -24,6 +24,10 @@ repositories {
 	maven { url "https://repo.spring.io/milestone" }
 }
 
+task copyDependencies(type: Copy) {
+    into "$buildDir/dependencies"
+    from configurations.runtime
+}
 
 ext {
 	springCloudVersion = 'Finchley.M8'
@@ -35,7 +39,8 @@ dependencies {
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	compile 'org.springframework.boot:spring-boot-starter-web'
-	compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+//	compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.2.1'
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '1.5.10.RELEASE'
 
 }
