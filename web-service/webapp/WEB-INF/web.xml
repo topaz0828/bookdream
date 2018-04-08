@@ -12,6 +12,10 @@
     <servlet>
         <servlet-name>exof-servlet</servlet-name>
         <servlet-class>team.balam.exof.module.was.WebServlet</servlet-class>
+        <init-param>
+            <param-name>servicePathExtractor</param-name>
+            <param-value>win.hellobro.web.RequestFilter</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>

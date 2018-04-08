@@ -87,9 +87,13 @@ class Body extends React.Component {
 				self.isLoading = false;
 				++self.pageIndex;
 				self.isLastPage = res.list.length < self.pageSize;
-			}).fail(function() {
+			}).fail(function(data) {
 				self.isLoading = false;
-				alert('Server error.');
+				if (data.status == 401) {
+					document.location = "/signin.html";
+				} else {
+					location.reload();
+				}
 			});
 	}
 
@@ -138,7 +142,7 @@ class Body extends React.Component {
 
 		if (this.isRefresh) {
 			return (
-				<div id={self.contentsDivId} style={{paddingTop:'20px', paddingLeft:'15px', paddingRight:'15px'}}>
+				<div id={self.contentsDivId} style={{paddingTop:'20px', maxWidth:'1200px'}}>
 					{
 						this.state.list.map(function(data) {
 							return self.makeContentsRow(colInfoArray, data, contentsCount++);

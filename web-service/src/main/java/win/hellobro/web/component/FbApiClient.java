@@ -37,6 +37,7 @@ public class FbApiClient {
 			HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, queryStringEncoder.toString());
 			httpRequest.headers().set(HttpHeaderNames.HOST, targetUri.getHost());
 
+			client.setConnectTimeout(10000);
 			client.connect(targetUri.getHost(), 443);
 			response = client.sendAndWait(httpRequest);
 		}
@@ -58,6 +59,7 @@ public class FbApiClient {
 			HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, queryStringEncoder.toString());
 			httpRequest.headers().set(HttpHeaderNames.HOST, targetUri.getHost());
 
+			client.setConnectTimeout(10000);
 			client.connect(targetUri.getHost(), 443);
 			response = client.sendAndWait(httpRequest);
 		}

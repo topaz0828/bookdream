@@ -30,4 +30,6 @@
         <variable name="readTimeout" value="5000"/>
         <variable name="maxPoolSize" value="1"/>
     </serviceDirectory>
+
+    <serviceDirectory class="win.hellobro.web.service.ErrorResponseSender" path="/error"/>
 </services>

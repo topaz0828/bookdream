@@ -1059,9 +1059,13 @@ var Body = function (_React$Component) {
 				self.isLoading = false;
 				++self.pageIndex;
 				self.isLastPage = res.list.length < self.pageSize;
-			}).fail(function () {
+			}).fail(function (data) {
 				self.isLoading = false;
-				alert('Server error.');
+				if (data.status == 401) {
+					document.location = "/signin.html";
+				} else {
+					location.reload();
+				}
 			});
 		}
 	}, {
@@ -1114,7 +1118,7 @@ var Body = function (_React$Component) {
 			if (this.isRefresh) {
 				return _react2.default.createElement(
 					'div',
-					{ id: self.contentsDivId, style: { paddingTop: '20px', paddingLeft: '15px', paddingRight: '15px' } },
+					{ id: self.contentsDivId, style: { paddingTop: '20px', maxWidth: '1200px' } },
 					this.state.list.map(function (data) {
 						return self.makeContentsRow(colInfoArray, data, contentsCount++);
 					}),
@@ -18525,13 +18529,17 @@ var _Contents = __webpack_require__(29);
 
 var _Contents2 = _interopRequireDefault(_Contents);
 
-var _MyPage = __webpack_require__(33);
+var _MyPage = __webpack_require__(32);
 
 var _MyPage2 = _interopRequireDefault(_MyPage);
 
-var _DetailModal = __webpack_require__(36);
+var _DetailModal = __webpack_require__(35);
 
 var _DetailModal2 = _interopRequireDefault(_DetailModal);
+
+var _AddContentsModal = __webpack_require__(36);
+
+var _AddContentsModal2 = _interopRequireDefault(_AddContentsModal);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18598,7 +18606,8 @@ var App = function (_React$Component) {
 				),
 				_react2.default.createElement(_DetailModal2.default, { ref: function ref(_ref3) {
 						_this2.detailModal = _ref3;
-					} })
+					} }),
+				_react2.default.createElement(_AddContentsModal2.default, { app: this })
 			);
 		}
 	}]);
@@ -18632,10 +18641,6 @@ var _Header2 = _interopRequireDefault(_Header);
 var _Body = __webpack_require__(14);
 
 var _Body2 = _interopRequireDefault(_Body);
-
-var _AddContentsModal = __webpack_require__(32);
-
-var _AddContentsModal2 = _interopRequireDefault(_AddContentsModal);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18671,18 +18676,22 @@ var Contents = function (_React$Component) {
 			this.body.getListBySearchInput(query);
 		}
 	}, {
+		key: 'refresh',
+		value: function refresh() {
+			this.body.refresh();
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			var _this2 = this;
 
 			return _react2.default.createElement(
 				'div',
-				null,
+				{ align: 'center' },
 				_react2.default.createElement(_Header2.default, { moveMyPage: this.moveMyPage, contents: this }),
 				_react2.default.createElement(_Body2.default, { range: 'all', ref: function ref(_ref) {
 						_this2.body = _ref;
-					}, parent: this }),
-				_react2.default.createElement(_AddContentsModal2.default, null)
+					}, parent: this })
 			);
 		}
 	}]);
@@ -18854,18 +18863,19 @@ var Card = function (_React$Component) {
 		_this.showDetailModal = function () {
 			_this.parent.app.showDetailModal(_this.props);
 		};
-		_this.colorClass = 'thumbnail alert-success';
-		if (_this.props.type === 'R') {
-			_this.colorClass = 'thumbnail alert-warning';
-		}
+		// this.colorClass = 'thumbnail alert-success';
+		// if (this.props.type === 'R') {
+		// 	this.colorClass = 'thumbnail alert-warning';
+		// }
 		_this.onMouseOver = function () {
-			_this.thumbnameDiv.className = 'thumbnail';
+			// this.thumbnameDiv.className = 'thumbnail';
 			_this.thumbnameDiv.style.cursor = 'pointer';
 		};
 		_this.onMouseOut = function () {
-			_this.thumbnameDiv.className = _this.colorClass;
+			// this.thumbnameDiv.className = this.colorClass;
 			_this.thumbnameDiv.style.cursor = 'arrow';
 		};
+		//<span name='updateDate'>{this.props.updateDate}</span>
 		return _this;
 	}
 
@@ -18874,7 +18884,8 @@ var Card = function (_React$Component) {
 		value: function render() {
 			var _this2 = this;
 
-			var className = 'thumbnail ' + this.colorClass;
+			// var className = 'thumbnail ' + this.colorClass;
+			var className = 'thumbnail bookdream-card';
 			return _react2.default.createElement(
 				'div',
 				{ ref: function ref(_ref) {
@@ -18899,12 +18910,16 @@ var Card = function (_React$Component) {
 										'td',
 										{ valign: 'top' },
 										_react2.default.createElement(
-											'h4',
+											'h5',
 											{ style: { paddingRight: '20px' } },
-											this.props.title
+											_react2.default.createElement(
+												'strong',
+												null,
+												this.props.title
+											)
 										),
 										_react2.default.createElement(
-											'h5',
+											'p',
 											{ name: 'author' },
 											this.props.author
 										)
@@ -18912,16 +18927,20 @@ var Card = function (_React$Component) {
 									_react2.default.createElement(
 										'td',
 										{ style: { paddingRight: '10px' } },
-										_react2.default.createElement('img', { name: 'image', src: this.props.image, width: '50px', style: { float: 'right' } })
+										_react2.default.createElement('img', { name: 'image', src: this.props.image, width: '100px', style: { float: 'right' } })
 									)
 								)
 							)
 						)
 					),
 					_react2.default.createElement(
-						'p',
-						{ name: 'text' },
-						this.props.text
+						'div',
+						{ align: 'left' },
+						_react2.default.createElement(
+							'p',
+							{ name: 'text' },
+							this.props.text
+						)
 					),
 					_react2.default.createElement(
 						'div',
@@ -18933,12 +18952,6 @@ var Card = function (_React$Component) {
 								'span',
 								{ name: 'nickname' },
 								this.props.nickname
-							),
-							_react2.default.createElement('br', null),
-							_react2.default.createElement(
-								'span',
-								{ name: 'updateDate' },
-								this.props.updateDate
 							)
 						)
 					),
@@ -18961,340 +18974,6 @@ exports.default = Card;
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var AddContentsModal = function (_React$Component) {
-	_inherits(AddContentsModal, _React$Component);
-
-	function AddContentsModal() {
-		_classCallCheck(this, AddContentsModal);
-
-		return _possibleConstructorReturn(this, (AddContentsModal.__proto__ || Object.getPrototypeOf(AddContentsModal)).apply(this, arguments));
-	}
-
-	_createClass(AddContentsModal, [{
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			var _this2 = this;
-
-			this.searchBookInput = $('#searchBookInput');
-			this.searchBookInput.on('keypress', function (events) {
-				if (events.keyCode == 13) {
-					_this2.findBook();
-				}
-			});
-			$('#searchBookButton').on('click', function () {
-				_this2.findBook();
-			});
-			this.impressionBack = $('#impressionBack');
-			this.reviewBack = $('#reviewBack');
-
-			this.impressionButton = $('#impressionButton');
-			this.impressionButton.on('click', function () {
-				_this2.impressionButton.addClass('active');
-				_this2.impressionBack.show();
-				_this2.reviewButton.removeClass('active');
-				_this2.reviewBack.hide();
-			});
-			this.reviewButton = $('#reviewButton');
-			this.reviewButton.on('click', function () {
-				_this2.impressionButton.removeClass('active');
-				_this2.impressionBack.hide();
-				_this2.reviewButton.addClass('active');
-				_this2.reviewBack.show();
-			});
-			this.searchResultDropdown = $('#searchResultDropdown');
-			this.selectedBookView = $('#selectedBookView');
-			this.selectedBook = null;
-		}
-	}, {
-		key: 'findBook',
-		value: function findBook() {
-			var self = this;
-			var inputValue = this.searchBookInput.val();
-			if (inputValue.length > 0) {
-				$.ajax({
-					type: 'GET',
-					url: '/api/search/book',
-					dataType: 'json',
-					data: { q: inputValue }
-				}).done(function (res) {
-					self.searchResultDropdown.empty();
-
-					var ul = document.createElement('ul');
-					ul.className = 'dropdown-menu';
-					ul.setAttribute('role', 'menu');
-					ul.style.width = '100%';
-					for (var i in res) {
-						var a = document.createElement('a');
-						a.setAttribute('role', 'menuitem');
-						a.setAttribute('tabIndex', '-1');
-						a.style.fontSize = '17px';
-						a.style.cursor = 'pointer';
-						a.textContent = res[i].title;
-						a.searchInfo = res[i];
-						$(a).click(function (event) {
-							self.selectBook(event.target.searchInfo);
-						});
-						var li = document.createElement('li');
-						li.setAttribute('role', 'presentation');
-						$(li).append(a);
-						$(ul).append(li);
-					}
-
-					self.searchResultDropdown.append(ul);
-					self.searchResultDropdown.addClass('open');
-				}).fail(function () {
-					alert('Server error.');
-				});
-			}
-		}
-	}, {
-		key: 'selectBook',
-		value: function selectBook(book) {
-			console.log(book);
-			this.selectedBook = book;
-			this.selectedBookView.html('<table>' + '<tr><td style="padding-left: 20px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + '<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' + '</table>');
-
-			this.searchBookInput.val('');
-			this.searchResultDropdown.removeClass('open');
-		}
-	}, {
-		key: 'save',
-		value: function save() {
-			if (this.selectedBook != null) {
-				var url,
-				    data = {};
-				data.book = this.selectedBook;
-
-				if (this.impressionButton.hasClass('active')) {
-					data.impression = [];
-					url = '/api/user/impression';
-					var impressionInput = $('input[name=impressionInput]');
-					for (var i in impressionInput) {
-						var text = impressionInput[i].value;
-						if (text && text.length > 0) {
-							data.impression.push(text);
-						}
-					}
-
-					if (data.impression.length == 0) {
-						return;
-					}
-				} else {
-					url = '/api/user/review';
-					data.review = $('#reviewInput').val();
-					if (data.review.length == 0) {
-						return;
-					}
-				}
-
-				var self = this;
-				$.ajax({
-					type: 'POST',
-					url: url,
-					data: JSON.stringify(data)
-				}).done(function () {
-					self.close();
-				}).fail(function () {
-					alert('Server error.');
-				});
-			}
-		}
-	}, {
-		key: 'close',
-		value: function close() {
-			this.selectedBook = null;
-			this.selectedBookView.empty();
-			this.searchBookInput.val('');
-			this.searchResultDropdown.removeClass('open');
-		}
-	}, {
-		key: 'renderInputView',
-		value: function renderInputView() {
-			return _react2.default.createElement(
-				'div',
-				null,
-				_react2.default.createElement(
-					'div',
-					{ className: 'input-group' },
-					_react2.default.createElement('input', { id: 'searchBookInput', type: 'text', className: 'form-control', placeholder: 'Book Finder', 'aria-describedby': 'sizing-addon2' }),
-					_react2.default.createElement(
-						'span',
-						{ className: 'input-group-btn' },
-						_react2.default.createElement(
-							'button',
-							{ id: 'searchBookButton', className: 'btn btn-default', type: 'button' },
-							_react2.default.createElement('span', { className: 'glyphicon glyphicon-search', 'aria-hidden': 'true' })
-						)
-					)
-				),
-				_react2.default.createElement(
-					'div',
-					{ id: 'searchResultDropdown', className: 'dropdown', width: '100%' },
-					_react2.default.createElement('ul', { className: 'dropdown-menu', role: 'menu', style: { width: '100%' } })
-				)
-			);
-		}
-	}, {
-		key: 'renderImpressionAndReviewView',
-		value: function renderImpressionAndReviewView() {
-			return _react2.default.createElement(
-				'div',
-				null,
-				_react2.default.createElement('div', { id: 'selectedBookView', style: { paddingTop: '10px' } }),
-				_react2.default.createElement(
-					'div',
-					{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-					_react2.default.createElement(
-						'ul',
-						{ className: 'nav nav-tabs' },
-						_react2.default.createElement(
-							'li',
-							{ role: 'presentation', className: 'active', id: 'impressionButton' },
-							_react2.default.createElement(
-								'a',
-								{ href: '#' },
-								'Impression'
-							)
-						),
-						_react2.default.createElement(
-							'li',
-							{ role: 'presentation', id: 'reviewButton' },
-							_react2.default.createElement(
-								'a',
-								{ href: '#' },
-								'Review'
-							)
-						)
-					)
-				),
-				_react2.default.createElement(
-					'div',
-					{ id: 'impressionBack', className: 'form-group' },
-					_react2.default.createElement(
-						'div',
-						{ style: { paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 1st impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
-					),
-					_react2.default.createElement(
-						'div',
-						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 2nd impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
-					),
-					_react2.default.createElement(
-						'div',
-						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 3rd impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
-					),
-					_react2.default.createElement(
-						'div',
-						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 4st impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
-					),
-					_react2.default.createElement(
-						'div',
-						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
-						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 5st impression', 'aria-describedby': 'sizing-addon2', maxLength: '100' })
-					)
-				),
-				_react2.default.createElement(
-					'div',
-					{ id: 'reviewBack', hidden: 'true', className: 'form-group' },
-					_react2.default.createElement('textarea', { id: 'reviewInput', className: 'form-control', style: { height: '260px', resize: 'none' } })
-				)
-			);
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _this3 = this;
-
-			return _react2.default.createElement(
-				'div',
-				{ className: 'modal fade', id: 'addContentsModal', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'myModalLabel', 'aria-hidden': 'true' },
-				_react2.default.createElement(
-					'div',
-					{ className: 'modal-dialog' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'modal-content' },
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-header' },
-							_react2.default.createElement(
-								'button',
-								{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
-								_react2.default.createElement(
-									'span',
-									{ 'aria-hidden': 'true' },
-									'\xD7'
-								)
-							),
-							_react2.default.createElement(
-								'h4',
-								{ className: 'modal-title', id: 'myModalLabel' },
-								'Add impression or review'
-							)
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-body' },
-							this.renderInputView(),
-							this.renderImpressionAndReviewView()
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-footer' },
-							_react2.default.createElement(
-								'button',
-								{ type: 'button', className: 'btn btn-default', 'data-dismiss': 'modal', onClick: function onClick() {
-										return _this3.close();
-									} },
-								'Close'
-							),
-							_react2.default.createElement(
-								'button',
-								{ type: 'button', className: 'btn btn-primary', 'data-dismiss': 'modal', onClick: function onClick() {
-										return _this3.save();
-									} },
-								'Save'
-							)
-						)
-					)
-				)
-			);
-		}
-	}]);
-
-	return AddContentsModal;
-}(_react2.default.Component);
-
-exports.default = AddContentsModal;
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
@@ -19304,11 +18983,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _Header = __webpack_require__(34);
+var _Header = __webpack_require__(33);
 
 var _Header2 = _interopRequireDefault(_Header);
 
-var _State = __webpack_require__(35);
+var _State = __webpack_require__(34);
 
 var _State2 = _interopRequireDefault(_State);
 
@@ -19346,13 +19025,18 @@ var MyPage = function (_React$Component) {
             this.myContents.refresh();
         }
     }, {
+        key: 'refresh',
+        value: function refresh() {
+            this.getInfo();
+        }
+    }, {
         key: 'render',
         value: function render() {
             var _this2 = this;
 
             return _react2.default.createElement(
                 'div',
-                null,
+                { align: 'center' },
                 _react2.default.createElement(_Header2.default, { moveMainView: this.moveMainView }),
                 _react2.default.createElement(_State2.default, { ref: function ref(_ref) {
                         _this2.myState = _ref;
@@ -19370,7 +19054,7 @@ var MyPage = function (_React$Component) {
 exports.default = MyPage;
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19410,28 +19094,41 @@ var Header = function (_React$Component) {
 		key: 'render',
 		value: function render() {
 			return _react2.default.createElement(
-				'table',
-				{ width: '100%' },
+				'div',
+				{ className: 'row' },
 				_react2.default.createElement(
-					'tbody',
-					null,
+					'div',
+					{ className: 'col-sm-6 col-md-3', align: 'center' },
 					_react2.default.createElement(
-						'tr',
+						'h1',
+						null,
+						'Marker'
+					),
+					_react2.default.createElement(
+						'h6',
 						null,
 						_react2.default.createElement(
-							'td',
-							{ className: 'h1', style: { paddingTop: '15px', paddingLeft: '10px' } },
-							'Bookdream'
+							'strong',
+							null,
+							'Mark'
 						),
-						_react2.default.createElement(
-							'td',
-							{ align: 'right', style: { paddingTop: '15px', paddingRight: '20px' }, width: '70px' },
-							_react2.default.createElement(
-								'button',
-								{ type: 'button', className: 'btn btn-info', onClick: this.moveMainView },
-								_react2.default.createElement('span', { className: 'glyphicon glyphicon-menu-left', 'aria-hidden': 'true' })
-							)
-						)
+						' the moments of your life.'
+					)
+				),
+				_react2.default.createElement('div', { className: 'col-sm-12 col-md-6', style: { paddingTop: '40px' }, align: 'center' }),
+				_react2.default.createElement(
+					'div',
+					{ className: 'col-sm-6 col-md-3', style: { paddingTop: '35px', paddingRight: '70px' }, align: 'right' },
+					_react2.default.createElement(
+						'button',
+						{ type: 'button', className: 'btn btn-info btn-lg', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
+						_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus', 'aria-hidden': 'true' })
+					),
+					'\xA0\xA0',
+					_react2.default.createElement(
+						'button',
+						{ type: 'button', className: 'btn btn-info btn-lg', onClick: this.moveMainView },
+						_react2.default.createElement('span', { className: 'glyphicon glyphicon-menu-left', 'aria-hidden': 'true' })
 					)
 				)
 			);
@@ -19444,7 +19141,7 @@ var Header = function (_React$Component) {
 exports.default = Header;
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19580,7 +19277,7 @@ var State = function (_React$Component) {
 exports.default = State;
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19703,6 +19400,352 @@ var DetailModal = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = DetailModal;
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var AddContentsModal = function (_React$Component) {
+	_inherits(AddContentsModal, _React$Component);
+
+	function AddContentsModal(props) {
+		_classCallCheck(this, AddContentsModal);
+
+		var _this = _possibleConstructorReturn(this, (AddContentsModal.__proto__ || Object.getPrototypeOf(AddContentsModal)).call(this, props));
+
+		_this.app = props.app;
+		return _this;
+	}
+
+	_createClass(AddContentsModal, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			var _this2 = this;
+
+			this.contentsView = this.app.contents;
+			this.myPageView = this.app.myPage;
+
+			this.searchBookInput = $('#searchBookInput');
+			this.searchBookInput.on('keypress', function (events) {
+				if (events.keyCode == 13) {
+					_this2.findBook();
+				}
+			});
+			$('#searchBookButton').on('click', function () {
+				_this2.findBook();
+			});
+			this.impressionBack = $('#impressionBack');
+			this.reviewBack = $('#reviewBack');
+
+			this.impressionButton = $('#impressionButton');
+			this.impressionButton.on('click', function () {
+				_this2.impressionButton.addClass('active');
+				_this2.impressionBack.show();
+				_this2.reviewButton.removeClass('active');
+				_this2.reviewBack.hide();
+			});
+			this.reviewButton = $('#reviewButton');
+			this.reviewButton.on('click', function () {
+				_this2.impressionButton.removeClass('active');
+				_this2.impressionBack.hide();
+				_this2.reviewButton.addClass('active');
+				_this2.reviewBack.show();
+			});
+			this.searchResultDropdown = $('#searchResultDropdown');
+			this.selectedBookView = $('#selectedBookView');
+			this.selectedBook = null;
+		}
+	}, {
+		key: 'findBook',
+		value: function findBook() {
+			var self = this;
+			var inputValue = this.searchBookInput.val();
+			if (inputValue.length > 0) {
+				$.ajax({
+					type: 'GET',
+					url: '/api/search/book',
+					dataType: 'json',
+					data: { q: inputValue }
+				}).done(function (res) {
+					self.searchResultDropdown.empty();
+
+					var ul = document.createElement('ul');
+					ul.className = 'dropdown-menu';
+					ul.setAttribute('role', 'menu');
+					ul.style.width = '100%';
+					for (var i in res) {
+						var a = document.createElement('a');
+						a.setAttribute('role', 'menuitem');
+						a.setAttribute('tabIndex', '-1');
+						a.style.fontSize = '17px';
+						a.style.cursor = 'pointer';
+						a.textContent = res[i].title;
+						a.searchInfo = res[i];
+						$(a).click(function (event) {
+							self.selectBook(event.target.searchInfo);
+						});
+						var li = document.createElement('li');
+						li.setAttribute('role', 'presentation');
+						$(li).append(a);
+						$(ul).append(li);
+					}
+
+					self.searchResultDropdown.append(ul);
+					self.searchResultDropdown.addClass('open');
+				}).fail(function () {
+					alert('Server error.');
+				});
+			}
+		}
+	}, {
+		key: 'selectBook',
+		value: function selectBook(book) {
+			// console.log(book);
+			this.selectedBook = book;
+			this.selectedBookView.html('<table>' + '<tr><td style="padding-left: 20px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + '<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' + '</table>');
+
+			this.searchBookInput.val('');
+			this.searchResultDropdown.removeClass('open');
+		}
+	}, {
+		key: 'save',
+		value: function save() {
+			if (this.selectedBook != null) {
+				var url,
+				    data = {};
+				data.book = this.selectedBook;
+				this.selectedBook = null;
+
+				if (this.impressionButton.hasClass('active')) {
+					data.impression = [];
+					url = '/api/user/impression';
+					var impressionInput = $('input[name=impressionInput]');
+					for (var i in impressionInput) {
+						var text = impressionInput[i].value;
+						if (text && text.length > 0) {
+							data.impression.push(text);
+						}
+					}
+
+					if (data.impression.length == 0) {
+						return;
+					}
+				} else {
+					url = '/api/user/review';
+					data.review = $('#reviewInput').val();
+					if (data.review.length == 0) {
+						return;
+					}
+				}
+
+				$('input[name=impressionInput]').val('');
+				$('#reviewInput').val('');
+				var self = this;
+				$.ajax({
+					type: 'POST',
+					url: url,
+					data: JSON.stringify(data)
+				}).done(function () {
+					self.close();
+					self.contentsView.refresh();
+					self.myPageView.refresh();
+				}).fail(function () {
+					alert('Server error.');
+					self.close();
+				});
+			}
+		}
+	}, {
+		key: 'close',
+		value: function close() {
+			this.selectedBook = null;
+			this.selectedBookView.empty();
+			this.searchBookInput.val('');
+			this.searchResultDropdown.removeClass('open');
+		}
+	}, {
+		key: 'renderInputView',
+		value: function renderInputView() {
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'div',
+					{ className: 'input-group' },
+					_react2.default.createElement('input', { id: 'searchBookInput', type: 'text', className: 'form-control', placeholder: 'Book Finder', 'aria-describedby': 'sizing-addon2' }),
+					_react2.default.createElement(
+						'span',
+						{ className: 'input-group-btn' },
+						_react2.default.createElement(
+							'button',
+							{ id: 'searchBookButton', className: 'btn btn-default', type: 'button' },
+							_react2.default.createElement('span', { className: 'glyphicon glyphicon-search', 'aria-hidden': 'true' })
+						)
+					)
+				),
+				_react2.default.createElement(
+					'div',
+					{ id: 'searchResultDropdown', className: 'dropdown', width: '100%' },
+					_react2.default.createElement('ul', { className: 'dropdown-menu', role: 'menu', style: { width: '100%' } })
+				)
+			);
+		}
+	}, {
+		key: 'renderImpressionAndReviewView',
+		value: function renderImpressionAndReviewView() {
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement('div', { id: 'selectedBookView', style: { paddingTop: '10px' } }),
+				_react2.default.createElement(
+					'div',
+					{ style: { paddingTop: '10px', paddingBottom: '10px' } },
+					_react2.default.createElement(
+						'ul',
+						{ className: 'nav nav-tabs' },
+						_react2.default.createElement(
+							'li',
+							{ role: 'presentation', className: 'active', id: 'impressionButton' },
+							_react2.default.createElement(
+								'a',
+								{ href: '#' },
+								'Impression'
+							)
+						),
+						_react2.default.createElement(
+							'li',
+							{ role: 'presentation', id: 'reviewButton' },
+							_react2.default.createElement(
+								'a',
+								{ href: '#' },
+								'Review'
+							)
+						)
+					)
+				),
+				_react2.default.createElement(
+					'div',
+					{ id: 'impressionBack', className: 'form-group' },
+					_react2.default.createElement(
+						'div',
+						{ style: { paddingBottom: '10px' } },
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 1st impression', 'aria-describedby': 'sizing-addon2', maxLength: '200' })
+					),
+					_react2.default.createElement(
+						'div',
+						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 2nd impression', 'aria-describedby': 'sizing-addon2', maxLength: '200' })
+					),
+					_react2.default.createElement(
+						'div',
+						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 3rd impression', 'aria-describedby': 'sizing-addon2', maxLength: '200' })
+					),
+					_react2.default.createElement(
+						'div',
+						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 4st impression', 'aria-describedby': 'sizing-addon2', maxLength: '200' })
+					),
+					_react2.default.createElement(
+						'div',
+						{ style: { paddingTop: '10px', paddingBottom: '10px' } },
+						_react2.default.createElement('input', { name: 'impressionInput', type: 'text', className: 'form-control', placeholder: 'Enter 5st impression', 'aria-describedby': 'sizing-addon2', maxLength: '200' })
+					)
+				),
+				_react2.default.createElement(
+					'div',
+					{ id: 'reviewBack', hidden: 'true', className: 'form-group' },
+					_react2.default.createElement('textarea', { id: 'reviewInput', className: 'form-control', style: { height: '260px', resize: 'none' } })
+				)
+			);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this3 = this;
+
+			return _react2.default.createElement(
+				'div',
+				{ className: 'modal fade', id: 'addContentsModal', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'myModalLabel', 'aria-hidden': 'true' },
+				_react2.default.createElement(
+					'div',
+					{ className: 'modal-dialog' },
+					_react2.default.createElement(
+						'div',
+						{ className: 'modal-content' },
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-header' },
+							_react2.default.createElement(
+								'button',
+								{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+								_react2.default.createElement(
+									'span',
+									{ 'aria-hidden': 'true' },
+									'\xD7'
+								)
+							),
+							_react2.default.createElement(
+								'h4',
+								{ className: 'modal-title', id: 'myModalLabel' },
+								'Add impression or review'
+							)
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-body' },
+							this.renderInputView(),
+							this.renderImpressionAndReviewView()
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-footer' },
+							_react2.default.createElement(
+								'button',
+								{ type: 'button', className: 'btn btn-default', 'data-dismiss': 'modal', onClick: function onClick() {
+										return _this3.close();
+									} },
+								'Close'
+							),
+							_react2.default.createElement(
+								'button',
+								{ type: 'button', className: 'btn btn-primary', 'data-dismiss': 'modal', onClick: function onClick() {
+										return _this3.save();
+									} },
+								'Save'
+							)
+						)
+					)
+				)
+			);
+		}
+	}]);
+
+	return AddContentsModal;
+}(_react2.default.Component);
+
+exports.default = AddContentsModal;
 
 /***/ })
 /******/ ]);

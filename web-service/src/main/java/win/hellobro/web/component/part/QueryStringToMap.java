@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class QueryStringToMap implements Inbound {
-	private static final Logger LOG = LoggerFactory.getLogger(team.balam.exof.module.service.component.http.QueryStringToMap.class);
+	private static final Logger LOG = LoggerFactory.getLogger(QueryStringToMap.class);
 	protected String charset = Charset.defaultCharset().name();
 
 	public void execute(ServiceObject se) throws InboundExecuteException {
