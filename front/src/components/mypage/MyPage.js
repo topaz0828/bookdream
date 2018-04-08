@@ -17,9 +17,13 @@ class MyPage extends React.Component {
         this.myContents.refresh();
 	}
 
+    refresh() {
+        this.getInfo();
+    }
+
     render(){
         return (
-    		<div>
+    		<div align='center'>
     			<Header moveMainView={this.moveMainView}/>
     			<State ref={(ref) => {this.myState = ref;}}/>
     			<Body range='my' ref={(ref) => {this.myContents = ref;}} parent={this}/>

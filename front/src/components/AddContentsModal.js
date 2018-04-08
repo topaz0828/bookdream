@@ -1,7 +1,15 @@
 import React from 'react';
 
 class AddContentsModal extends React.Component {
+	constructor(props) {
+		super(props)
+		this.app = props.app;
+	}
+
 	componentDidMount() {
+		this.contentsView = this.app.contents;
+		this.myPageView = this.app.myPage;
+		
 		this.searchBookInput = $('#searchBookInput');
 		this.searchBookInput.on('keypress', (events) => {
 			if (events.keyCode == 13) {
@@ -75,7 +83,7 @@ class AddContentsModal extends React.Component {
 	}
 
 	selectBook(book) {
-		console.log(book);
+		// console.log(book);
 		this.selectedBook = book;
 		this.selectedBookView.html('<table>' + 
 										'<tr><td style="padding-left: 20px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + 
@@ -90,6 +98,7 @@ class AddContentsModal extends React.Component {
 		if (this.selectedBook != null) {
 			var url, data = {};
 			data.book = this.selectedBook;
+			this.selectedBook = null;
 
 			if (this.impressionButton.hasClass('active')) {
 				data.impression = [];
@@ -101,7 +110,7 @@ class AddContentsModal extends React.Component {
 						data.impression.push(text);
 					}
 				}
-				
+
 				if (data.impression.length == 0) {
 					return;
 				}
@@ -113,6 +122,8 @@ class AddContentsModal extends React.Component {
 				}
 			}
 			
+			$('input[name=impressionInput]').val('');
+			$('#reviewInput').val('');
 			var self = this;
 			$.ajax({
 				type: 'POST',
@@ -120,8 +131,11 @@ class AddContentsModal extends React.Component {
 				data: JSON.stringify(data),
 			}).done(function() {
 				self.close();
+				self.contentsView.refresh();
+				self.myPageView.refresh();
 			}).fail(function() {
 				alert('Server error.');
+				self.close();
 			});
 		}
 	}
@@ -165,19 +179,19 @@ class AddContentsModal extends React.Component {
 				</div>
 				<div id='impressionBack' className='form-group'>
 					<div style={{paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 1st impression' aria-describedby="sizing-addon2" maxLength='100'/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 1st impression' aria-describedby="sizing-addon2" maxLength='200'/>
 					</div>
 					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 2nd impression' aria-describedby="sizing-addon2" maxLength='100'/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 2nd impression' aria-describedby="sizing-addon2" maxLength='200'/>
 					</div>
 					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 3rd impression' aria-describedby="sizing-addon2" maxLength='100'/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 3rd impression' aria-describedby="sizing-addon2" maxLength='200'/>
 					</div>
 					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 4st impression' aria-describedby="sizing-addon2" maxLength='100'/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 4st impression' aria-describedby="sizing-addon2" maxLength='200'/>
 					</div>
 					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 5st impression' aria-describedby="sizing-addon2" maxLength='100'/>
+						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 5st impression' aria-describedby="sizing-addon2" maxLength='200'/>
 					</div>
 				</div>
 				<div id='reviewBack' hidden='true' className='form-group'>

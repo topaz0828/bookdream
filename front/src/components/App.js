@@ -2,6 +2,7 @@ import React from 'react';
 import Contents from './main/Contents'
 import MyPage from './mypage/MyPage';
 import DetailModal from './DetailModal';
+import AddContentsModal from './AddContentsModal';
 
 class App extends React.Component {
 	componentDidMount() {
@@ -34,6 +35,7 @@ class App extends React.Component {
 		            	<MyPage app={this} ref={(ref) => {this.myPage = ref;}}/>
 		            </div>
 		            <DetailModal ref={(ref) => {this.detailModal = ref;}}/>
+		            <AddContentsModal app={this}/>
 	            </div>
         );
     }
