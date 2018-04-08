@@ -33,7 +33,7 @@ class Card extends React.Component {
 							<tbody>
 							<tr>
 								<td valign='top'>
-									<h5 style={{paddingRight:'20px'}}><strong>{this.props.title}</strong></h5>
+									<h5 name='title' style={{paddingRight:'20px'}}><strong>{this.props.title}</strong></h5>
 									<p name='author'>{this.props.author}</p>
 								</td>
 								<td style={{paddingRight:'10px'}}>

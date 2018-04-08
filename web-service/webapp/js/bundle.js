@@ -1140,10 +1140,9 @@ var Body = function (_React$Component) {
 						while (column) {
 							var contentsParent = column.firstChild.firstChild;
 							var data = {};
-							data.title = $(contentsParent).find('span[name="title"]').text();
-							data.author = $(contentsParent).children('h5[name="author"]').text();
+							data.title = $(contentsParent).find('h5[name="title"]').text();
+							data.author = $(contentsParent).children('p[name="author"]').text();
 							data.nickname = $(contentsParent).find('span[name="nickname"]').text();
-							data.updateDate = $(contentsParent).find('span[name="updateDate"]').text();
 							data.image = $(contentsParent).find('img[name="image"]').attr('src');
 							data.text = $(contentsParent).children('p[name="text"]').text();
 							data.type = $(contentsParent).children('input[name="type"]').val();
@@ -18911,7 +18910,7 @@ var Card = function (_React$Component) {
 										{ valign: 'top' },
 										_react2.default.createElement(
 											'h5',
-											{ style: { paddingRight: '20px' } },
+											{ name: 'title', style: { paddingRight: '20px' } },
 											_react2.default.createElement(
 												'strong',
 												null,
