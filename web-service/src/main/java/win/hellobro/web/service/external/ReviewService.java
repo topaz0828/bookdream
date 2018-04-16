@@ -24,9 +24,10 @@ import team.balam.exof.module.service.annotation.Variable;
 import win.hellobro.web.service.vo.BookInfo;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 
-@ServiceDirectory
+@ServiceDirectory(internal = true)
 public class ReviewService {
 	private static final Logger LOG = LoggerFactory.getLogger(ReviewService.class);
 
@@ -48,17 +49,17 @@ public class ReviewService {
 				.build();
 	}
 
-	@Service(internal = true)
-	public String searchContentsList(String isbn, String pageIndex, String pageSize) {
-		return this.sendSearchRequest(null, isbn, pageIndex, pageSize);
+	@Service
+	public String searchContentsList(String userId, String isbn, String pageIndex, String pageSize) {
+		return this.sendSearchRequest(userId, isbn, pageIndex, pageSize, false);
 	}
 
-	@Service(internal = true)
+	@Service
 	public String searchMyContentsList(String userId, String isbn, String pageIndex, String pageSize) {
-		return this.sendSearchRequest(userId, isbn, pageIndex, pageSize);
+		return this.sendSearchRequest(userId, isbn, pageIndex, pageSize, true);
 	}
 
-	private String sendSearchRequest(String userId, String isbn, String pageIndex, String pageSize) {
+	private String sendSearchRequest(String userId, String isbn, String pageIndex, String pageSize, boolean isMyContents) {
 		QueryStringEncoder query = new QueryStringEncoder("/review");
 		query.addParam("offset", pageIndex);
 		query.addParam("limit", pageSize);
@@ -66,7 +67,7 @@ public class ReviewService {
 			query.addParam("isbn", isbn);
 		}
 
-		if (!StringUtil.isNullOrEmpty(userId)) {
+		if (isMyContents) {
 			query.addParam("userId", userId);
 		}
 
@@ -76,7 +77,7 @@ public class ReviewService {
 		try (Client client = this.clientPool.get()) {
 			FullHttpResponse saveResponse = client.sendAndWait(request);
 			if (saveResponse.status().code() == HttpResponseStatus.OK.code()) {
-				String data = "{\"isbn\":" + "\"" + isbn + "\",";
+				String data = "{\"isbn\":\"" + isbn + "\", \"id\":\"" + userId + "\",";
 				data += "\"list\":" + saveResponse.content().toString(Charset.defaultCharset()) + "}";
 				return data;
 			} else {
@@ -89,7 +90,7 @@ public class ReviewService {
 		return "{\"isbn\":" + "\"" + isbn + "\", \"list\":[]}";
 	}
 
-	@Service(internal = true)
+	@Service
 	public boolean saveReview(String userId, BookInfo bookInfo, String review) {
 		long bookId;
 		try {
@@ -101,7 +102,7 @@ public class ReviewService {
 		return this.saveReviewAndImpression(userId, bookId, review, "R");
 	}
 
-	@Service(internal = true)
+	@Service
 	public boolean saveImpression(String userId, BookInfo bookInfo, List<String> impression) {
 		long bookId;
 		try {
@@ -189,12 +190,12 @@ public class ReviewService {
 		return false;
 	}
 
-	@Service(internal = true)
+	@Service
 	public int getReviewCount(String userId) {
 		return this.getCount(userId, "R"); // review
 	}
 
-	@Service(internal = true)
+	@Service
 	public int getImpressionCount(String userId) {
 		return this.getCount(userId, "C"); // comment
 	}
@@ -218,6 +219,53 @@ public class ReviewService {
 		}
 
 		return 0;
+	}
+
+	@Service
+	public boolean updateContents(String userId, long bookId, String type, long reviewId, String text) {
+		HashMap<String, Object> parameter = new HashMap<>();
+		parameter.put("USER_ID", userId);
+		parameter.put("BOOK_ID", bookId);
+		parameter.put("TYPE", type);
+		parameter.put("TEXT", text);
+
+		byte[] content = RequestConverter.toJson(parameter);
+		FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PUT, "/review/" + reviewId);
+		request.headers().set(HttpHeaderNames.HOST, this.address);
+		request.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.length);
+		request.content().writeBytes(content);
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse response = client.sendAndWait(request);
+
+			if (response.status().code() == HttpResponseStatus.OK.code()) {
+				return true;
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+
+
+		return false;
+	}
+
+	@Service
+	public String getReviewOrImpression(String reviewId) {
+		HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/review/" + reviewId);
+		request.headers().set(HttpHeaderNames.HOST, this.address);
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse response = client.sendAndWait(request);
+			if (response.status().code() == HttpResponseStatus.OK.code()) {
+				return response.content().toString(Charset.defaultCharset());
+			} else {
+				LOG.error("fail to get review. http status code: {}", response.status().code());
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+
+		return "{}";
 	}
 
 	@Shutdown

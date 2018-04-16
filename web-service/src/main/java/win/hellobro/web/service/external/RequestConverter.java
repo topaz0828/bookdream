@@ -41,7 +41,7 @@ public class RequestConverter {
 		return toJson(data);
 	}
 
-	private static byte[] toJson(Map<String, Object> data) {
+	public static byte[] toJson(Map<String, Object> data) {
 		try {
 			StringWriter writer = new StringWriter();
 			JSON_MAPPER.writeValue(writer, data);

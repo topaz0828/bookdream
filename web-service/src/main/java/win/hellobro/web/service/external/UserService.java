@@ -26,7 +26,7 @@ import win.hellobro.web.UserInfo;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-@ServiceDirectory
+@ServiceDirectory(internal = true)
 public class UserService {
 	private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
@@ -49,14 +49,14 @@ public class UserService {
 				.build();
 	}
 
-	@Service(internal = true)
+	@Service
 	public boolean save(UserInfo userInfo) {
 		QueryStringEncoder queryStringEncoder = new QueryStringEncoder("/user");
 		queryStringEncoder.addParam("id", userInfo.getId());
 		queryStringEncoder.addParam("nickname", userInfo.getNickName());
 		queryStringEncoder.addParam("email", userInfo.getEmail());
 		queryStringEncoder.addParam("from", userInfo.getOauthSite().val());
-		queryStringEncoder.addParam("image", userInfo.getImage());
+//		queryStringEncoder.addParam("image", userInfo.getImage());
 
 		FullHttpRequest saveRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, queryStringEncoder.toString());
 		saveRequest.headers().set(HttpHeaderNames.HOST, this.address);
@@ -75,7 +75,7 @@ public class UserService {
 		return true;
 	}
 
-	@Service(internal = true)
+	@Service
 	public UserInfo get(String userId) {
 		int status = -1;
 		HttpRequest saveRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/user/" + userId);

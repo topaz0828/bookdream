@@ -1,6 +1,7 @@
 package win.hellobro.web.service;
 
 import io.netty.handler.codec.http.QueryStringEncoder;
+import io.netty.util.internal.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.balam.exof.module.listener.RequestContext;
@@ -80,6 +81,11 @@ public class FacebookSignIn {
 			UserInfo userInfo = this.userGetter.call(serviceObject);
 			if (userInfo != null && !UserInfo.NOT_FOUND_USER.equals(userInfo)) {
 				LOG.info("SIGN IN BookDream. :) {}.", userInfo.getEmail());
+
+				if (StringUtil.isNullOrEmpty(userInfo.getImage())) {
+					userInfo.setImage(facebookUser.getPicture());
+				}
+
 				request.getSession().setAttribute(SessionKey.USER_INFO, userInfo);
 				response.sendRedirect("/");
 			} else if (UserInfo.NOT_FOUND_USER.equals(userInfo)) {

@@ -5,7 +5,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.balam.exof.module.listener.RequestContext;
-import team.balam.exof.module.service.ServiceObject;
 import team.balam.exof.module.service.ServiceWrapper;
 import team.balam.exof.module.service.annotation.Inbound;
 import team.balam.exof.module.service.annotation.Service;
@@ -37,6 +36,9 @@ public class Finder {
 
 	@Service("/external/review-service/searchContentsList")
 	private ServiceWrapper allContentsGetter;
+
+	@Service("/external/review-service/getReviewOrImpression")
+	private ServiceWrapper contentsGetter;
 
 	@Service("book")
 	@Inbound({HttpGet.class, QueryStringToMap.class})
@@ -77,19 +79,41 @@ public class Finder {
 			isbn = this.findIsbnFromBookApi(query);
 		}
 
+		HttpServletRequest servletRequest = RequestContext.getServletRequest();
+		HttpServletResponse response = RequestContext.getServletResponse();
+		UserInfo user = (UserInfo) servletRequest.getSession().getAttribute(SessionKey.USER_INFO);
 		String resultList;
 
-		if ("my".equals(range)) {
-			HttpServletRequest servletRequest = RequestContext.getServletRequest();
-			UserInfo user = (UserInfo) servletRequest.getSession().getAttribute(SessionKey.USER_INFO);
-			resultList = this.myContentsGetter.call(new ServiceObject(user.getId(), isbn, pageIndex, pageSize));
-		} else {
-			resultList = this.allContentsGetter.call(new ServiceObject(isbn, pageIndex, pageSize));
-		}
+		try {
+			if ("my".equals(range)) {
+				resultList = this.myContentsGetter.call(user.getId(), isbn, pageIndex, pageSize);
+			} else {
+				resultList = this.allContentsGetter.call(user.getId(), isbn, pageIndex, pageSize);
+			}
 
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(resultList != null ? resultList : "");
+		} catch (Exception e) {
+			LOG.error("fail to call service contentsGetter.", e);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Service("contents")
+	@Inbound({HttpGet.class, QueryStringToMap.class})
+	public void getReviewAndImpression(Map<String, Object> param) throws IOException {
 		HttpServletResponse response = RequestContext.getServletResponse();
 		response.setCharacterEncoding("UTF-8");
-		response.getWriter().write(resultList != null ? resultList : "");
+
+		String id = (String) param.get("id");
+
+		try {
+			String result = this.contentsGetter.call(id);
+			response.getWriter().write(result);
+		} catch (Exception e) {
+			LOG.error("fail to get contents.", e);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	private String findIsbnFromBookApi(String query) {
