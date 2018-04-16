@@ -64,7 +64,8 @@ dependencies {
 //    compile "org.springframework.boot:spring-boot-configuration-processor"
 
     compile ("org.mybatis:mybatis:3.4.5")
-    compile ("mysql:mysql-connector-java")
+//    compile ("mysql:mysql-connector-java")
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.2.1'
     compile "com.google.code.gson:gson:2.8.2"
 
 

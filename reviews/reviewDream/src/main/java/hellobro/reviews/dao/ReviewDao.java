@@ -32,6 +32,10 @@ public class ReviewDao {
         return sqlSession.selectList("select", map);
     }
 
+    public Map<String, Object> selectOne(String reviewId) {
+	    return sqlSession.selectOne("selectOne", reviewId);
+    }
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Integer count(String type) {
         log.info("count {}", type);

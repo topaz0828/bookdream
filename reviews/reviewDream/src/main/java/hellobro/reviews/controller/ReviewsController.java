@@ -1,14 +1,25 @@
 package hellobro.reviews.controller;
 
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import hellobro.reviews.dao.ReviewDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 @RestController
 public class ReviewsController {
@@ -42,6 +53,13 @@ public class ReviewsController {
                                                 @RequestParam(value = "limit", required = false) Integer limit) {
         return getReview(userId, bookid, type, isbn, offset, limit);
     }
+	@RequestMapping(value = {"/review/{reviewId}"}, method = RequestMethod.GET)
+	@ResponseStatus(value = HttpStatus.OK)
+    public ResponseEntity<String> getReivew(@PathVariable("reviewId") String reviewId) {
+    	Map<String, Object> review = this.dao.selectOne(reviewId);
+		return new ResponseEntity<>(gson.toJson(review), HttpStatus.OK);
+	}
+
 
     @RequestMapping(value = {"user/{uid}/review/count"}, method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
