@@ -34,7 +34,7 @@ class Card extends React.Component {
 							<tr>
 								<td valign='top'>
 									<h5 name='title' style={{paddingRight:'20px'}}><strong>{this.props.title}</strong></h5>
-									<p name='author'>{this.props.author}</p>
+									<p><span name='author'>{this.props.author}</span></p>
 								</td>
 								<td style={{paddingRight:'10px'}}>
 									<img name='image' src={this.props.image} width='100px' style={{float:'right'}}/>
@@ -43,9 +43,12 @@ class Card extends React.Component {
 							</tbody>
 						</table>
 					</div>
-					<div align='left'><p name='text'>{this.props.text}</p></div>
+					<div align='left'><p><span name='text'>{this.props.text}</span></p></div>
 					<div align='right'><p><span name='nickname'>{this.props.nickname}</span></p></div>
+					<input type='hidden' name='contentsId' value={this.props.contentsId}/>
+					<input type='hidden' name='bookId' value={this.props.bookId}/>
 					<input type='hidden' name='type' value={this.props.type}/>
+					<input type='hidden' name='my' value={this.props.my}/>
 				</div>
 			</div>
 		);

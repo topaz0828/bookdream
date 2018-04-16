@@ -37,7 +37,7 @@ class State extends React.Component {
 					<table width='100%'>
 						<tbody>
 							<tr>
-								<td><h2>{this.state.email}</h2></td>
+								<td><h3>{this.state.email}</h3></td>
 							</tr>
 							<tr>
 								<td>
