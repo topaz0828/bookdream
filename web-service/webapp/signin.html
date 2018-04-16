@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="/jui/ui.min.css" />
-<link rel="stylesheet" href="/jui/ui-jennifer.min.css" />
-<script src="/jui/core.min.js"></script>
-<script src="/jui/ui.min.js"></script>
-<!-- <script src="/oauth/facebook.js"></script> -->
-<script type="text/javascript">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<head>
+    <link rel="shortcut icon" href="/css/favicon.png"/>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/jui/ui.min.css" />
+    <link rel="stylesheet" href="/jui/ui-jennifer.min.css" />
+    <script src="/jui/core.min.js"></script>
+    <script src="/jui/ui.min.js"></script>
+    <!-- <script src="/oauth/facebook.js"></script> -->
+    <script type="text/javascript">
 		function login() {
 			$.get("/api/signin/facebook/oauth-uri", function(data) {
 				document.location = data;
@@ -14,7 +17,6 @@
 		}
 	</script>
 
-<head>
     <meta charset="UTF-8">
     <title>Bookdream</title>
 </head>

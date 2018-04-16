@@ -986,11 +986,14 @@ var Body = function (_React$Component) {
 		_this.isLastPage = false;
 		_this.pageSize = 30;
 
-		setInterval(function () {
-			if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+		$(window).scroll(function () {
+			var maxHeight = $(document).height();
+			var currentScroll = $(window).scrollTop() + $(window).height();
+
+			if (maxHeight <= currentScroll + 200) {
 				_this.getListByScroll();
 			}
-		}, 500);
+		});
 		return _this;
 	}
 
@@ -999,7 +1002,7 @@ var Body = function (_React$Component) {
 		value: function getListByScroll() {
 			if (!this.isLoading) {
 				this.isRefresh = false;
-				this.getList({ isbn: this.isbn, range: this.range, pageIndex: this.pageIndex, pageSize: this.pageSize });
+				this.getList({ isbn: this.isbn, range: this.range, pageIndex: this.pageIndex * this.pageSize, pageSize: this.pageSize });
 			}
 		}
 	}, {
@@ -1044,14 +1047,15 @@ var Body = function (_React$Component) {
 					var d = res.list[i];
 
 					newList.push({
-						reviewId: d.ID,
+						contentsId: d.ID,
+						bookId: d.BOOK_ID,
 						nickname: d.NICKNAME,
 						title: d.TITLE,
 						author: d.AUTHOR,
-						updateDate: d.UPDATE_DATE,
 						image: d.IMAGE,
 						text: d.TEXT,
-						type: d.TYPE // C : Coment, R : review
+						type: d.TYPE, // C : Coment, R : review
+						my: d.USER_ID === res.id ? 'y' : 'n'
 					});
 				}
 
@@ -1077,6 +1081,7 @@ var Body = function (_React$Component) {
 
 			var newRow = null;
 			if (contentsCount > 0 && contentsCount % this.maxColumnCount == this.maxColumnCount - 1) {
+				this.lastColIndex = -1;
 				newRow = _react2.default.createElement(
 					'div',
 					{ className: 'row', key: 'row-' + contentsCount },
@@ -1096,15 +1101,16 @@ var Body = function (_React$Component) {
 				'div',
 				{ className: 'col-sm-6 col-md-3', key: 'col-' + data.key },
 				_react2.default.createElement(_Card2.default, { key: data.key,
-					reviewId: data.reviewId,
+					contentsId: data.contentsId,
+					bookId: data.bookId,
 					nickname: data.nickname,
 					title: data.title,
 					author: data.author,
-					updateDate: data.updateDate,
 					image: data.image,
 					text: data.text,
 					type: data.type,
-					parent: this.parent })
+					parent: this.parent,
+					my: data.my })
 			);
 		}
 	}, {
@@ -1133,19 +1139,21 @@ var Body = function (_React$Component) {
 			} else {
 				return _react2.default.createElement(
 					'div',
-					{ id: self.contentsDivId, style: { paddingTop: '20px', paddingLeft: '15px', paddingRight: '15px' } },
+					{ id: self.contentsDivId, style: { paddingTop: '20px', maxWidth: '1200px' } },
 					currentRows.map(function (index) {
 						var resultRow = null;
 						var column = currentRows[index].firstChild;
 						while (column) {
-							var contentsParent = column.firstChild.firstChild;
 							var data = {};
-							data.title = $(contentsParent).find('h5[name="title"]').text();
-							data.author = $(contentsParent).children('p[name="author"]').text();
-							data.nickname = $(contentsParent).find('span[name="nickname"]').text();
-							data.image = $(contentsParent).find('img[name="image"]').attr('src');
-							data.text = $(contentsParent).children('p[name="text"]').text();
-							data.type = $(contentsParent).children('input[name="type"]').val();
+							data.title = $(column).find('h5[name="title"]').text();
+							data.author = $(column).find('span[name="author"]').text();
+							data.nickname = $(column).find('span[name="nickname"]').text();
+							data.image = $(column).find('img[name="image"]').attr('src');
+							data.text = $(column).find('span[name="text"]').text();
+							data.contentsId = $(column).find('input[name="contentsId"]').val();
+							data.bookId = $(column).find('input[name="bookId"]').val();
+							data.type = $(column).find('input[name="type"]').val();
+							data.my = $(column).find('input[name="my"]').val();
 
 							var newRow = self.makeContentsRow(colInfoArray, data, contentsCount++);
 							if (newRow != null) {
@@ -1162,6 +1170,7 @@ var Body = function (_React$Component) {
 						'div',
 						{ className: 'row', key: 'row-' + contentsCount },
 						colInfoArray.slice(0, this.lastColIndex + 1).map(function (data) {
+							console.log(self.lastColIndex);
 							return self.makeContentsCard(data);
 						})
 					)
@@ -18805,15 +18814,25 @@ var Header = function (_React$Component) {
 					'div',
 					{ className: 'col-sm-6 col-md-3', style: { paddingTop: '35px', paddingRight: '70px' }, align: 'right' },
 					_react2.default.createElement(
-						'button',
-						{ type: 'button', className: 'btn btn-info btn-lg', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
-						_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus', 'aria-hidden': 'true' })
-					),
-					'\xA0\xA0',
-					_react2.default.createElement(
-						'button',
-						{ type: 'button', className: 'btn btn-info btn-lg', onClick: this.moveMyPage },
-						_react2.default.createElement('span', { className: 'glyphicon glyphicon-user', 'aria-hidden': 'true' })
+						'form',
+						{ method: 'POST', action: '/api/user/logout' },
+						_react2.default.createElement(
+							'button',
+							{ type: 'button', className: 'btn btn-default', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
+							_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus', 'aria-hidden': 'true' })
+						),
+						'\xA0\xA0',
+						_react2.default.createElement(
+							'button',
+							{ type: 'button', className: 'btn btn-default', onClick: this.moveMyPage },
+							_react2.default.createElement('span', { className: 'glyphicon glyphicon-user', 'aria-hidden': 'true' })
+						),
+						'\xA0\xA0',
+						_react2.default.createElement(
+							'button',
+							{ type: 'submit', className: 'btn btn-default' },
+							_react2.default.createElement('span', { className: 'glyphicon glyphicon-log-out', 'aria-hidden': 'true' })
+						)
 					)
 				)
 			);
@@ -18919,8 +18938,12 @@ var Card = function (_React$Component) {
 										),
 										_react2.default.createElement(
 											'p',
-											{ name: 'author' },
-											this.props.author
+											null,
+											_react2.default.createElement(
+												'span',
+												{ name: 'author' },
+												this.props.author
+											)
 										)
 									),
 									_react2.default.createElement(
@@ -18937,8 +18960,12 @@ var Card = function (_React$Component) {
 						{ align: 'left' },
 						_react2.default.createElement(
 							'p',
-							{ name: 'text' },
-							this.props.text
+							null,
+							_react2.default.createElement(
+								'span',
+								{ name: 'text' },
+								this.props.text
+							)
 						)
 					),
 					_react2.default.createElement(
@@ -18954,7 +18981,10 @@ var Card = function (_React$Component) {
 							)
 						)
 					),
-					_react2.default.createElement('input', { type: 'hidden', name: 'type', value: this.props.type })
+					_react2.default.createElement('input', { type: 'hidden', name: 'contentsId', value: this.props.contentsId }),
+					_react2.default.createElement('input', { type: 'hidden', name: 'bookId', value: this.props.bookId }),
+					_react2.default.createElement('input', { type: 'hidden', name: 'type', value: this.props.type }),
+					_react2.default.createElement('input', { type: 'hidden', name: 'my', value: this.props.my })
 				)
 			);
 		}
@@ -19119,15 +19149,25 @@ var Header = function (_React$Component) {
 					'div',
 					{ className: 'col-sm-6 col-md-3', style: { paddingTop: '35px', paddingRight: '70px' }, align: 'right' },
 					_react2.default.createElement(
-						'button',
-						{ type: 'button', className: 'btn btn-info btn-lg', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
-						_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus', 'aria-hidden': 'true' })
-					),
-					'\xA0\xA0',
-					_react2.default.createElement(
-						'button',
-						{ type: 'button', className: 'btn btn-info btn-lg', onClick: this.moveMainView },
-						_react2.default.createElement('span', { className: 'glyphicon glyphicon-menu-left', 'aria-hidden': 'true' })
+						'form',
+						{ method: 'POST', action: '/api/user/logout' },
+						_react2.default.createElement(
+							'button',
+							{ type: 'button', className: 'btn btn-default', 'data-toggle': 'modal', 'data-target': '#addContentsModal' },
+							_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus', 'aria-hidden': 'true' })
+						),
+						'\xA0\xA0',
+						_react2.default.createElement(
+							'button',
+							{ type: 'button', className: 'btn btn-default', onClick: this.moveMainView },
+							_react2.default.createElement('span', { className: 'glyphicon glyphicon-menu-left', 'aria-hidden': 'true' })
+						),
+						'\xA0\xA0',
+						_react2.default.createElement(
+							'button',
+							{ type: 'submit', className: 'btn btn-default' },
+							_react2.default.createElement('span', { className: 'glyphicon glyphicon-log-out', 'aria-hidden': 'true' })
+						)
 					)
 				)
 			);
@@ -19224,7 +19264,7 @@ var State = function (_React$Component) {
 									'td',
 									null,
 									_react2.default.createElement(
-										'h2',
+										'h3',
 										null,
 										this.state.email
 									)
@@ -19308,12 +19348,7 @@ var DetailModal = function (_React$Component) {
 
 		var _this = _possibleConstructorReturn(this, (DetailModal.__proto__ || Object.getPrototypeOf(DetailModal)).call(this, props));
 
-		_this.state = {
-			text: '',
-			title: '',
-			author: '',
-			nickname: ''
-		};
+		_this.state = { info: { title: '', nickname: '' }, contents: '' };
 		return _this;
 	}
 
@@ -19321,22 +19356,86 @@ var DetailModal = function (_React$Component) {
 		key: 'componentDidMount',
 		value: function componentDidMount() {
 			this.modal = $('#detailModal');
+			this.detailText = $('#detailText');
+			this.modifyTextarea = $('#modifyTextarea');
+			this.detailModifyButton = $('#detailModifyButton');
+			this.detailSaveButton = $('#detailSaveButton');
+			this.detailNoti = $('#detailNoti');
+			this.detailSaveButton.hide();
+			this.modifyTextarea.hide();
 		}
 	}, {
 		key: 'show',
 		value: function show(info) {
-			//서버와 통신에서 내용을 가져온다.
-			this.setState({
-				text: info.text,
-				title: info.title,
-				author: info.author,
-				nickname: info.nickname
+			var self = this;
+			$.ajax({
+				type: 'GET',
+				url: '/api/search/contents?id=' + info.contentsId,
+				dataType: 'json'
+			}).done(function (res) {
+				self.setState({ info: info, contents: res.TEXT });
+
+				self.detailText.show();
+				self.modifyTextarea.hide();
+				self.detailSaveButton.hide();
+				self.modifyTextarea.val('');
+				self.detailNoti.text('');
+
+				if ('y' === info.my) {
+					self.detailModifyButton.show();
+				} else {
+					self.detailModifyButton.hide();
+				}
+
+				if ('C' === info.type) {
+					self.modifyTextarea.attr('maxLength', '200');
+				} else {
+					self.modifyTextarea.removeAttr('maxLength');
+				}
+				self.modal.modal();
+			}).fail(function (err) {
+				alert('server error');
 			});
-			this.modal.modal();
+		}
+	}, {
+		key: 'showModify',
+		value: function showModify() {
+			this.detailText.hide();
+			this.modifyTextarea.show();
+			this.modifyTextarea.val(this.state.info.text);
+			this.detailSaveButton.show();
+			this.detailModifyButton.hide();
+		}
+	}, {
+		key: 'save',
+		value: function save() {
+			var contents = this.modifyTextarea.val();
+			if (contents.length == 0) {
+				return;
+			}
+
+			var data = { bookId: this.state.info.bookId,
+				type: this.state.info.type,
+				contentsId: this.state.info.contentsId,
+				contents: contents };
+
+			var self = this;
+			$.ajax({
+				type: 'PUT',
+				url: '/api/user/contents',
+				data: JSON.stringify(data)
+			}).done(function (res) {
+				self.modal.modal('hide');
+				self.state.info.parent.refresh();
+			}).fail(function (data) {
+				self.detailNoti.text('저장되지 않았습니다. 다시 시도해 주세요.');
+			});
 		}
 	}, {
 		key: 'render',
 		value: function render() {
+			var _this2 = this;
+
 			return _react2.default.createElement(
 				'div',
 				{ className: 'modal fade', id: 'detailModal', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'detailModalLabel', 'aria-hidden': 'true' },
@@ -19361,28 +19460,48 @@ var DetailModal = function (_React$Component) {
 							_react2.default.createElement(
 								'h4',
 								{ className: 'modal-title', id: 'detailModalLabel' },
-								this.state.title
+								this.state.info.title
 							)
 						),
 						_react2.default.createElement(
 							'div',
 							{ className: 'modal-body' },
 							_react2.default.createElement(
-								'p',
-								null,
-								this.state.text
-							),
-							_react2.default.createElement(
 								'div',
-								{ align: 'right' },
-								'- ',
-								this.state.nickname,
-								' -'
-							)
+								{ id: 'detailText' },
+								_react2.default.createElement(
+									'p',
+									null,
+									this.state.contents
+								),
+								_react2.default.createElement(
+									'div',
+									{ align: 'right' },
+									'- ',
+									this.state.info.nickname,
+									' -'
+								)
+							),
+							_react2.default.createElement('textarea', { id: 'modifyTextarea', className: 'form-control', style: { height: '200px', resize: 'none' } }),
+							_react2.default.createElement('div', { align: 'right', style: { paddingTop: '10px' }, id: 'detailNoti' })
 						),
 						_react2.default.createElement(
 							'div',
 							{ className: 'modal-footer' },
+							_react2.default.createElement(
+								'button',
+								{ id: 'detailModifyButton', type: 'button', className: 'btn btn-default', onClick: function onClick() {
+										return _this2.showModify();
+									} },
+								'Modify'
+							),
+							_react2.default.createElement(
+								'button',
+								{ id: 'detailSaveButton', type: 'button', className: 'btn btn-default', onClick: function onClick() {
+										return _this2.save();
+									} },
+								'Save'
+							),
 							_react2.default.createElement(
 								'button',
 								{ type: 'button', className: 'btn btn-default', 'data-dismiss': 'modal' },
