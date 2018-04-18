@@ -18,7 +18,7 @@
 			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
 		</encoder>
 	</appender>
-	<root level="INFO">
+	<root level="debug">
 		<appender-ref ref="ROLLIN" />
 		<appender-ref ref="CONSOLE" />
 	</root>

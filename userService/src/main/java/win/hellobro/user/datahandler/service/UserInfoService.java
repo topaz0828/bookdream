@@ -35,6 +35,17 @@ public class UserInfoService implements  IUserInfoService{
     }
 
     @Override
+    public boolean isExistEmail(String eMail) {
+        return userInfoDAO.isExistEmail(eMail);
+    }
+
+    @Override
+    public boolean isExistNickName(String nickName) {
+        return userInfoDAO.isExistNickName(nickName);
+    }
+
+
+    @Override
     public synchronized boolean addUserinfo(UserInfo userInfo) {
         if (userInfoDAO.existEMailAndOAuthSite(userInfo.getEMail(), userInfo.getOAuthSite())) {
             return false;

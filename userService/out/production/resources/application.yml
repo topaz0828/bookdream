@@ -34,9 +34,9 @@ eureka:
 
 spring:
   datasource:
-    url: jdbc:mysql://49.236.144.204:3306/bookdream?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/bookdream?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Seoul
     username: bookdream
-    driver-class-name:
+    driver-class-name: 
     tomcat:
       initial-size: 2
       validation-query: SELECT 1
@@ -46,3 +46,13 @@ spring:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+
+data-validation:
+  len:
+    id: 100
+    email: 100
+    nickname: 100
+    oauthsite: 50
+    image: 4096
+

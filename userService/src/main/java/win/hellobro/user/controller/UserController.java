@@ -22,38 +22,46 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    UserDataHandler userDataHandler;
+    UserDataHandler userDataHandle;
 
     @Autowired
     DataVaildator dataVaildator;
 
     @RequestMapping(value = "user/{ID}", method = RequestMethod.GET)
     public UserInfo getUserInfo(@PathVariable String ID) throws UserServiceException {
-        return userDataHandler.getUserInfo(ID);
+        return userDataHandle.getUserInfo(ID);
     }
 
     @RequestMapping(value = "user", method = RequestMethod.GET)
-    public UserInfo getUserInfoByEmailnFrom(@RequestParam(name = "email", required = true) String eMail,
-                                            @RequestParam(name = "from", required = true) String from) throws UserServiceException {
+    public ResponseEntity<Void>existEmailOrNickName(@RequestParam(name = "email", required = false) String eMail,
+                                            @RequestParam(name = "nickname", required = false) String nickName) throws UserServiceException {
 
-       return userDataHandler.getUserInfo(eMail, from);
+       userDataHandle.existEmailOrNickName(eMail, nickName);
+       return  new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "user", method = RequestMethod.GET)
+    public UserInfo getUserInfoByEmailnFrom(@RequestParam(name = "email") String eMail,
+                                            @RequestParam(name = "from") String from) throws UserServiceException {
+
+        return userDataHandle.getUserInfo(eMail, from);
     }
 
 
     @RequestMapping(value = "users", method = RequestMethod.GET)
     public List<UserInfo> getAllUsers(@RequestParam(name = "start", defaultValue = "0") String start,
                                       @RequestParam(name = "count", defaultValue = "10") String count) {
-        return userDataHandler.getAllUserInfo(start, count);
+        return userDataHandle.getAllUserInfo(start, count);
     }
 
     @RequestMapping(value = "user", method = RequestMethod.POST)
     public ResponseEntity<Void> addUser(@RequestParam(name = "id", required = false) String ID,
-                                        @RequestParam(name = "nickname", required = true) String nickName,
-                                        @RequestParam(name = "email", required = true) String eMail,
+                                        @RequestParam(name = "nickname") String nickName,
+                                        @RequestParam(name = "email") String eMail,
                                         @RequestParam(name = "image", required = false) String image,
-                                        @RequestParam(name = "from", required = true) String from) throws UnsupportedEncodingException, UserServiceException {
-        userDataHandler.addUserInfo(ID, nickName, eMail, from, image);
-        return new ResponseEntity<Void>(HttpStatus.CREATED);
+                                        @RequestParam(name = "from") String from) throws UnsupportedEncodingException, UserServiceException {
+        userDataHandle.addUserInfo(ID, nickName, eMail, from, image);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "user/{ID}", method = RequestMethod.PUT)
@@ -61,11 +69,11 @@ public class UserController {
         return new ResponseEntity<>(userInfo, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "userss", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteUserInfo(@RequestParam(name = "email", required = true) String eMail,
-                                               @RequestParam(name = "from", required = true) String from) throws UserServiceException {
-        userDataHandler.removeUserinfo(eMail, from);
-        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+    @RequestMapping(value = "users", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteUserInfo(@RequestParam(name = "email") String eMail,
+                                               @RequestParam(name = "from") String from) throws UserServiceException {
+        userDataHandle.removeUserinfo(eMail, from);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

@@ -57,11 +57,19 @@ public class UserInfoDAO implements IUserInfoDAO{
     }
 
     @Override
-    public boolean existNickName(String nickName) {
+    public boolean isExistNickName(String nickName) {
         String hql = "FROM UserInfo users WHERE users.nickName = ?";
         int count = entityManager.createQuery(hql).setParameter(1, nickName).getResultList().size();
         return count > 0 ? true : false;
     }
+
+    @Override
+    public boolean isExistEmail(String eMail) {
+        String hql = "FROM UserInfo users WHERE users.nickName = ?";
+        int count = entityManager.createQuery(hql).setParameter(1, eMail).getResultList().size();
+        return count > 0 ? true : false;
+    }
+
 
     @Override
     public boolean existEMailAndOAuthSite(String eMail, String OAuth_Site) {

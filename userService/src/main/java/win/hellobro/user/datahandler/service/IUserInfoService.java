@@ -11,4 +11,7 @@ public interface IUserInfoService {
     void updateUserInfo(UserInfo user);
     boolean deleteUserInfo(String eMail, String from);
     UserInfo getUserinfoByEmailAndOAuthSite(String eMail, String from);
+    boolean isExistEmail(String eMail);
+    boolean isExistNickName(String eMail);
+
 }

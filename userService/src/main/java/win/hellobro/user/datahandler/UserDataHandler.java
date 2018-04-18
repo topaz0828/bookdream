@@ -1,12 +1,12 @@
 package win.hellobro.user.datahandler;
 
-import com.mysql.cj.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import win.hellobro.user.exception.UserServiceException;
 import win.hellobro.user.datahandler.entity.UserInfo;
 import win.hellobro.user.datahandler.service.IUserInfoService;
@@ -95,8 +95,8 @@ public class UserDataHandler {
     }
 
     public List<UserInfo> getAllUserInfo(String start, String end) {
-        if(StringUtils.isNullOrEmpty(start)) start = DEFAULT_START;
-        if (StringUtils.isNullOrEmpty(end))  end = DEFAULT_PAGECOUNT;
+        if(StringUtils.isEmpty(start)) start = DEFAULT_START;
+        if (StringUtils.isEmpty(end))  end = DEFAULT_PAGECOUNT;
         return userInfoService.getAllUserInfo(Integer.parseInt(start), Integer.parseInt(end));
     }
 
@@ -117,4 +117,11 @@ public class UserDataHandler {
     }
 
 
+    public void existEmailOrNickName(String eMail, String nickName) throws UserServiceException {
+        if (userInfoService.isExistEmail(eMail)){
+            throw new UserServiceException(HttpStatus.CONFLICT, "Already a Existing eMail");
+        } else if (userInfoService.isExistNickName(nickName)) {
+            throw new UserServiceException(HttpStatus.CONFLICT, "Already a Existing NickName");
+        }
+    }
 }

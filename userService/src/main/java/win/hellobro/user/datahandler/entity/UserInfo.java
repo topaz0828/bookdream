@@ -31,7 +31,6 @@ public class UserInfo implements Serializable {
     @Column(name="IMAGE")
     private String image;
 
-
     @Column(name="OAUTH_SITE")
     private String OAuthSite;
 

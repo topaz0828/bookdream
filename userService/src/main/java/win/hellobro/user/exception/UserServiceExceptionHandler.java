@@ -19,7 +19,7 @@ import java.sql.SQLException;
 @ControllerAdvice
 public class UserServiceExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceExceptionHandler.class);
+  //  private static final Logger logger = LoggerFactory.getLogger(UserServiceExceptionHandler.class);
 
     @ExceptionHandler(value = UserServiceException.class)
     @ResponseBody

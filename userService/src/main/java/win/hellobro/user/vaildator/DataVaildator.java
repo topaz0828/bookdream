@@ -1,9 +1,9 @@
 package win.hellobro.user.vaildator;
 
-import com.mysql.cj.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import win.hellobro.user.exception.UserServiceException;
 
 @Service
@@ -24,7 +24,7 @@ public class DataVaildator {
     @Value("${data-validation.len.image}")
     private int LEN_IMAGE;
 
-    private int checkMaxSize(String value) throws UserServiceException {
+    private int checkMaxSize(String value)  {
         int maxSize = 0;
         if ("id".equalsIgnoreCase(value)) maxSize = LEN_ID;
         if ("email".equalsIgnoreCase(value)) maxSize = LEN_EMAIL;
@@ -35,7 +35,7 @@ public class DataVaildator {
     }
 
     public void isValidMandantory(String param, String value) throws UserServiceException {
-        if (StringUtils.isNullOrEmpty(value))
+        if (StringUtils.isEmpty(value))
             throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("%s [%s] is null or empty", param, value));
 
         if(value.length() > checkMaxSize(param))
