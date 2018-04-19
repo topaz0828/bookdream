@@ -60,14 +60,14 @@ public class UserInfoDAO implements IUserInfoDAO {
     public boolean isExistNickName(String nickName) {
         String hql = "FROM UserInfo users WHERE users.nickName = :NICKNAME";
         int count = entityManager.createQuery(hql).setParameter("NICKNAME", nickName).getResultList().size();
-        return count > 0 ? true : false;
+        return count > 0;
     }
 
     @Override
     public boolean isExistEmail(String eMail) {
         String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL";
         int count = entityManager.createQuery(hql).setParameter("EMAIL", eMail).getResultList().size();
-        return count > 0 ? true : false;
+        return count > 0;
     }
 
 
@@ -76,7 +76,7 @@ public class UserInfoDAO implements IUserInfoDAO {
         String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
         int count = entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", OAuth_Site).
                 getResultList().size();
-        return count > 0 ? true : false;
+        return count > 0;
     }
 
     @Override
