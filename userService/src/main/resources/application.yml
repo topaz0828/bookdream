@@ -35,13 +35,13 @@ eureka:
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/bookdream?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Seoul
-    username: bookdream
-    driver-class-name:
+    username: test
+    driver-class-name: org.mariadb.jdbc.Driver
     tomcat:
       initial-size: 2
       validation-query: SELECT 1
       test-while-idle: true
-    password: pwbookdream
+    password: test
   jpa:
     hibernate:
       naming:

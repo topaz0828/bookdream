@@ -32,7 +32,7 @@ public class UserController {
         return userDataHandle.getUserInfo(ID);
     }
 
-    @RequestMapping(value = "user", method = RequestMethod.GET)
+    @RequestMapping(value = "check", method = RequestMethod.GET)
     public ResponseEntity<Void>existEmailOrNickName(@RequestParam(name = "email", required = false) String eMail,
                                             @RequestParam(name = "nickname", required = false) String nickName) throws UserServiceException {
 
