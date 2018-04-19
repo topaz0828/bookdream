@@ -3,7 +3,8 @@ import React from 'react';
 class Header extends React.Component {
 	constructor(props) {
 		super(props);
-		this.moveMyPage = props.moveMyPage;
+		this.moveMyPage = props.contents.moveMyPage;
+		this.refreshBody = props.contents.refreshBody;
 		this.contents = props.contents;
 	}
 
@@ -39,6 +40,14 @@ class Header extends React.Component {
 				</div>
 				<div className='col-sm-6 col-md-3' style={{paddingTop: '35px', paddingRight: '70px'}} align='right'>
 					<form method='POST' action='/api/user/logout'>
+						<button type='submit' className='btn btn-default'>
+							<span className='glyphicon glyphicon-log-out' aria-hidden='true'></span>
+						</button>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<button type='button' className='btn btn-default' onClick={this.refreshBody}>
+							<span className='glyphicon glyphicon-refresh' aria-hidden='true'></span>
+						</button>
+						&nbsp;&nbsp;
 						<button type='button' className='btn btn-default' data-toggle='modal' data-target='#addContentsModal'>
 							<span className='glyphicon glyphicon-plus' aria-hidden='true'></span>
 						</button>
@@ -46,10 +55,7 @@ class Header extends React.Component {
 						<button type='button' className='btn btn-default' onClick={this.moveMyPage}>
 							<span className='glyphicon glyphicon-user' aria-hidden='true'></span>
 						</button>
-						&nbsp;&nbsp;
-						<button type='submit' className='btn btn-default'>
-							<span className='glyphicon glyphicon-log-out' aria-hidden='true'></span>
-						</button>
+						
 					</form>
 				</div>
 			</div>

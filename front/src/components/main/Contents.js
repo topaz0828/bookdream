@@ -9,6 +9,9 @@ class Contents extends React.Component {
 		this.moveMyPage = () => {
 			this.app.moveMyPage();
 		}
+		this.refreshBody = () => {
+			this.refresh();
+		}
 	}
 
 	componentDidMount() {
@@ -26,7 +29,7 @@ class Contents extends React.Component {
 	render() {
 		return (
 			<div align='center'>
-				<Header moveMyPage={this.moveMyPage} contents={this}/>
+				<Header contents={this}/>
 		        <Body range='all' ref={(ref) => {this.body = ref;}} parent={this}/>
 			</div>
 		);

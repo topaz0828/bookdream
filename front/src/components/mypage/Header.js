@@ -14,16 +14,16 @@ class Header extends React.Component {
 				</div>
 				<div className='col-sm-6 col-md-3' style={{paddingTop: '35px', paddingRight: '70px'}} align='right'>
 					<form method='POST' action='/api/user/logout'>
+						<button type='submit' className='btn btn-default'>
+							<span className='glyphicon glyphicon-log-out' aria-hidden='true'></span>
+						</button>
+						&nbsp;&nbsp;&nbsp;&nbsp;
 						<button type='button' className='btn btn-default' data-toggle='modal' data-target='#addContentsModal'>
 							<span className='glyphicon glyphicon-plus' aria-hidden='true'></span>
 						</button>
 						&nbsp;&nbsp;
 						<button type='button' className='btn btn-default' onClick={this.moveMainView}>
 							<span className='glyphicon glyphicon-menu-left' aria-hidden='true'></span>
-						</button>
-						&nbsp;&nbsp;
-						<button type='submit' className='btn btn-default'>
-							<span className='glyphicon glyphicon-log-out' aria-hidden='true'></span>
 						</button>
 					</form>
 				</div>

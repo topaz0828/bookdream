@@ -52,7 +52,7 @@ class DetailModal extends React.Component {
 	showModify() {
 		this.detailText.hide();
 		this.modifyTextarea.show();
-		this.modifyTextarea.val(this.state.info.text);
+		this.modifyTextarea.val(this.state.contents);
 		this.detailSaveButton.show();
 		this.detailModifyButton.hide();
 	}
