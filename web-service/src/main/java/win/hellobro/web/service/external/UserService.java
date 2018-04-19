@@ -50,13 +50,39 @@ public class UserService {
 	}
 
 	@Service
+	public void checkEmailAndNickname(String email, String nickname) throws DuplicateException {
+		QueryStringEncoder encoder = new QueryStringEncoder("/check");
+		encoder.addParam("email", email);
+		encoder.addParam("nickname", nickname);
+
+		HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, encoder.toString());
+		request.headers().set(HttpHeaderNames.HOST, this.address);
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse response = client.sendAndWait(request);
+			if (response.status().code() == HttpResponseStatus.CONFLICT.code()) {
+				String body = response.content().toString(Charset.defaultCharset());
+				if (body.contains("eMail")) {
+					throw new DuplicateException("email");
+				} else if (body.contains("NickName")) {
+					throw new DuplicateException("nickname");
+				}
+			}
+		} catch (DuplicateException e){
+			throw e;
+		} catch (Exception e) {
+			throw new RuntimeException("UserService error.");
+		}
+	}
+
+	@Service
 	public boolean save(UserInfo userInfo) {
 		QueryStringEncoder queryStringEncoder = new QueryStringEncoder("/user");
 		queryStringEncoder.addParam("id", userInfo.getId());
 		queryStringEncoder.addParam("nickname", userInfo.getNickName());
 		queryStringEncoder.addParam("email", userInfo.getEmail());
 		queryStringEncoder.addParam("from", userInfo.getOauthSite().val());
-//		queryStringEncoder.addParam("image", userInfo.getImage());
+		queryStringEncoder.addParam("image", "");
 
 		FullHttpRequest saveRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, queryStringEncoder.toString());
 		saveRequest.headers().set(HttpHeaderNames.HOST, this.address);

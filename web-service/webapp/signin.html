@@ -4,10 +4,10 @@
 <head>
     <link rel="shortcut icon" href="/css/favicon.png"/>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="/jui/ui.min.css" />
-    <link rel="stylesheet" href="/jui/ui-jennifer.min.css" />
     <script src="/jui/core.min.js"></script>
     <script src="/jui/ui.min.js"></script>
+    <link rel="stylesheet" href="/jui/ui.min.css" />
+    <link rel="stylesheet" href="/jui/ui-jennifer.min.css" />
     <!-- <script src="/oauth/facebook.js"></script> -->
     <script type="text/javascript">
 		function login() {
@@ -18,16 +18,21 @@
 	</script>
 
     <meta charset="UTF-8">
-    <title>Bookdream</title>
+    <title>Marker</title>
 </head>
 
 <body class="jui">
-<div align="center" style="margin-top: 250px;">
-    <div class="h1" style="padding-bottom: 20px">Bookdream</div>
-    <input type="button" value="LOGIN" onclick="login()">
+<div id="back" align="center">
+    <div class="h1">Marker</div>
+    <div class="h5">Mark the moments of your life.</div>
+    <div style="height:30px;"></div>
+    <a class="btn large focus" onclick="login()">Facebook</a>
     <!-- <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false" onlogin="checkLoginState();" data-scope="public_profile, email"></div> -->
     <!-- <div><input type="button" value="sign out" onclick="FB.logout(function(response){console.log(response);});"></div>
     <div><input type="button" value="check Permission" onclick="checkPermission();"></div> -->
 </div>
+<script type="text/javascript">
+    document.getElementById('back').style.marginTop = (window.innerHeight / 2 - 150) + 'px';
+</script>
 </body>
 </html>

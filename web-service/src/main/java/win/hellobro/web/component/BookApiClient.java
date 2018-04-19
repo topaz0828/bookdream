@@ -30,7 +30,7 @@ public class BookApiClient {
 	}
 
 	public static List<BookSearchResult> search(String apiUri, String apiKey, String query) throws Exception {
-		return search(apiUri, apiKey, query, 10);
+		return search(apiUri, apiKey, query, 20);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class BookApiClient {
 			searchResult.setCategory((String) book.get("category"));
 			searchResult.setContents((String) book.get("contents"));
 			searchResult.setPublisher((String) book.get("publisher"));
-			searchResult.setThumbnail((String) book.get("thumbnail"));
+			searchResult.setThumbnail(((String) book.get("thumbnail")).replaceFirst("http:", "https:"));
 			searchResult.setTitle((String) book.get("title"));
 			searchResult.setPurchaseUrl((String) book.get("url"));
 			searchResult.setPrice((int) book.get("price"));

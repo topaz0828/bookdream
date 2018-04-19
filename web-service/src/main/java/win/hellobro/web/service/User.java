@@ -5,7 +5,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.balam.exof.module.listener.RequestContext;
-import team.balam.exof.module.service.ServiceObject;
 import team.balam.exof.module.service.ServiceWrapper;
 import team.balam.exof.module.service.annotation.Inbound;
 import team.balam.exof.module.service.annotation.Service;
@@ -17,6 +16,7 @@ import team.balam.exof.module.service.component.http.JsonToMap;
 import win.hellobro.web.SessionKey;
 import win.hellobro.web.UserInfo;
 import win.hellobro.web.component.part.QueryStringToMap;
+import win.hellobro.web.service.external.DuplicateException;
 import win.hellobro.web.service.vo.BookInfo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +29,9 @@ import java.util.Map;
 public class User {
 	private static final Logger LOG = LoggerFactory.getLogger(User.class);
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+
+	@Service("/external/user-service/checkEmailAndNickname")
+	private ServiceWrapper emailNicknameChecker;
 
 	@Service("/external/user-service/save")
 	private ServiceWrapper userSaver;
@@ -50,27 +53,39 @@ public class User {
 
 	@Service
 	@Inbound({HttpPost.class, QueryStringToMap.class})
-	public void signUp(Map<String, Object> request) {
-		HttpServletRequest servletRequest = RequestContext.getServletRequest();
+	public void signUp(Map<String, Object> request) throws IOException {
 		HttpServletResponse response = RequestContext.getServletResponse();
-		UserInfo signUpInfo = (UserInfo) servletRequest.getSession().getAttribute(SessionKey.SIGN_UP_INFO);
-		signUpInfo.setNickName((String) request.get("nickname"));
-		signUpInfo.setEmail((String) request.get("email"));
+		String email = (String) request.get("email");
+		String nickname = (String) request.get("nickname");
+
+		if (StringUtil.isNullOrEmpty(email) || !email.contains("@") || !email.contains(".") ||
+				StringUtil.isNullOrEmpty(nickname)) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		}
 
 		try {
-			ServiceObject serviceObject = new ServiceObject();
-			serviceObject.setServiceParameter(signUpInfo);
+			this.emailNicknameChecker.call(email, nickname);
 
-			boolean isSuccess = this.userSaver.call(serviceObject);
+			HttpServletRequest servletRequest = RequestContext.getServletRequest();
+			UserInfo signUpInfo = (UserInfo) servletRequest.getSession().getAttribute(SessionKey.SIGN_UP_INFO);
+			signUpInfo.setNickName(nickname);
+			signUpInfo.setEmail(email);
+
+			boolean isSuccess = this.userSaver.call(signUpInfo);
 			if (isSuccess) {
 				LOG.info("SIGN UP Marker. :) {}.", signUpInfo.getEmail());
 				servletRequest.getSession().setAttribute(SessionKey.USER_INFO, signUpInfo);
-				response.sendRedirect("/");
 			} else {
-				response.sendRedirect("/signin.html");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
+			if (e.getCause() != null && e.getCause() instanceof DuplicateException) {
+				response.setStatus(HttpServletResponse.SC_CONFLICT);
+				response.getWriter().write(e.getCause().getMessage());
+			} else {
+				LOG.error(e.getMessage(), e);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
 		}
 	}
 

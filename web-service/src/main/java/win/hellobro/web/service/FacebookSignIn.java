@@ -75,10 +75,7 @@ public class FacebookSignIn {
 
 			FbUserInfo facebookUser = FbApiClient.getUserInfo(this.userInfoUri, accessToken.getAccessToken());
 
-			ServiceObject serviceObject = new ServiceObject();
-			serviceObject.setRequest(facebookUser.getId());
-
-			UserInfo userInfo = this.userGetter.call(serviceObject);
+			UserInfo userInfo = this.userGetter.call(facebookUser.getId());
 			if (userInfo != null && !UserInfo.NOT_FOUND_USER.equals(userInfo)) {
 				LOG.info("SIGN IN BookDream. :) {}.", userInfo.getEmail());
 

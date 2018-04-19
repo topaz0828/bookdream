@@ -7,33 +7,82 @@
     <link rel="stylesheet" href="/jui/ui.min.css" />
     <link rel="stylesheet" href="/jui/ui-jennifer.min.css" />
     <meta charset="UTF-8">
-    <title>Bookdream</title>
+    <title>Marker</title>
+    <script type="text/javascript">
+        function join() {
+            var email = document.signUp.email.value;
+            var nickname = document.signUp.nickname.value;
+            $('#email_noti').text('');
+            $('#nickname_noti').text('');
+
+            if (email.length == 0 || email.indexOf('@') < 0 || email.indexOf('.') < 0) {
+                $('#email_noti').text('이메일을 확인해 주세요.');
+                return;
+            }
+
+            if (nickname.length == 0) {
+                $('#nickname_noti').text('닉네임을 입력해 주세요.');
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/user/signUp',
+                data: {nickname: nickname, email: email}
+            }).done(function(res) {
+                document.location = '/';
+            }).fail(function(res) {
+            console.log(res);
+                if (res.status == 409) {
+                    if (res.responseText === 'email') {
+                        $('#email_noti').text('이메일이 중복되었습니다.');
+                    } else if (res.responseText === 'nickname') {
+                        $('#nickname_noti').text('닉네임이 중복되었습니다.');
+                    }
+                } else if (res.status == 400) {
+                    alert('잘못된 요청입니다.');
+                    document.location = '/signin.html';
+                } else {
+                    alert('server error.');
+                    document.location = '/signin.html';
+                }
+            });
+        }
+    </script>
 </head>
 <body class="jui">
 <div align="center" style="padding-top: 150px;">
-    <h1>Welcome Bookdream!</h1>
-    <form name="signUp" method="POST" action="/api/user/signUp">
+    <h1>Welcome Marker!</h1>
+    <form name="signUp">
         <table>
             <tr>
-                <td align="center"><img name="profilePicture" src=""></td>
+                <td align="center">
+                    <img name="profilePicture" src="">
+                </td>
             </tr>
             <tr>
-                <td>email<br><input class="input large" style="width: 250px;" name="email"></td>
+                <td>
+                    이메일<br><input class="input large" style="width: 250px;" name="email">
+                    <div id="email_noti" style="font-size: 13px; color:red; padding-top: 5px;"></div>
+                </td>
             </tr>
             <tr>
-                <td style="padding-top:10px;">nickname<br><input class="input large" style="width: 250px;" name="nickname"></td>
+                <td style="padding-top:10px;">
+                    닉네임<br><input class="input large" style="width: 250px;" name="nickname">
+                    <div id="nickname_noti" style="font-size: 13px; color:red; padding-top: 5px;"></div>
+                </td>
             </tr>
             <tr>
-                <td align="center" colspan="2" style="padding-top:10px;"><a class="btn large focus" onclick="document.signUp.submit();">Sign up</a></td>
+                <td align="center" colspan="2" style="padding-top:10px;"><a class="btn large focus" onclick="join()">Sign up</a></td>
             </tr>
         </table>
     </form>
 </div>
 <script type="text/javascript">
-			var url = new URL(document.location);
-			document.signUp.email.value = url.searchParams.get("email");
-			document.signUp.nickname.value = url.searchParams.get("name");
-			document.signUp.profilePicture.src = url.searchParams.get("picture");
-		</script>
+    var url = new URL(document.location);
+    document.signUp.email.value = url.searchParams.get("email");
+    document.signUp.nickname.value = url.searchParams.get("name");
+    document.signUp.profilePicture.src = url.searchParams.get("picture");
+</script>
 </body>
 </html>
