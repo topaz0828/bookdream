@@ -12,7 +12,7 @@ import java.util.List;
 
 @Transactional
 @Repository
-public class UserInfoDAO implements IUserInfoDAO{
+public class UserInfoDAO implements IUserInfoDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserInfoDAO.class);
 
@@ -25,8 +25,8 @@ public class UserInfoDAO implements IUserInfoDAO{
     public List<UserInfo> getAllUserInfoDAO(int start, int pageCount) {
         LOGGER.info("{}/{}", start, pageCount);
         String hql = "FROM UserInfo users ORDER BY 1";
-         return (List<UserInfo>) entityManager.createQuery(hql, UserInfo.class)
-                 .setFirstResult(start).setMaxResults(pageCount).getResultList();
+        return (List<UserInfo>) entityManager.createQuery(hql, UserInfo.class)
+                .setFirstResult(start).setMaxResults(pageCount).getResultList();
     }
 
     @Override
@@ -53,20 +53,20 @@ public class UserInfoDAO implements IUserInfoDAO{
 
     @Override
     public void deleteUserlInfo(String eMail, String OAuth_Site) {
-        entityManager.remove(getUserInfoByEmailAndOAuthSite(eMail,OAuth_Site));
+        entityManager.remove(getUserInfoByEmailAndOAuthSite(eMail, OAuth_Site));
     }
 
     @Override
     public boolean isExistNickName(String nickName) {
-        String hql = "FROM UserInfo users WHERE users.nickName = ?";
-        int count = entityManager.createQuery(hql).setParameter(1, nickName).getResultList().size();
+        String hql = "FROM UserInfo users WHERE users.nickName = :NICKNAME";
+        int count = entityManager.createQuery(hql).setParameter("NICKNAME", nickName).getResultList().size();
         return count > 0 ? true : false;
     }
 
     @Override
     public boolean isExistEmail(String eMail) {
-        String hql = "FROM UserInfo users WHERE users.nickName = ?";
-        int count = entityManager.createQuery(hql).setParameter(1, eMail).getResultList().size();
+        String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL";
+        int count = entityManager.createQuery(hql).setParameter("EMAIL", eMail).getResultList().size();
         return count > 0 ? true : false;
     }
 
@@ -74,7 +74,7 @@ public class UserInfoDAO implements IUserInfoDAO{
     @Override
     public boolean existEMailAndOAuthSite(String eMail, String OAuth_Site) {
         String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
-        int count = entityManager.createQuery(hql).setParameter("EMAIL",eMail).setParameter("OAUTH_SITE", OAuth_Site).
+        int count = entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", OAuth_Site).
                 getResultList().size();
         return count > 0 ? true : false;
     }
@@ -82,7 +82,7 @@ public class UserInfoDAO implements IUserInfoDAO{
     @Override
     public UserInfo getUserInfoByEmailAndOAuthSite(String eMail, String OAuth_Site) {
         String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
-        return  (UserInfo)entityManager.createQuery(hql).setParameter("EMAIL",eMail).setParameter("OAUTH_SITE", OAuth_Site).getSingleResult();
+        return (UserInfo) entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", OAuth_Site).getSingleResult();
     }
 }
 
