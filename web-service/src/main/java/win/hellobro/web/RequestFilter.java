@@ -19,6 +19,7 @@ public class RequestFilter implements ServicePathExtractor, Filter {
 	private static Set<String> notLoginPath = new HashSet<>();
 
 	public RequestFilter() {
+		notLoginPath.add("/user/profile-image");
 		notLoginPath.add("/user/signUp");
 		notLoginPath.add("/signin/facebook/oauth-uri");
 		notLoginPath.add("/signin/facebook/callback");
@@ -28,7 +29,7 @@ public class RequestFilter implements ServicePathExtractor, Filter {
 	public String extract(HttpServletRequest httpServletRequest) {
 		String requestPath = httpServletRequest.getPathInfo();
 		if (!notLoginPath.contains(requestPath)) {
-			UserInfo info = (UserInfo) httpServletRequest.getSession().getAttribute(SessionKey.USER_INFO);
+			UserInfo info = SessionRepository.getUserInfo();
 			if (info == null) {
 				return "/error/send-unauthorized";
 			}

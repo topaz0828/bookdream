@@ -5,7 +5,6 @@ import io.netty.util.internal.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.balam.exof.module.listener.RequestContext;
-import team.balam.exof.module.service.ServiceObject;
 import team.balam.exof.module.service.ServiceWrapper;
 import team.balam.exof.module.service.annotation.Inbound;
 import team.balam.exof.module.service.annotation.Service;
@@ -13,7 +12,7 @@ import team.balam.exof.module.service.annotation.ServiceDirectory;
 import team.balam.exof.module.service.annotation.Variable;
 import team.balam.exof.module.service.component.http.HttpGet;
 import win.hellobro.web.OAuthSite;
-import win.hellobro.web.SessionKey;
+import win.hellobro.web.SessionRepository;
 import win.hellobro.web.UserInfo;
 import win.hellobro.web.component.FbAccessToken;
 import win.hellobro.web.component.FbApiClient;
@@ -24,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 
 @ServiceDirectory
 public class FacebookSignIn {
@@ -44,9 +42,7 @@ public class FacebookSignIn {
 	@Service("oauth-uri")
 	@Inbound(HttpGet.class)
 	public void getOAuthUri(HttpServletRequest request) throws IOException {
-		String state = UUID.randomUUID().toString();
-		request.getSession().setAttribute(SessionKey.OAUTH_STATE, state);
-
+		String state = SessionRepository.createOAuthState();
 		String oauthUri = this.loginUri +
 				"client_id=" + this.appId +
 				"&redirect_uri=" + this.redirectUri +
@@ -61,10 +57,10 @@ public class FacebookSignIn {
 	public void receiveCallback(Map<String, Object> callbackParam) throws IOException {
 		HttpServletRequest request = RequestContext.getServletRequest();
 		HttpServletResponse response = RequestContext.getServletResponse();
-		String originalState = (String) request.getSession().getAttribute(SessionKey.OAUTH_STATE);
+		String originalState = SessionRepository.getOAuthState();
 
-		if (originalState == null || !originalState.equals(callbackParam.get(SessionKey.OAUTH_STATE))) {
-			LOG.error("Session state not equals. {} / {}", originalState, callbackParam.get(SessionKey.OAUTH_STATE));
+		if (originalState == null || !originalState.equals(callbackParam.get("state"))) {
+			LOG.error("Session state not equals. {} / {}", originalState, callbackParam.get("state"));
 			response.getWriter().write("You can't sign in.");
 			return;
 		}
@@ -83,7 +79,7 @@ public class FacebookSignIn {
 					userInfo.setImage(facebookUser.getPicture());
 				}
 
-				request.getSession().setAttribute(SessionKey.USER_INFO, userInfo);
+				SessionRepository.saveUserInfo(userInfo);
 				response.sendRedirect("/");
 			} else if (UserInfo.NOT_FOUND_USER.equals(userInfo)) {
 				moveSignUpPage(facebookUser);
@@ -106,8 +102,8 @@ public class FacebookSignIn {
 		user.setImage(facebookUser.getPicture());
 		user.setOauthSite(OAuthSite.FACEBOOK);
 
-		HttpServletRequest request = RequestContext.getServletRequest();
-		request.getSession().setAttribute(SessionKey.SIGN_UP_INFO, user);
+		SessionRepository.saveSignUpInfo(user);
+
 		QueryStringEncoder signUpParam = new QueryStringEncoder("/signup.html");
 		signUpParam.addParam("email", facebookUser.getEmail());
 		signUpParam.addParam("name", facebookUser.getName());

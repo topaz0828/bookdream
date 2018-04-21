@@ -11,13 +11,12 @@ import team.balam.exof.module.service.annotation.Service;
 import team.balam.exof.module.service.annotation.ServiceDirectory;
 import team.balam.exof.module.service.annotation.Variable;
 import team.balam.exof.module.service.component.http.HttpGet;
-import win.hellobro.web.SessionKey;
+import win.hellobro.web.SessionRepository;
 import win.hellobro.web.UserInfo;
 import win.hellobro.web.component.BookApiClient;
 import win.hellobro.web.component.BookSearchResult;
 import win.hellobro.web.component.part.QueryStringToMap;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
@@ -79,9 +78,8 @@ public class Finder {
 			isbn = this.findIsbnFromBookApi(query);
 		}
 
-		HttpServletRequest servletRequest = RequestContext.getServletRequest();
 		HttpServletResponse response = RequestContext.getServletResponse();
-		UserInfo user = (UserInfo) servletRequest.getSession().getAttribute(SessionKey.USER_INFO);
+		UserInfo user = SessionRepository.getUserInfo();
 		String resultList;
 
 		try {

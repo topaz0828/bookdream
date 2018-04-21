@@ -71,7 +71,7 @@ class DetailModal extends React.Component {
 		var self = this;
 		$.ajax({
 			type: 'PUT',
-			url: '/api/user/contents',
+			url: '/api/contents/update',
 			data: JSON.stringify(data),
 		}).done(function(res) {
 			self.modal.modal('hide');

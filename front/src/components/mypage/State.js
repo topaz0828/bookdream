@@ -31,7 +31,7 @@ class State extends React.Component {
 		return (
 			<div className='row' style={{paddingTop: '30px', paddingBottom: '30px'}}>
 				<div className='col-sm-6 col-md-6' align='right' style={{paddingTop: '30px', paddingRight: '50px'}}>
-					<img src={this.state.image}/>
+					<img src={this.state.image} style={{maxWidth: '100px', maxHeight: '100px'}}/>
 				</div>
 				<div className='col-sm-6 col-md-6' style={{paddingLeft: '30px'}}>
 					<table width='100%'>

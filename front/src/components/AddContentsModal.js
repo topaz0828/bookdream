@@ -102,7 +102,7 @@ class AddContentsModal extends React.Component {
 
 			if (this.impressionButton.hasClass('active')) {
 				data.impression = [];
-				url = '/api/user/impression';
+				url = '/api/contents/impression';
 				var impressionInput = $('input[name=impressionInput]');
 				for (var i in impressionInput) {
 					var text = impressionInput[i].value;
@@ -115,7 +115,7 @@ class AddContentsModal extends React.Component {
 					return;
 				}
 			} else {
-				url = '/api/user/review';
+				url = '/api/contents/review';
 				data.review = $('#reviewInput').val();
 				if (data.review.length ==  0) {
 					return;

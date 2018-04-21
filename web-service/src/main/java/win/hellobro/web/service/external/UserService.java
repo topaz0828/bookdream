@@ -82,7 +82,7 @@ public class UserService {
 		queryStringEncoder.addParam("nickname", userInfo.getNickName());
 		queryStringEncoder.addParam("email", userInfo.getEmail());
 		queryStringEncoder.addParam("from", userInfo.getOauthSite().val());
-		queryStringEncoder.addParam("image", "");
+		queryStringEncoder.addParam("image", userInfo.getImage());
 
 		FullHttpRequest saveRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, queryStringEncoder.toString());
 		saveRequest.headers().set(HttpHeaderNames.HOST, this.address);
