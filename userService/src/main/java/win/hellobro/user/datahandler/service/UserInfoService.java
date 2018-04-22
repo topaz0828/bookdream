@@ -11,10 +11,10 @@ import java.util.List;
 
 
 @Service
-public class UserInfoService implements  IUserInfoService{
+public class UserInfoService implements IUserInfoService {
 
     @Autowired
-    private IUserInfoDAO userInfoDAO  ;
+    private IUserInfoDAO userInfoDAO;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserInfoService.class);
 
@@ -25,7 +25,7 @@ public class UserInfoService implements  IUserInfoService{
 
     @Override
     public UserInfo getUserinfoById(String ID) {
-       return  userInfoDAO.getUserInfoById(ID);
+        return userInfoDAO.getUserInfoById(ID);
     }
 
 
@@ -50,7 +50,7 @@ public class UserInfoService implements  IUserInfoService{
     }
 
 
-        @Override
+    @Override
     public synchronized boolean addUserinfo(UserInfo userInfo) {
         if (userInfoDAO.existEMailAndOAuthSite(userInfo.getEMail(), userInfo.getOAuthSite())) {
             return false;

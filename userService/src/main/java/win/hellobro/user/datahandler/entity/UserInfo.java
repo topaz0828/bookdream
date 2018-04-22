@@ -11,38 +11,38 @@ import java.util.Date;
 
 @Data
 @Entity
-@Table(name="USER_INFO")
+@Table(name = "USER_INFO")
 public class UserInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public UserInfo() {}
+    public UserInfo() {
+    }
 
     @Id
-    @Column(name="ID")
+    @Column(name = "ID")
     private String id;
 
-    @Column(name="EMAIL")
+    @Column(name = "EMAIL")
     private String eMail;
 
-    @Column(name="NICKNAME")
+    @Column(name = "NICKNAME")
     private String nickName;
 
-    @Column(name="IMAGE")
+    @Column(name = "IMAGE")
     private String image;
 
-    @Column(name="OAUTH_SITE")
+    @Column(name = "OAUTH_SITE")
     private String OAuthSite;
 
-    @Column(name="UPDATE_DATE")
+    @Column(name = "UPDATE_DATE")
     private Date updateDate;
 
     @Override
     public String toString() {
         return "user [ID:" + id + "EMAIL:" + eMail + "NICKNAME:" +
-                nickName + "OAUTH_SITE:" + OAuthSite + "UPDATE_DATE" + updateDate +  "IMAGE" + image +"]";
+                nickName + "OAUTH_SITE:" + OAuthSite + "UPDATE_DATE" + updateDate + "IMAGE" + image + "]";
     }
-
 
 
 }

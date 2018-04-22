@@ -24,7 +24,7 @@ public class DataVaildator {
     @Value("${data-validation.len.image}")
     private int LEN_IMAGE;
 
-    private int checkMaxSize(String value)  {
+    private int checkMaxSize(String value) {
         int maxSize = 0;
         if ("id".equalsIgnoreCase(value)) maxSize = LEN_ID;
         if ("email".equalsIgnoreCase(value)) maxSize = LEN_EMAIL;
@@ -38,16 +38,14 @@ public class DataVaildator {
         if (StringUtils.isEmpty(value))
             throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("%s [%s] is null or empty", param, value));
 
-        if(value.length() > checkMaxSize(param))
-            throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("$s [%s] data size exceed maxSize", param, value));
-    }
-
-    public void isValidOption(String param, String value) throws UserServiceException {
-        if(value.length() > checkMaxSize(param))
+        if (value.length() > checkMaxSize(param))
             throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("%s [%s] data size exceed maxSize", param, value));
     }
 
-
+    public void isValidOption(String param, String value) throws UserServiceException {
+        if (value.length() > checkMaxSize(param))
+            throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("%s [%s] data size exceed maxSize", param, value));
+    }
 
 
 }

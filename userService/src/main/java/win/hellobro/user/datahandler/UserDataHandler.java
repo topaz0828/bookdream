@@ -22,9 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configurable
 public class UserDataHandler {
 
-    private final String DEFAULT_START = "0";
-    private final String DEFAULT_PAGECOUNT = "5";
-    private final String DELIMETER = ":";
+    private final static String DEFAULT_START = "0";
+    private final static String DEFAULT_PAGECOUNT = "5";
+    private final static String DELIMETER = ":";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDataHandler.class);
     private Map<String, UserInfo> userMap = new ConcurrentHashMap<>();

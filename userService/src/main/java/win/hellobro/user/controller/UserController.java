@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/")
 public class UserController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     UserDataHandler userDataHandle;
@@ -66,9 +66,9 @@ public class UserController {
 
     @RequestMapping(value = "user", method = RequestMethod.PATCH)
     public UserInfo updateUserInfo(@RequestParam(name = "email") String eMail,
-                                                   @RequestParam(name="from") String from,
-                                                   @RequestBody UserInfo userInfo) throws UserServiceException {
-        return  userDataHandle.updateUserInfo(eMail, from, userInfo);
+                                   @RequestParam(name = "from") String from,
+                                   @RequestBody UserInfo userInfo) throws UserServiceException {
+        return userDataHandle.updateUserInfo(eMail, from, userInfo);
     }
 
     @RequestMapping(value = "users", method = RequestMethod.DELETE)

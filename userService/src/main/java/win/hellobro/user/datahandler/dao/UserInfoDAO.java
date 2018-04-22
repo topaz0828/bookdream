@@ -28,7 +28,7 @@ public class UserInfoDAO implements IUserInfoDAO {
     public List<UserInfo> getAllUserInfoDAO(int start, int pageCount) {
         LOGGER.info("{}/{}", start, pageCount);
         String hql = "FROM UserInfo users ORDER BY 1";
-        return (List<UserInfo>) entityManager.createQuery(hql, UserInfo.class)
+        return entityManager.createQuery(hql, UserInfo.class)
                 .setFirstResult(start).setMaxResults(pageCount).getResultList();
     }
 
