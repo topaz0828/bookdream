@@ -9,6 +9,8 @@ import win.hellobro.user.datahandler.entity.UserInfo;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 
 @Transactional
@@ -38,6 +40,7 @@ public class UserInfoDAO implements IUserInfoDAO {
 
     @Override
     public void addUserInfo(UserInfo user) {
+        user.setUpdateDate(getDate());
         entityManager.merge(user);
 
     }
@@ -47,13 +50,13 @@ public class UserInfoDAO implements IUserInfoDAO {
         String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
         UserInfo user = (UserInfo) entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", from).getSingleResult();
 
-        user.setEMail(StringUtils.isEmpty(aftUser.getEMail())? user.getEMail():aftUser.getEMail());
-        user.setNickName(StringUtils.isEmpty(aftUser.getNickName())?user.getNickName():aftUser.getNickName());
-        user.setOAuthSite(StringUtils.isEmpty(aftUser.getOAuthSite())?user.getOAuthSite():aftUser.getOAuthSite());
-        user.setImage(StringUtils.isEmpty(aftUser.getImage())?user.getImage():aftUser.getImage());
-
+        user.setEMail(StringUtils.isEmpty(aftUser.getEMail()) ? user.getEMail() : aftUser.getEMail());
+        user.setNickName(StringUtils.isEmpty(aftUser.getNickName()) ? user.getNickName() : aftUser.getNickName());
+        user.setOAuthSite(StringUtils.isEmpty(aftUser.getOAuthSite()) ? user.getOAuthSite() : aftUser.getOAuthSite());
+        user.setImage(StringUtils.isEmpty(aftUser.getImage()) ? user.getImage() : aftUser.getImage());
+        user.setUpdateDate(getDate());
         entityManager.flush();
-        return  user;
+        return user;
     }
 
     @Override
@@ -90,6 +93,10 @@ public class UserInfoDAO implements IUserInfoDAO {
         return (UserInfo) entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", OAuth_Site).getSingleResult();
     }
 
+    private Date getDate() {
+        Calendar calendar = Calendar.getInstance();
+        return new Date(calendar.getTime().getTime());
+    }
 
 }
 
