@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.expression.spel.ast.NullLiteral;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,6 +14,7 @@ import win.hellobro.user.datahandler.service.IUserInfoService;
 import win.hellobro.user.vaildator.DataVaildator;
 
 
+import javax.validation.constraints.Null;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
@@ -123,5 +125,24 @@ public class UserDataHandler {
         } else if (userInfoService.isExistNickName(nickName)) {
             throw new UserServiceException(HttpStatus.CONFLICT, "Already a Existing NickName");
         }
+    }
+
+    public UserInfo updateUserInfo(String eMail, String from, UserInfo userInfo) throws UserServiceException {
+        vaildator.isValidMandantory("email", eMail);
+        vaildator.isValidMandantory("from", from);
+
+        UserInfo user = userInfoService.getUserinfoByEmailAndOAuthSite(eMail, from);
+        if (user == null) {
+            throw new UserServiceException(HttpStatus.NOT_FOUND, "User Information to modify not found");
+        }
+        UserInfo modifiedUser = userInfoService.updateUserInfo(eMail, from, userInfo);
+        if (!StringUtils.isEmpty(modifiedUser)) {
+            String Key = makeKey(eMail, from);
+            if (userMap.containsKey(Key)) {
+                userMap.remove(Key);
+                userMap.put(makeKey(eMail, from), user);
+            }
+        }
+        return modifiedUser;
     }
 }

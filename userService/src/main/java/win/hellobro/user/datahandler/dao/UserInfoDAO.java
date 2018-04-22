@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import win.hellobro.user.datahandler.entity.UserInfo;
 
 import javax.persistence.EntityManager;
@@ -37,18 +38,22 @@ public class UserInfoDAO implements IUserInfoDAO {
 
     @Override
     public void addUserInfo(UserInfo user) {
-        //entityManager.remove(user);
         entityManager.merge(user);
 
     }
 
     @Override
-    public void updateUserinfo(UserInfo user) {
-        UserInfo updateUser = getUserInfoById(user.getId());
-        updateUser.setEMail(user.getEMail());
-        updateUser.setNickName(user.getNickName());
-        updateUser.setOAuthSite(user.getOAuthSite());
+    public UserInfo updateUserinfo(String eMail, String from, UserInfo aftUser) {
+        String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
+        UserInfo user = (UserInfo) entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", from).getSingleResult();
+
+        user.setEMail(StringUtils.isEmpty(aftUser.getEMail())? user.getEMail():aftUser.getEMail());
+        user.setNickName(StringUtils.isEmpty(aftUser.getNickName())?user.getNickName():aftUser.getNickName());
+        user.setOAuthSite(StringUtils.isEmpty(aftUser.getOAuthSite())?user.getOAuthSite():aftUser.getOAuthSite());
+        user.setImage(StringUtils.isEmpty(aftUser.getImage())?user.getImage():aftUser.getImage());
+
         entityManager.flush();
+        return  user;
     }
 
     @Override
@@ -84,6 +89,8 @@ public class UserInfoDAO implements IUserInfoDAO {
         String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
         return (UserInfo) entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", OAuth_Site).getSingleResult();
     }
+
+
 }
 
 

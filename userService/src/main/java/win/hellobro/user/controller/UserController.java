@@ -33,11 +33,11 @@ public class UserController {
     }
 
     @RequestMapping(value = "check", method = RequestMethod.GET)
-    public ResponseEntity<Void>existEmailOrNickName(@RequestParam(name = "email", required = false) String eMail,
-                                            @RequestParam(name = "nickname", required = false) String nickName) throws UserServiceException {
+    public ResponseEntity<Void> existEmailOrNickName(@RequestParam(name = "email", required = false) String eMail,
+                                                     @RequestParam(name = "nickname", required = false) String nickName) throws UserServiceException {
 
-       userDataHandle.existEmailOrNickName(eMail, nickName);
-       return  new ResponseEntity<>(HttpStatus.OK);
+        userDataHandle.existEmailOrNickName(eMail, nickName);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "user", method = RequestMethod.GET)
@@ -64,9 +64,12 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "user/{ID}", method = RequestMethod.PUT)
-    public ResponseEntity<UserInfo> updateArticle(@RequestBody UserInfo userInfo) {
-        return new ResponseEntity<>(userInfo, HttpStatus.OK);
+    @RequestMapping(value = "user", method = RequestMethod.PATCH)
+    public ResponseEntity<UserInfo> updateUserInfo(@RequestParam(name = "email") String eMail,
+                                                   @RequestParam(name="from") String from,
+                                                   @RequestBody UserInfo userInfo) throws UserServiceException {
+        UserInfo user = userDataHandle.updateUserInfo(eMail, from, userInfo);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @RequestMapping(value = "users", method = RequestMethod.DELETE)

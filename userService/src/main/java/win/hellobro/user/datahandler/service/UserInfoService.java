@@ -44,8 +44,13 @@ public class UserInfoService implements  IUserInfoService{
         return userInfoDAO.isExistNickName(nickName);
     }
 
-
     @Override
+    public UserInfo updateUserInfo(String eMail, String from, UserInfo userInfo) {
+        return userInfoDAO.updateUserinfo(eMail, from, userInfo);
+    }
+
+
+        @Override
     public synchronized boolean addUserinfo(UserInfo userInfo) {
         if (userInfoDAO.existEMailAndOAuthSite(userInfo.getEMail(), userInfo.getOAuthSite())) {
             return false;
@@ -56,17 +61,12 @@ public class UserInfoService implements  IUserInfoService{
     }
 
     @Override
-    public void updateUserInfo(UserInfo userInfo) {
-        userInfoDAO.updateUserinfo(userInfo);
-    }
-
-    @Override
     public synchronized boolean deleteUserInfo(String eMail, String from) {
         if (userInfoDAO.existEMailAndOAuthSite(eMail, from)) {
             userInfoDAO.deleteUserlInfo(eMail, from);
             return true;
         }
-        return true;
+        return false;
     }
 
 }
