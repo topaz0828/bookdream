@@ -5,6 +5,7 @@ import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -21,9 +22,11 @@ import team.balam.exof.module.service.annotation.ServiceDirectory;
 import team.balam.exof.module.service.annotation.Shutdown;
 import team.balam.exof.module.service.annotation.Startup;
 import team.balam.exof.module.service.annotation.Variable;
+import win.hellobro.web.OAuthSite;
 import win.hellobro.web.UserInfo;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 
 @ServiceDirectory(internal = true)
@@ -102,6 +105,7 @@ public class UserService {
 	}
 
 	@Service
+	@SuppressWarnings("unchecked")
 	public UserInfo get(String userId) {
 		int status = -1;
 		HttpRequest saveRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/user/" + userId);
@@ -131,6 +135,33 @@ public class UserService {
 
 		LOG.error("UserService ======> Can not get user. Http status code : {}", status);
 		return null;
+	}
+
+	@Service
+	public void updateProfileImage(String email, OAuthSite from, String profileUrl) throws Exception {
+		QueryStringEncoder encoder = new QueryStringEncoder("/user");
+		encoder.addParam("email", email);
+		encoder.addParam("from", from.val());
+
+		HashMap<String, String> user = new HashMap<>();
+		user.put("image", profileUrl);
+		byte[] body = JSON_MAPPER.writeValueAsBytes(user);
+
+		FullHttpRequest saveRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PATCH, encoder.toString());
+		saveRequest.headers().set(HttpHeaderNames.HOST, this.address);
+		saveRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
+		saveRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
+		saveRequest.content().writeBytes(body);
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse response = client.sendAndWait(saveRequest);
+
+			if (response.status().code() != HttpResponseStatus.OK.code()) {
+				LOG.error("=====> UserService Fail to update profile image. status:{}", response.status().code());
+			}
+		} catch (Exception e) {
+			LOG.error("Fail to update profile image.", e);
+		}
 	}
 
 	@Shutdown

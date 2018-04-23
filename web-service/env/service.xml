@@ -4,7 +4,7 @@
         <variable name="tempDir" value="./webapp/temp/"/>
         <variable name="profileImageDir" value="./webapp/image/profile/"/>
         <!--<variable name="profileBaseUrl" value="https://book.hellobro.win/image/profile/"/>-->
-        <!--<variable name="profileBaseUrl" value="https://book.hellobro.win/temp/profile/"/>-->
+        <!--<variable name="profileTempUrl" value="https://book.hellobro.win/temp/profile/"/>-->
         <variable name="profileBaseUrl" value="http://localhost:3003/image/profile/"/>
         <variable name="profileTempUrl" value="http://localhost:3003/temp/profile/"/>
     </serviceDirectory>

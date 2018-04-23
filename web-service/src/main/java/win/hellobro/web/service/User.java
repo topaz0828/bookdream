@@ -1,5 +1,6 @@
 package win.hellobro.web.service;
 
+import io.netty.handler.ssl.OpenSslSessionTicketKey;
 import io.netty.util.internal.StringUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.jetty.util.MultiPartInputStream;
@@ -14,14 +15,11 @@ import team.balam.exof.module.service.annotation.Startup;
 import team.balam.exof.module.service.annotation.Variable;
 import team.balam.exof.module.service.component.http.HttpGet;
 import team.balam.exof.module.service.component.http.HttpPost;
-import team.balam.exof.module.service.component.http.HttpPut;
-import team.balam.exof.module.service.component.http.JsonToMap;
 import team.balam.exof.util.StreamUtil;
 import win.hellobro.web.SessionRepository;
 import win.hellobro.web.UserInfo;
 import win.hellobro.web.component.part.QueryStringToMap;
 import win.hellobro.web.service.external.DuplicateException;
-import win.hellobro.web.service.vo.BookInfo;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
@@ -66,6 +64,9 @@ public class User {
 
 	@Service("/external/review-service/getImpressionCount")
 	private ServiceWrapper impressionCountGetter;
+
+	@Service("/external/user-service/updateProfileImage")
+	private ServiceWrapper profileImageUpdater;
 
 	@Startup
 	public void init() {
@@ -124,7 +125,7 @@ public class User {
 				LOG.error("File to save profile image file.", e);
 				return "";
 			} finally {
-				tempFile.deleteOnExit();
+				tempFile.delete();
 			}
 		}
 
@@ -140,81 +141,26 @@ public class User {
 
 		MultipartConfigElement config = new MultipartConfigElement(saveDir.getAbsolutePath());
 		MultiPartInputStream multiPart = new MultiPartInputStream(request.getInputStream(), request.getContentType(), config, new File(this.tempDir));
-
 		MultiPartInputStream.MultiPart part = (MultiPartInputStream.MultiPart) multiPart.getPart("profileImage");
+
 		SessionRepository.saveProfileImageFile(part.getFile().getAbsolutePath());
 
 		HttpServletResponse response = RequestContext.getServletResponse();
-		response.getWriter().write(this.profileTempUrl + todayDir + "/" + part.getFile().getName());
-	}
 
-//	@SuppressWarnings("unchecked")
-//	@Service("impression")
-//	@Inbound({HttpPost.class, JsonToMap.class})
-//	public void saveImpression(Map<String, Object> request) throws IOException {
-//		HttpServletResponse response = RequestContext.getServletResponse();
-//
-//		UserInfo user = SessionRepository.getUserInfo();
-//		BookInfo book = new BookInfo((Map<String, Object>) request.get("book"));
-//
-//		LOG.info("save impression. book[{}] impression:{}", book.getTitle(), request.get("impression"));
-//
-//		try {
-//			boolean isSuccess = this.impressionSaver.call(user.getId(), book, request.get("impression"));
-//			if (!isSuccess) {
-//				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//			}
-//		} catch (Exception e) {
-//			LOG.error("Fail to call impressionSaver.", e);
-//			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//		}
-//	}
-//
-//	@SuppressWarnings("unchecked")
-//	@Service("review")
-//	@Inbound({HttpPost.class, JsonToMap.class})
-//	public void saveReview(Map<String, Object> request) throws IOException {
-//		UserInfo user = SessionRepository.getUserInfo();
-//		BookInfo book = new BookInfo((Map<String, Object>) request.get("book"));
-//		String review = (String) request.get("review");
-//
-//		LOG.info("save review. book[{}] review:{}", book.getTitle(), review);
-//
-//		HttpServletResponse response = RequestContext.getServletResponse();
-//
-//		try {
-//			boolean isSuccess = this.reviewSaver.call(user.getId(), book, review);
-//			if (!isSuccess) {
-//				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//			}
-//		} catch (Exception e) {
-//			LOG.error("Fail to save review.", e);
-//			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//		}
-//	}
-//
-//	@Service("contents")
-//	@Inbound({HttpPut.class, JsonToMap.class})
-//	public void updateReviewOrImpression(Map<String, Object> request) throws IOException {
-//		HttpServletResponse response = RequestContext.getServletResponse();
-//		UserInfo user = SessionRepository.getUserInfo();
-//
-//		if (StringUtil.isNullOrEmpty((String) request.get("contents"))) {
-//			LOG.warn("contents is empty. user id: {}", user.getId());
-//			return;
-//		}
-//
-//		try {
-//			boolean isSuccess = this.contentsUpdater.call(user.getId(), request.get("bookId"), request.get("type"),
-//					request.get("contentsId"), request.get("contents"));
-//			if (!isSuccess) {
-//				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//			}
-//		} catch (Exception e) {
-//			LOG.error("Fail to update review or impression.", e);
-//			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//		}
-//	}
+		if ("y".equals(request.getParameter("direct"))) {
+			try {
+				UserInfo user = SessionRepository.getUserInfo();
+				String imageUrl = this.saveProfileImage();
+				this.profileImageUpdater.call(user.getEmail(), user.getOauthSite(), imageUrl);
+
+				response.getWriter().write(imageUrl);
+			} catch (Exception e) {
+				LOG.error("Fail to update profile image.", e);
+			}
+		} else {
+			response.getWriter().write(this.profileTempUrl + todayDir + "/" + part.getFile().getName());
+		}
+	}
 
 	@Service("profile")
 	@Inbound(HttpGet.class)
