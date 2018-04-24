@@ -75,4 +75,23 @@ public class BookDao {
         }
         return null;
     }
+
+	public void insertPublisher(String name) {
+		try {
+			sqlSession.insert("insertPublisher", name);
+			log.info("insertPublisher {}", name);
+		} catch (Exception e) {
+			log.error("insertPublisher Exception", e);
+		}
+	}
+
+	public Map<String, Object> selectPublisher(String name) {
+		try {
+			log.info("selectPublisher {}", name);
+			return sqlSession.selectOne("selectPublisher", name);
+		} catch (Exception e) {
+			log.error("selectPublisher Exception", e);
+		}
+		return null;
+	}
 }

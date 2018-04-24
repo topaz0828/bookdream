@@ -12,9 +12,9 @@
     <!--SELECT r.ID, r.USER_ID, r.BOOK_ID, r.TYPE, r.TEXT, r.`UPDATE_DATE`, b.`AUTHOR`, b.`CATEGORY_ID`, b.`DESCRIPTION`, b.`IMAGE`, b.`ISBN`, b.`PAGES`, b.`PRICE`, b.`PUB_ID`, b.`RARITY`, b.`TITLE`, b.`TRANSLATOR`-->
     <select id="select" parameterType="map" resultType="map">
         SELECT r.ID, u.`NICKNAME`, r.BOOK_ID, r.TYPE, IF(CHAR_LENGTH(r.TEXT) > 50, CONCAT(SUBSTRING(r.TEXT, 1, 50), '...'), r.TEXT) AS TEXT, r.`UPDATE_DATE`, b.`AUTHOR`, b.`CATEGORY_ID`,
-        b.`DESCRIPTION`, b.`IMAGE`, b.`ISBN`, b.`PAGES`, b.`PRICE`, b.`PUB_ID`, b.`RARITY`, b.`TITLE`, b.`TRANSLATOR`, r.`USER_ID`
-        FROM `BOOK_REVIEW` r, `BOOK_INFO` b, `USER_INFO` u
-        WHERE r.`BOOK_ID` = b.`ID` AND r.`USER_ID` = u.`ID`
+        b.`DESCRIPTION`, b.`IMAGE`, b.`ISBN`, b.`PAGES`, b.`PRICE`, p.name PUB, b.`RARITY`, b.`TITLE`, b.`TRANSLATOR`, r.`USER_ID`
+        FROM `BOOK_REVIEW` r, `BOOK_INFO` b, `USER_INFO` u, PUBLISHER_INFO p
+        WHERE r.`BOOK_ID` = b.`ID` AND r.`USER_ID` = u.`ID` AND p.ID=b.pub_id
         <if test="BOOK_ID != null">
             AND r.BOOK_ID = #{BOOK_ID}
         </if>

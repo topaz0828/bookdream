@@ -63,4 +63,11 @@
         LIMIT 1;
     </select>
 
+    <select id="selectPublisher" parameterType="string" resultType="map">
+        SELECT * FROM PUBLISHER_INFO WHERE NAME=#{name};
+    </select>
+
+    <insert id="insertPublisher" parameterType="string">
+        INSERT INTO PUBLISHER_INFO (NAME) VALUES (#{name});
+    </insert>
 </mapper>

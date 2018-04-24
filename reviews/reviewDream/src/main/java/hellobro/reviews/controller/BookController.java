@@ -52,7 +52,10 @@ public class BookController {
     }
 
     private ResponseEntity<Integer> insertBook(Map<String, Object> map) {
-        String category = (String) map.get("CATEGORY");
+	    Long publisherId = findPublisherId((String) map.remove("PUB"));
+	    map.put("pub_id", publisherId);
+
+        String category = (String) map.remove("CATEGORY");
         if (category == null) {
             Integer bookId = dao.insert2(map);
             if (bookId == null) {
@@ -60,17 +63,13 @@ public class BookController {
             }
             return new ResponseEntity<>(bookId, HttpStatus.OK);
         } else {
-            Integer categoryId = this.dao.selectCategoryId(category);
-            if (categoryId == null) {
-                this.dao.insertCategory(category);
-                categoryId = this.dao.selectCategoryId(category);
-                if (categoryId == null) {
-                    return new ResponseEntity<>(0, HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
+            Integer categoryId = findCategoryId(category);
+	        if (categoryId == null) {
+		        return new ResponseEntity<>(0, HttpStatus.INTERNAL_SERVER_ERROR);
+	        } else {
+		        map.put("CATEGORY_ID", categoryId);
+	        }
 
-            map.remove("CATEGORY");
-            map.put("CATEGORY_ID", categoryId);
             Integer bookId = dao.insert2(map);
             if (bookId == null) {
                 return new ResponseEntity<>(0, HttpStatus.NOT_FOUND);
@@ -79,4 +78,22 @@ public class BookController {
         }
     }
 
+    private Integer findCategoryId(String category) {
+	    Integer categoryId = this.dao.selectCategoryId(category);
+	    if (categoryId == null) {
+		    this.dao.insertCategory(category);
+		    return this.dao.selectCategoryId(category);
+	    }
+	    return null;
+    }
+
+    private Long findPublisherId(String publisher) {
+	    Map<String, Object> result = dao.selectPublisher(publisher);
+		if (result == null) {
+			dao.insertPublisher(publisher);
+			result = dao.selectPublisher(publisher);
+			return (Long) result.get("ID");
+		}
+		return null;
+    }
 }

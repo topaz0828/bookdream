@@ -20,7 +20,7 @@ public class RequestConverter {
 
 	public static byte[] convert(BookInfo bookInfo) {
 		HashMap<String, Object> bookData = new HashMap<>();
-		bookData.put("PUB_ID", bookInfo.getPublisher());
+		bookData.put("PUB", bookInfo.getPublisher() != null ? bookInfo.getPublisher() : "");
 		bookData.put("CATEGORY", bookInfo.getCategory());
 		bookData.put("TITLE", bookInfo.getTitle());
 		bookData.put("IMAGE", bookInfo.getThumbnail());
