@@ -73,13 +73,14 @@ class Body extends React.Component {
 			var newList = [];
 			for (var i in res.list) {
 				var d = res.list[i];
-				
+				console.log(d);
 				newList.push({
 					contentsId: d.ID,
 					bookId: d.BOOK_ID,
 					nickname: d.NICKNAME,
 					title: d.TITLE,
 					author: d.AUTHOR,
+					publisher: d.PUB,
 					image: d.IMAGE,
 					text: d.TEXT,
 					type: d.TYPE, // C : Coment, R : review
@@ -131,6 +132,7 @@ class Body extends React.Component {
 					nickname={data.nickname}
 					title={data.title}
 					author={data.author}
+					publisher={data.publisher}
 					image={data.image}
 					text={data.text}
 					type={data.type}
@@ -174,6 +176,7 @@ class Body extends React.Component {
 								var data = {};
 								data.title = $(column).find('h5[name="title"]').text();
 								data.author = $(column).find('span[name="author"]').text();
+								data.publisher = $(column).find('span[name="publisher"]').text();
 								data.nickname = $(column).find('span[name="nickname"]').text();
 								data.image = $(column).find('img[name="image"]').attr('src');
 								data.text = $(column).find('span[name="text"]').text();

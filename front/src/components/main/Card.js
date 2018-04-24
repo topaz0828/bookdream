@@ -35,6 +35,7 @@ class Card extends React.Component {
 								<td valign='top'>
 									<h5 name='title' style={{paddingRight:'20px'}}><strong>{this.props.title}</strong></h5>
 									<p><span name='author'>{this.props.author}</span></p>
+									<p><span name='publisher'>{this.props.publisher}</span></p>
 								</td>
 								<td style={{paddingRight:'10px'}}>
 									<img name='image' src={this.props.image} width='100px' style={{float:'right'}}/>
