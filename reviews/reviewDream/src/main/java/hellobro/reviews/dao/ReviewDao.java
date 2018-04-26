@@ -98,15 +98,16 @@ public class ReviewDao {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Boolean delete(String reviewId, String userId, String bookId) {
         try {
-            if (reviewId != null) {
-                log.info("delete reviewId={}", reviewId);
-                sqlSession.delete("delete", reviewId);
-            }
-            if (userId != null) {
+            if (reviewId != null && userId != null) {
+                log.info("delete reviewId={}, userId={}", reviewId, userId);
+                HashMap<String, Object> param = new HashMap<>();
+                param.put("ID", reviewId);
+                param.put("USER_ID", userId);
+                sqlSession.delete("delete", param);
+            } else if (userId != null) {
                 log.info("deleteByUserId userId={}", userId);
                 sqlSession.delete("deleteByUserId", userId);
-            }
-            if (bookId != null) {
+            } else if (bookId != null) {
                 log.info("deleteByBookId bookId={}", bookId);
                 sqlSession.delete("deleteByBookId", bookId);
             }

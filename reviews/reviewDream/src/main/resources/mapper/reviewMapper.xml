@@ -114,7 +114,7 @@
 
 
     <delete id="delete">
-        DELETE FROM BOOK_REVIEW WHERE ID = #{ID}
+        DELETE FROM BOOK_REVIEW WHERE ID = #{ID} AND USER_ID = #{USER_ID}
     </delete>
 
     <delete id="deleteByUserID">

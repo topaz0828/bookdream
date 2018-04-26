@@ -82,9 +82,9 @@ public class BookController {
 	    Integer categoryId = this.dao.selectCategoryId(category);
 	    if (categoryId == null) {
 		    this.dao.insertCategory(category);
-		    return this.dao.selectCategoryId(category);
+		    categoryId = this.dao.selectCategoryId(category);
 	    }
-	    return null;
+	    return categoryId;
     }
 
     private Long findPublisherId(String publisher) {
@@ -92,8 +92,7 @@ public class BookController {
 		if (result == null) {
 			dao.insertPublisher(publisher);
 			result = dao.selectPublisher(publisher);
-			return (Long) result.get("ID");
 		}
-		return null;
+		return (Long) result.get("ID");
     }
 }
