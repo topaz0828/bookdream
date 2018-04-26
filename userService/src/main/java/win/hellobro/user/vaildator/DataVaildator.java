@@ -21,6 +21,9 @@ public class DataVaildator {
     @Value("${data-validation.len.oauthsite}")
     private int LEN_OAUTHSITE;
 
+	@Value("${data-validation.len.oauthId}")
+	private int LEN_OAUTHID;
+
     @Value("${data-validation.len.image}")
     private int LEN_IMAGE;
 
@@ -31,6 +34,7 @@ public class DataVaildator {
         if ("nickname".equalsIgnoreCase(value)) maxSize = LEN_NICKNAME;
         if ("from".equalsIgnoreCase(value)) maxSize = LEN_OAUTHSITE;
         if ("image".equalsIgnoreCase(value)) maxSize = LEN_IMAGE;
+	    if ("oauthId".equalsIgnoreCase(value)) maxSize = LEN_OAUTHID;
         return maxSize;
     }
 

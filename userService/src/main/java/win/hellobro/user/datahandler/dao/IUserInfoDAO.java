@@ -22,6 +22,8 @@ public interface IUserInfoDAO {
 
     UserInfo getUserInfoByEmailAndOAuthSite(String eMail, String OAuth_Site);
 
+	UserInfo getUserInfoByOauthIdAndOAuthSite(String oauthId, String OAuth_Site);
+
     UserInfo updateUserinfo(String eMail, String from, UserInfo userInfo);
 }
 

@@ -93,6 +93,17 @@ public class UserInfoDAO implements IUserInfoDAO {
         return (UserInfo) entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", OAuth_Site).getSingleResult();
     }
 
+	@Override
+	public UserInfo getUserInfoByOauthIdAndOAuthSite(String oauthId, String oauthSite) {
+		String hql = "FROM UserInfo users WHERE users.oauthId = :OAUTH_ID AND users.OAuthSite = :OAUTH_SITE";
+		List<UserInfo> result = entityManager.createQuery(hql).setParameter("OAUTH_ID", oauthId).setParameter("OAUTH_SITE", oauthSite).getResultList();
+		if (!result.isEmpty()) {
+			return result.get(0);
+		} else {
+			return null;
+		}
+	}
+
     private Date getDate() {
         Calendar calendar = Calendar.getInstance();
         return new Date(calendar.getTime().getTime());

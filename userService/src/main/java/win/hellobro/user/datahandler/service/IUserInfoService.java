@@ -15,6 +15,8 @@ public interface IUserInfoService {
 
     UserInfo getUserinfoByEmailAndOAuthSite(String eMail, String from);
 
+	UserInfo getUserInfoByOAuthIdAndOAuthSite(String oauthId, String oauthSite);
+
     boolean isExistEmail(String eMail);
 
     boolean isExistNickName(String eMail);

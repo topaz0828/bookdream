@@ -38,6 +38,9 @@ public class UserInfo implements Serializable {
     @Column(name = "UPDATE_DATE")
     private Date updateDate;
 
+	@Column(name = "OAUTH_ID")
+    private String oauthId;
+
     @Override
     public String toString() {
         return "user [ID:" + id + "EMAIL:" + eMail + "NICKNAME:" +

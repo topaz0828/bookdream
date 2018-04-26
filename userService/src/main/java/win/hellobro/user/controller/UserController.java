@@ -47,6 +47,13 @@ public class UserController {
         return userDataHandle.getUserInfo(eMail, from);
     }
 
+	@RequestMapping(value = "user/oauth", method = RequestMethod.GET)
+	public UserInfo getUserInfoByOauthIdnFrom(@RequestParam(name = "oauthId") String eMail,
+	                                        @RequestParam(name = "from") String from) throws UserServiceException {
+
+		return userDataHandle.getUserInfoByOAuthIdAndFrom(eMail, from);
+	}
+
 
     @RequestMapping(value = "users", method = RequestMethod.GET)
     public List<UserInfo> getAllUsers(@RequestParam(name = "start", defaultValue = "0") String start,
@@ -59,8 +66,9 @@ public class UserController {
                                         @RequestParam(name = "nickname") String nickName,
                                         @RequestParam(name = "email") String eMail,
                                         @RequestParam(name = "image", required = false) String image,
-                                        @RequestParam(name = "from") String from) throws UnsupportedEncodingException, UserServiceException {
-        userDataHandle.addUserInfo(ID, nickName, eMail, from, image);
+                                        @RequestParam(name = "from") String from,
+                                        @RequestParam(name = "oauthId") String oauthId) throws UnsupportedEncodingException, UserServiceException {
+        userDataHandle.addUserInfo(ID, nickName, eMail, from, image, oauthId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

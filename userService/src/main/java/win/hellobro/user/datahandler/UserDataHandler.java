@@ -64,14 +64,26 @@ public class UserDataHandler {
 
     }
 
-    public void addUserInfo(String ID, String nickName, String eMail, String from, String image) throws UnsupportedEncodingException, UserServiceException {
+	public UserInfo getUserInfoByOAuthIdAndFrom(String oauthId, String from) throws UserServiceException {
+		vaildator.isValidMandantory("oauthId", oauthId);
+		vaildator.isValidMandantory("from", from);
+
+		UserInfo userInfo = userInfoService.getUserInfoByOAuthIdAndOAuthSite(oauthId, from);
+		if (userInfo == null) {
+			throw new UserServiceException(HttpStatus.NOT_FOUND, "Account is not found");
+		}
+		return userInfo;
+	}
+
+    public void addUserInfo(String ID, String nickName, String eMail, String from, String image, String oauthId) throws UnsupportedEncodingException, UserServiceException {
         vaildator.isValidMandantory("id", ID);
         vaildator.isValidMandantory("nickname", nickName);
         vaildator.isValidMandantory("email", eMail);
         vaildator.isValidMandantory("from", from);
+	    vaildator.isValidMandantory("oauthId", oauthId);
         vaildator.isValidOption("image", image);
 
-        UserInfo user = mappingUser(ID, nickName, eMail, from, image);
+        UserInfo user = mappingUser(ID, nickName, eMail, from, image, oauthId);
         Boolean result = userInfoService.addUserinfo(user);
         if (result) {
             userMap.put(makeKey(eMail, from), user);
@@ -99,11 +111,12 @@ public class UserDataHandler {
         return userInfoService.getAllUserInfo(Integer.parseInt(start), Integer.parseInt(end));
     }
 
-    private UserInfo mappingUser(String ID, String nickName, String eMail, String from, String image)
+    private UserInfo mappingUser(String ID, String nickName, String eMail, String from, String image, String oauthId)
             throws UnsupportedEncodingException {
 
         UserInfo user = new UserInfo();
         user.setOAuthSite(from);
+        user.setOauthId(oauthId);
         user.setNickName(nickName);
         user.setEMail(eMail);
         user.setId(ID);

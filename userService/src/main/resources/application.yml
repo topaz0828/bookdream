@@ -54,5 +54,6 @@ data-validation:
     email: 100
     nickname: 100
     oauthsite: 50
+    oauthId: 1000
     image: 4096
 

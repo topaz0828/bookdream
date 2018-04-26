@@ -34,7 +34,12 @@ public class UserInfoService implements IUserInfoService {
         return userInfoDAO.getUserInfoByEmailAndOAuthSite(eMail, from);
     }
 
-    @Override
+	@Override
+	public UserInfo getUserInfoByOAuthIdAndOAuthSite(String oauthId, String oauthSite) {
+		return userInfoDAO.getUserInfoByOauthIdAndOAuthSite(oauthId, oauthSite);
+	}
+
+	@Override
     public boolean isExistEmail(String eMail) {
         return userInfoDAO.isExistEmail(eMail);
     }
