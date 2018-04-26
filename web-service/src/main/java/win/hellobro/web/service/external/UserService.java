@@ -86,6 +86,7 @@ public class UserService {
 		queryStringEncoder.addParam("email", userInfo.getEmail());
 		queryStringEncoder.addParam("from", userInfo.getOauthSite().val());
 		queryStringEncoder.addParam("image", userInfo.getImage());
+		queryStringEncoder.addParam("oauthId", userInfo.getOauthId());
 
 		FullHttpRequest saveRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, queryStringEncoder.toString());
 		saveRequest.headers().set(HttpHeaderNames.HOST, this.address);
@@ -106,9 +107,13 @@ public class UserService {
 
 	@Service
 	@SuppressWarnings("unchecked")
-	public UserInfo get(String userId) {
+	public UserInfo get(String oauthId, OAuthSite site) {
+		QueryStringEncoder encoder = new QueryStringEncoder("/user/oauth");
+		encoder.addParam("oauthId", oauthId);
+		encoder.addParam("from", site.val());
+
 		int status = -1;
-		HttpRequest saveRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/user/" + userId);
+		HttpRequest saveRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, encoder.toString());
 		saveRequest.headers().set(HttpHeaderNames.HOST, this.address);
 
 		String body = null;
@@ -125,6 +130,7 @@ public class UserService {
 				userInfo.setEmail((String) data.get("email"));
 				userInfo.setImage((String) data.get("image"));
 				userInfo.setOauthSite((String) data.get("oauthSite"));
+				userInfo.setOauthId((String) data.get("oauthId"));
 				return userInfo;
 			} else if (status == HttpResponseStatus.NOT_FOUND.code()) {
 				return UserInfo.NOT_FOUND_USER;

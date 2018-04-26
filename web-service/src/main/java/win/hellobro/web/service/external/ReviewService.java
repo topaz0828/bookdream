@@ -24,7 +24,6 @@ import team.balam.exof.module.service.annotation.Variable;
 import win.hellobro.web.service.vo.BookInfo;
 
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.List;
 
 @ServiceDirectory(internal = true)
@@ -223,13 +222,8 @@ public class ReviewService {
 
 	@Service
 	public boolean updateContents(String userId, long bookId, String type, long reviewId, String text) {
-		HashMap<String, Object> parameter = new HashMap<>();
-		parameter.put("USER_ID", userId);
-		parameter.put("BOOK_ID", bookId);
-		parameter.put("TYPE", type);
-		parameter.put("TEXT", text);
+		byte[] content = RequestConverter.convert(bookId, userId, text, type);
 
-		byte[] content = RequestConverter.toJson(parameter);
 		FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.PUT, "/review/" + reviewId);
 		request.headers().set(HttpHeaderNames.HOST, this.address);
 		request.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.length);
@@ -266,6 +260,25 @@ public class ReviewService {
 		}
 
 		return "{}";
+	}
+
+	@Service
+	public void deleteContents(String contentsId, String userId) {
+		byte[] body = RequestConverter.convert(contentsId, userId);
+
+		FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.DELETE, "/review/" + contentsId);
+		request.headers().set(HttpHeaderNames.HOST, this.address);
+		request.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
+		request.content().writeBytes(body);
+
+		try (Client client = this.clientPool.get()) {
+			FullHttpResponse response = client.sendAndWait(request);
+			if (response.status().code() != HttpResponseStatus.OK.code()) {
+				LOG.error("### fail to remove review. http status code: {}", response.status().code());
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
 	}
 
 	@Shutdown

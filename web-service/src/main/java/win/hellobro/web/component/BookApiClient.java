@@ -8,7 +8,6 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringEncoder;
 import io.netty.util.CharsetUtil;
-import io.netty.util.internal.StringUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +75,10 @@ public class BookApiClient {
 			List<String> authors = (List<String>) book.get("authors");
 			if (!authors.isEmpty()) {
 				searchResult.setAuthor(authors.get(0));
+			}
+
+			if (searchResult.getAuthor() == null) {
+				searchResult.setAuthor("-");
 			}
 
 			String isbn = (String) book.get("isbn");

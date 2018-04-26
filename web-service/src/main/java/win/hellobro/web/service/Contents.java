@@ -8,9 +8,11 @@ import team.balam.exof.module.service.ServiceWrapper;
 import team.balam.exof.module.service.annotation.Inbound;
 import team.balam.exof.module.service.annotation.Service;
 import team.balam.exof.module.service.annotation.ServiceDirectory;
+import team.balam.exof.module.service.component.http.HttpDelete;
 import team.balam.exof.module.service.component.http.HttpPost;
 import team.balam.exof.module.service.component.http.HttpPut;
 import team.balam.exof.module.service.component.http.JsonToMap;
+import team.balam.exof.module.service.component.http.QueryStringToMap;
 import win.hellobro.web.SessionRepository;
 import win.hellobro.web.UserInfo;
 import win.hellobro.web.service.vo.BookInfo;
@@ -32,6 +34,9 @@ public class Contents {
 
 	@Service("/external/review-service/saveReview")
 	private ServiceWrapper reviewSaver;
+
+	@Service("/external/review-service/deleteContents")
+	private ServiceWrapper contentsRemover;
 
 	@SuppressWarnings("unchecked")
 	@Service("impression")
@@ -98,6 +103,25 @@ public class Contents {
 		} catch (Exception e) {
 			LOG.error("Fail to update review or impression.", e);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Service("delete")
+	@Inbound({HttpDelete.class, QueryStringToMap.class})
+	public void deleteContents(Map<String, Object> request) throws IOException {
+		String contentsId = (String) request.get("contentsId");
+		String userId = SessionRepository.getUserInfo().getId();
+
+		if (StringUtil.isNullOrEmpty(contentsId)) {
+			LOG.error("### contentsId is empty.");
+			return;
+		}
+
+		try {
+			this.contentsRemover.call(contentsId, userId);
+		} catch (Exception e) {
+			LOG.error("Fail to delete contents.", e);
+			RequestContext.getServletResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 }

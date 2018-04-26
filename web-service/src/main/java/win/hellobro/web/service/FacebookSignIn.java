@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 @ServiceDirectory
 public class FacebookSignIn {
@@ -71,7 +72,7 @@ public class FacebookSignIn {
 
 			FbUserInfo facebookUser = FbApiClient.getUserInfo(this.userInfoUri, accessToken.getAccessToken());
 
-			UserInfo userInfo = this.userGetter.call(facebookUser.getId());
+			UserInfo userInfo = this.userGetter.call(facebookUser.getId(), OAuthSite.FACEBOOK);
 			if (userInfo != null && !UserInfo.NOT_FOUND_USER.equals(userInfo)) {
 				LOG.info("SIGN IN BookDream. :) {}.", userInfo.getEmail());
 
@@ -96,7 +97,8 @@ public class FacebookSignIn {
 
 	private static void moveSignUpPage(FbUserInfo facebookUser) throws IOException {
 		UserInfo user = new UserInfo();
-		user.setId(facebookUser.getId());
+		user.setId(UUID.randomUUID().toString().replaceAll("-", ""));
+		user.setOauthId(facebookUser.getId());
 		user.setEmail(facebookUser.getEmail());
 		user.setNickName(facebookUser.getName());
 		user.setImage(facebookUser.getPicture());

@@ -73,7 +73,7 @@ class Body extends React.Component {
 			var newList = [];
 			for (var i in res.list) {
 				var d = res.list[i];
-				console.log(d);
+				
 				newList.push({
 					contentsId: d.ID,
 					bookId: d.BOOK_ID,

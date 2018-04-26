@@ -10,7 +10,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestConverter {
+class RequestConverter {
 	private static final Logger LOG = LoggerFactory.getLogger(RequestConverter.class);
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
@@ -18,7 +18,7 @@ public class RequestConverter {
 
 	}
 
-	public static byte[] convert(BookInfo bookInfo) {
+	static byte[] convert(BookInfo bookInfo) {
 		HashMap<String, Object> bookData = new HashMap<>();
 		bookData.put("PUB", bookInfo.getPublisher() != null ? bookInfo.getPublisher() : "");
 		bookData.put("CATEGORY", bookInfo.getCategory());
@@ -32,16 +32,23 @@ public class RequestConverter {
 		return toJson(bookData);
 	}
 
-	public static byte[] convert(long bookId, String userId, String impression, String type) {
+	static byte[] convert(long bookId, String userId, String text, String type) {
 		HashMap<String, Object> data = new HashMap<>();
 		data.put("BOOK_ID", bookId);
 		data.put("USER_ID", userId);
 		data.put("TYPE", type);
-		data.put("TEXT", impression);
+		data.put("TEXT", text);
 		return toJson(data);
 	}
 
-	public static byte[] toJson(Map<String, Object> data) {
+	static byte[] convert(String contentsId, String userId) {
+		HashMap<String, Object> data = new HashMap<>();
+		data.put("USER_ID", userId);
+		data.put("ID", contentsId);
+		return toJson(data);
+	}
+
+	static byte[] toJson(Map<String, Object> data) {
 		try {
 			StringWriter writer = new StringWriter();
 			JSON_MAPPER.writeValue(writer, data);

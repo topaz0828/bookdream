@@ -89,6 +89,12 @@ public class User {
 			this.emailNicknameChecker.call(email, nickname);
 
 			UserInfo signUpInfo = SessionRepository.getSignUpInfo();
+			if (UserInfo.NOT_FOUND_USER.equals(signUpInfo)) {
+				LOG.error("not found user in session. {} / {}", nickname, email);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+
 			signUpInfo.setNickName(nickname);
 			signUpInfo.setEmail(email);
 			signUpInfo.setImage(this.saveProfileImage());
@@ -112,20 +118,23 @@ public class User {
 	}
 
 	private String saveProfileImage() {
-		File tempFile = new File(SessionRepository.getProfileImageFile());
-		if (tempFile.exists()) {
-			String fileName = UUID.randomUUID().toString();
-			File target = new File(this.profileImageDir +  fileName);
-			try (FileInputStream source = new FileInputStream(tempFile);
-			     FileOutputStream profile = new FileOutputStream(target)) {
-				StreamUtil.write(source, profile);
+		String imageFilePath = SessionRepository.getProfileImageFile();
+		if (imageFilePath != null) {
+			File tempFile = new File(imageFilePath);
+			if (tempFile.exists()) {
+				String fileName = UUID.randomUUID().toString();
+				File target = new File(this.profileImageDir +  fileName);
+				try (FileInputStream source = new FileInputStream(tempFile);
+				     FileOutputStream profile = new FileOutputStream(target)) {
+					StreamUtil.write(source, profile);
 
-				return this.profileBaseUrl + fileName;
-			} catch (IOException e) {
-				LOG.error("File to save profile image file.", e);
-				return "";
-			} finally {
-				tempFile.delete();
+					return this.profileBaseUrl + fileName;
+				} catch (IOException e) {
+					LOG.error("File to save profile image file.", e);
+					return "";
+				} finally {
+					tempFile.delete();
+				}
 			}
 		}
 

@@ -4,11 +4,17 @@ import java.io.Serializable;
 
 public class UserInfo implements Serializable {
 	public static final UserInfo NOT_FOUND_USER = new UserInfo();
+	static {
+		NOT_FOUND_USER.id = "";
+		NOT_FOUND_USER.nickName = "";
+		NOT_FOUND_USER.email = "";
+	}
 
 	private String id;
 	private String nickName;
 	private String email;
 	private OAuthSite oauthSite;
+	private String oauthId;
 	private String image;
 
 	public String getId() {
@@ -41,6 +47,14 @@ public class UserInfo implements Serializable {
 
 	public void setOauthSite(OAuthSite oauthSite) {
 		this.oauthSite = oauthSite;
+	}
+
+	public void setOauthId(String oauthId) {
+		this.oauthId = oauthId;
+	}
+
+	public String getOauthId() {
+		return oauthId;
 	}
 
 	public void setOauthSite(String oauthSite) {

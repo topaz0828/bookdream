@@ -103,7 +103,8 @@ class AddContentsModal extends React.Component {
 			if (this.impressionButton.hasClass('active')) {
 				data.impression = [];
 				url = '/api/contents/impression';
-				var impressionInput = $('input[name=impressionInput]');
+				var impressionInput = $('textarea[name=impressionInput]');
+				
 				for (var i in impressionInput) {
 					var text = impressionInput[i].value;
 					if (text && text.length > 0) {
@@ -178,24 +179,12 @@ class AddContentsModal extends React.Component {
 					</ul>
 				</div>
 				<div id='impressionBack' className='form-group'>
-					<div style={{paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 1st impression' aria-describedby="sizing-addon2" maxLength='200'/>
-					</div>
-					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 2nd impression' aria-describedby="sizing-addon2" maxLength='200'/>
-					</div>
-					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 3rd impression' aria-describedby="sizing-addon2" maxLength='200'/>
-					</div>
-					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 4st impression' aria-describedby="sizing-addon2" maxLength='200'/>
-					</div>
-					<div style={{paddingTop:'10px', paddingBottom:'10px'}}>
-						<input name='impressionInput' type="text" className="form-control" placeholder='Enter 5st impression' aria-describedby="sizing-addon2" maxLength='200'/>
+					<div className='form-group'>
+						<textarea name='impressionInput' className='form-control' placeholder='감명깊게 읽은 문구를 적어주세요' style={{height:'150px', resize:'none'}} maxLength='200'></textarea>
 					</div>
 				</div>
 				<div id='reviewBack' hidden='true' className='form-group'>
-					<textarea id='reviewInput' className='form-control' style={{height:'260px', resize:'none'}}></textarea>
+					<textarea id='reviewInput' className='form-control' placeholder='후기를 적어주세요' style={{height:'300px', resize:'none'}}></textarea>
 				</div>
 			</div>
 		);
@@ -208,7 +197,7 @@ class AddContentsModal extends React.Component {
 					<div className="modal-content">
 						<div className="modal-header">
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							<h4 className="modal-title" id="myModalLabel">Add impression or review</h4>
+							<h4 className="modal-title" id="myModalLabel">감명깊은 문구 / 후기</h4>
 						</div>
 						<div className="modal-body">
 							{this.renderInputView()}

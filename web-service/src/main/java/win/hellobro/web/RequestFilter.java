@@ -30,7 +30,7 @@ public class RequestFilter implements ServicePathExtractor, Filter {
 		String requestPath = httpServletRequest.getPathInfo();
 		if (!notLoginPath.contains(requestPath)) {
 			UserInfo info = SessionRepository.getUserInfo();
-			if (info == null) {
+			if (UserInfo.NOT_FOUND_USER.equals(info)) {
 				return "/error/send-unauthorized";
 			}
 		}

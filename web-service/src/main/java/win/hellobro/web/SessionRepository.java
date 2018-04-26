@@ -28,7 +28,8 @@ public class SessionRepository {
 
 	public static UserInfo getSignUpInfo() {
 		HttpServletRequest request = RequestContext.getServletRequest();
-		return (UserInfo) request.getSession().getAttribute(Type.SIGN_UP_INFO.name());
+		UserInfo userInfo = (UserInfo) request.getSession().getAttribute(Type.SIGN_UP_INFO.name());
+		return userInfo != null ? userInfo : UserInfo.NOT_FOUND_USER;
 	}
 
 	public static void saveSignUpInfo(UserInfo userInfo) {
@@ -38,7 +39,8 @@ public class SessionRepository {
 
 	public static UserInfo getUserInfo() {
 		HttpServletRequest request = RequestContext.getServletRequest();
-		return (UserInfo) request.getSession().getAttribute(Type.USER_INFO.name());
+		UserInfo userInfo = (UserInfo) request.getSession().getAttribute(Type.USER_INFO.name());
+		return userInfo != null ? userInfo : UserInfo.NOT_FOUND_USER;
 	}
 
 	public static void saveUserInfo(UserInfo userInfo) {

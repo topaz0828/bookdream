@@ -13,11 +13,24 @@ class DetailModal extends React.Component {
 		this.detailModifyButton = $('#detailModifyButton');
 		this.detailSaveButton = $('#detailSaveButton');
 		this.detailNoti = $('#detailNoti');
+		this.deleteContentsButton = $('#deleteContentsButton');
+		this.confirmDeleteButton = $('#confirmDeleteButton');
 		this.detailSaveButton.hide();
 		this.modifyTextarea.hide();
+		this.deleteContentsButton.hide();
+		this.confirmDeleteButton.hide();
 	}
 
 	show(info) {
+		this.detailText.show();
+		this.modifyTextarea.hide();
+		this.detailSaveButton.hide();
+		this.confirmDeleteButton.hide();
+		this.detailModifyButton.hide();
+		this.deleteContentsButton.hide();
+		this.modifyTextarea.val('');
+		this.detailNoti.text('');
+
 		var self = this;
 		$.ajax({
 			type: 'GET',
@@ -25,17 +38,10 @@ class DetailModal extends React.Component {
 			dataType: 'json'
 		}).done(function(res) {
 			self.setState({info: info, contents: res.TEXT});
-
-			self.detailText.show();
-			self.modifyTextarea.hide();
-			self.detailSaveButton.hide();
-			self.modifyTextarea.val('');
-			self.detailNoti.text('');
-
+			
 			if ('y' === info.my) {
 				self.detailModifyButton.show();
-			} else {
-				self.detailModifyButton.hide();
+				self.deleteContentsButton.show();
 			}
 
 			if ('C' === info.type) {
@@ -72,13 +78,31 @@ class DetailModal extends React.Component {
 		$.ajax({
 			type: 'PUT',
 			url: '/api/contents/update',
-			data: JSON.stringify(data),
+			data: JSON.stringify(data)
 		}).done(function(res) {
 			self.modal.modal('hide');
 			self.state.info.parent.refresh();
 		}).fail(function(data) {
 			self.detailNoti.text('저장되지 않았습니다. 다시 시도해 주세요.');
 		});
+	}
+
+	delete() {
+		var self = this;
+		$.ajax({
+			type: 'DELETE',
+			url: '/api/contents/delete?contentsId=' + this.state.info.contentsId
+		}).done(function(res) {
+			self.modal.modal('hide');
+			self.state.info.parent.refresh();
+		}).fail(function(data) {
+			self.detailNoti.text('삭제하지 못 했습니다.');
+		});
+	}
+
+	changeConfirm() {
+		this.deleteContentsButton.hide();
+		this.confirmDeleteButton.show();
 	}
 
 	render() {
@@ -92,13 +116,16 @@ class DetailModal extends React.Component {
 						</div>
 						<div className="modal-body">
 							<div id='detailText'>
-								<p>{this.state.contents}</p>
-								<div align='right'>- {this.state.info.nickname} -</div>
+								<textarea  className='form-control' style={{height:'300px', resize:'none'}} value={this.state.contents} readOnly></textarea>
+								<div align='right' style={{paddingTop: '5px'}}>- {this.state.info.nickname} -</div>
 							</div>
-							<textarea id='modifyTextarea' className='form-control' style={{height:'200px', resize:'none'}}></textarea>
+							<textarea id='modifyTextarea' className='form-control' style={{height:'300px', resize:'none'}}></textarea>
 							<div align='right' style={{paddingTop: '10px'}} id='detailNoti'></div> 
 						</div>
 						<div className="modal-footer">
+							<button id='confirmDeleteButton' type="button" className='btn btn-danger' onClick={() => this.delete()}>Confirm</button>
+							<button id='deleteContentsButton' type="button" className='btn btn-default' onClick={() => this.changeConfirm()}>Delete</button>
+							&nbsp;&nbsp;&nbsp;&nbsp;
 							<button id='detailModifyButton' type="button" className='btn btn-default' onClick={() => this.showModify()}>Modify</button>
 							<button id='detailSaveButton' type="button" className='btn btn-default' onClick={() => this.save()}>Save</button>
 							<button type="button" className="btn btn-default" data-dismiss="modal">Close</button>

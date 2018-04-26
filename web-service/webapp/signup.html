@@ -43,6 +43,9 @@
                 } else if (res.status == 400) {
                     alert('잘못된 요청입니다.');
                     document.location = '/signin.html';
+                } else if (res.status == 404) {
+                    alert('다시 시도해주세요.');
+                    document.location = '/signin.html';
                 } else {
                     alert('server error.');
                     document.location = '/signin.html';

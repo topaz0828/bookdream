@@ -6,6 +6,10 @@ class Header extends React.Component {
 		this.moveMainView = props.moveMainView;
 	}
 
+	openAddModal() {
+		$('#addContentsModal').modal({backdrop: 'static'});
+	}
+
 	render() {
 		return (
 			<div className='row'>
@@ -18,7 +22,7 @@ class Header extends React.Component {
 							<span className='glyphicon glyphicon-log-out' aria-hidden='true'></span>
 						</button>
 						&nbsp;&nbsp;&nbsp;&nbsp;
-						<button type='button' className='btn btn-default' data-toggle='modal' data-target='#addContentsModal'>
+						<button type='button' className='btn btn-default' onClick={this.openAddModal}>
 							<span className='glyphicon glyphicon-plus' aria-hidden='true'></span>
 						</button>
 						&nbsp;&nbsp;
