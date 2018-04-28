@@ -1,6 +1,5 @@
 package win.hellobro.web.service;
 
-import io.netty.handler.ssl.OpenSslSessionTicketKey;
 import io.netty.util.internal.StringUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.jetty.util.MultiPartInputStream;
@@ -194,6 +193,7 @@ public class User {
 		info.put("impressionCount",impressionCount);
 
 		HttpServletResponse response = RequestContext.getServletResponse();
+		response.setCharacterEncoding("UTF-8");
 		JSON_MAPPER.writeValue(response.getWriter(), info);
 	}
 

@@ -97,15 +97,17 @@
         button: 'file_uploader',
         url: '/api/user/profile-image',
         name: 'profileImage',
-        maxSize: 1024,
+        maxSize: 512,
         onSubmit: function(filename, extension) {
             document.progress_bar.hidden = false;
             $('#file_uploader').hide();
         },
         onComplete: function(filename, response) {
+            if (response) {
+                document.signUp.profilePicture.src = response;
+            }
             document.progress_bar.hidden = true;
             $('#file_uploader').show();
-            document.signUp.profilePicture.src = response;
         }
     });
 </script>

@@ -73,11 +73,18 @@ class Body extends React.Component {
 			var newList = [];
 			for (var i in res.list) {
 				var d = res.list[i];
+				//console.log(d);
 				
+				var profileImage = '/css/default_profile.png';
+				if (d.PROFILE_IMAGE && d.PROFILE_IMAGE.length > 0) {
+					profileImage = d.PROFILE_IMAGE;
+				}
+
 				newList.push({
 					contentsId: d.ID,
 					bookId: d.BOOK_ID,
 					nickname: d.NICKNAME,
+					profileImage: profileImage,
 					title: d.TITLE,
 					author: d.AUTHOR,
 					publisher: d.PUB,
@@ -126,18 +133,7 @@ class Body extends React.Component {
 	makeContentsCard(data) {
 		return (
 			<div className='col-sm-6 col-md-3' key={'col-' + data.key}>
-				<Card key={data.key}
-					contentsId={data.contentsId}
-					bookId={data.bookId}
-					nickname={data.nickname}
-					title={data.title}
-					author={data.author}
-					publisher={data.publisher}
-					image={data.image}
-					text={data.text}
-					type={data.type}
-					parent={this.parent}
-					my={data.my}/>
+				<Card key={data.key} data={data} parent={this.parent}/>
 			</div>
 		);
 	}
@@ -178,6 +174,7 @@ class Body extends React.Component {
 								data.author = $(column).find('span[name="author"]').text();
 								data.publisher = $(column).find('span[name="publisher"]').text();
 								data.nickname = $(column).find('span[name="nickname"]').text();
+								data.profileImage = $(column).find('img[name="profileImage"]').attr('src');
 								data.image = $(column).find('img[name="image"]').attr('src');
 								data.text = $(column).find('span[name="text"]').text();
 								data.contentsId = $(column).find('input[name="contentsId"]').val();

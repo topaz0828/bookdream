@@ -3,9 +3,9 @@ import React from 'react';
 class Card extends React.Component {
 	constructor(props) {
 		super(props);
-		this.parent = props.parent;
+		this.data = this.props.data;
 		this.showDetailModal = () => {
-			this.parent.app.showDetailModal(this.props);
+			this.props.parent.app.showDetailModal(this.data);
 		}
 		// this.colorClass = 'thumbnail alert-success';
 		// if (this.props.type === 'R') {
@@ -33,23 +33,27 @@ class Card extends React.Component {
 							<tbody>
 							<tr>
 								<td valign='top'>
-									<h5 name='title' style={{paddingRight:'20px'}}><strong>{this.props.title}</strong></h5>
-									<p><span name='author'>{this.props.author}</span></p>
-									<p><span name='publisher'>{this.props.publisher}</span></p>
+									<h5 name='title' style={{paddingRight:'20px'}}><strong>{this.data.title}</strong></h5>
+									<p><span name='author'>{this.data.author}</span></p>
+									<p><span name='publisher'>{this.data.publisher}</span></p>
 								</td>
 								<td style={{paddingRight:'10px'}}>
-									<img name='image' src={this.props.image} width='100px' style={{float:'right'}}/>
+									<img name='image' src={this.data.image} width='100px' style={{float:'right'}}/>
 								</td>
 							</tr>
 							</tbody>
 						</table>
 					</div>
-					<div align='left'><p><span name='text'>{this.props.text}</span></p></div>
-					<div align='right'><p><span name='nickname'>{this.props.nickname}</span></p></div>
-					<input type='hidden' name='contentsId' value={this.props.contentsId}/>
-					<input type='hidden' name='bookId' value={this.props.bookId}/>
-					<input type='hidden' name='type' value={this.props.type}/>
-					<input type='hidden' name='my' value={this.props.my}/>
+					<div align='left'><p><span name='text'>{this.data.text}</span></p></div>
+					<div align='right'>
+						<img name='profile_image' src={this.data.profileImage} className='profile_image'/>&nbsp;
+						<span name='nickname'>{this.data.nickname}</span>
+					</div>
+
+					<input type='hidden' name='contentsId' value={this.data.contentsId}/>
+					<input type='hidden' name='bookId' value={this.data.bookId}/>
+					<input type='hidden' name='type' value={this.data.type}/>
+					<input type='hidden' name='my' value={this.data.my}/>
 				</div>
 			</div>
 		);

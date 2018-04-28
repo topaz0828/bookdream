@@ -29,7 +29,7 @@ class DetailModal extends React.Component {
 		this.detailModifyButton.hide();
 		this.deleteContentsButton.hide();
 		this.modifyTextarea.val('');
-		this.detailNoti.text('');
+		// this.detailNoti.text('');
 
 		var self = this;
 		$.ajax({
@@ -37,6 +37,7 @@ class DetailModal extends React.Component {
 			url: '/api/search/contents?id=' + info.contentsId,
 			dataType: 'json'
 		}).done(function(res) {
+			//console.log(res);
 			self.setState({info: info, contents: res.TEXT});
 			
 			if ('y' === info.my) {
@@ -49,7 +50,7 @@ class DetailModal extends React.Component {
 			} else {
 				self.modifyTextarea.removeAttr('maxLength');
 			}
-			self.modal.modal();
+			self.modal.modal({backdrop: 'static'});
 		}).fail(function(err) {
 			alert('server error');
 		});
@@ -116,8 +117,11 @@ class DetailModal extends React.Component {
 						</div>
 						<div className="modal-body">
 							<div id='detailText'>
-								<textarea  className='form-control' style={{height:'300px', resize:'none'}} value={this.state.contents} readOnly></textarea>
-								<div align='right' style={{paddingTop: '5px'}}>- {this.state.info.nickname} -</div>
+								<textarea  className='form-control' style={{height:'300px', resize:'none', cursor:'default'}} value={this.state.contents} readOnly></textarea>
+								<div align='right' style={{paddingTop: '10px', paddingRight: '10px'}}>
+									<img name='profile_image' src={this.state.info.profileImage} className='profile_image'/>&nbsp;
+									{this.state.info.nickname} 
+								</div>
 							</div>
 							<textarea id='modifyTextarea' className='form-control' style={{height:'300px', resize:'none'}}></textarea>
 							<div align='right' style={{paddingTop: '10px'}} id='detailNoti'></div> 

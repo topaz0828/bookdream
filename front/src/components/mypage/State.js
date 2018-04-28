@@ -23,9 +23,11 @@ class State extends React.Component {
             $('#change_profile_image').hide();
         },
         onComplete: function(filename, response) {
+        	if (response) {
+        		$('#profile_image').attr('src', response);
+            }
             $('#profile_image_progress_bar').hide();
             $('#change_profile_image').show();
-            $('#profile_image').attr('src', response);
         }
     });
 	}
