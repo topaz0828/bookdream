@@ -38,17 +38,21 @@ public class DataVaildator {
         return maxSize;
     }
 
-    public void isValidMandantory(String param, String value) throws UserServiceException {
+    public DataVaildator isValidMandantory(String param, String value) throws UserServiceException {
         if (StringUtils.isEmpty(value))
             throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("%s [%s] is null or empty", param, value));
 
         if (value.length() > checkMaxSize(param))
             throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("%s [%s] data size exceed maxSize", param, value));
+
+        return this;
     }
 
-    public void isValidOption(String param, String value) throws UserServiceException {
+    public DataVaildator isValidOption(String param, String value) throws UserServiceException {
         if (value.length() > checkMaxSize(param))
             throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("%s [%s] data size exceed maxSize", param, value));
+
+        return this;
     }
 
 

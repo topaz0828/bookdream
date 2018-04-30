@@ -47,8 +47,7 @@ public class UserDataHandler {
     }
 
     public UserInfo getUserInfo(String eMail, String from) throws UserServiceException {
-        vaildator.isValidMandantory("email", eMail);
-        vaildator.isValidMandantory("from", from);
+        vaildator.isValidMandantory("email", eMail).isValidMandantory("from", from);
 
         String key = makeKey(eMail, from);
         if (userMap.get(key) != null) {
@@ -64,24 +63,23 @@ public class UserDataHandler {
 
     }
 
-	public UserInfo getUserInfoByOAuthIdAndFrom(String oauthId, String from) throws UserServiceException {
-		vaildator.isValidMandantory("oauthId", oauthId);
-		vaildator.isValidMandantory("from", from);
+    public UserInfo getUserInfoByOAuthIdAndFrom(String oauthId, String from) throws UserServiceException {
+        vaildator.isValidMandantory("oauthId", oauthId).isValidMandantory("from", from);
 
-		UserInfo userInfo = userInfoService.getUserInfoByOAuthIdAndOAuthSite(oauthId, from);
-		if (userInfo == null) {
-			throw new UserServiceException(HttpStatus.NOT_FOUND, "Account is not found");
-		}
-		return userInfo;
-	}
+        UserInfo userInfo = userInfoService.getUserInfoByOAuthIdAndOAuthSite(oauthId, from);
+        if (userInfo == null) {
+            throw new UserServiceException(HttpStatus.NOT_FOUND, "Account is not found");
+        }
+        return userInfo;
+    }
 
     public void addUserInfo(String ID, String nickName, String eMail, String from, String image, String oauthId) throws UnsupportedEncodingException, UserServiceException {
-        vaildator.isValidMandantory("id", ID);
-        vaildator.isValidMandantory("nickname", nickName);
-        vaildator.isValidMandantory("email", eMail);
-        vaildator.isValidMandantory("from", from);
-	    vaildator.isValidMandantory("oauthId", oauthId);
-        vaildator.isValidOption("image", image);
+        vaildator.isValidMandantory("id", ID)
+                .isValidMandantory("nickname", nickName)
+                .isValidMandantory("email", eMail)
+                .isValidMandantory("from", from)
+                .isValidMandantory("oauthId", oauthId)
+                .isValidOption("image", image);
 
         UserInfo user = mappingUser(ID, nickName, eMail, from, image, oauthId);
         Boolean result = userInfoService.addUserinfo(user);
@@ -93,8 +91,8 @@ public class UserDataHandler {
     }
 
     public void removeUserinfo(String eMail, String from) throws UserServiceException {
-        vaildator.isValidMandantory("email", eMail);
-        vaildator.isValidMandantory("from", from);
+        vaildator.isValidMandantory("email", eMail)
+                .isValidMandantory("from", from);
 
         String Key = makeKey(eMail, from);
         if (userMap.containsKey(Key)) {
@@ -138,8 +136,14 @@ public class UserDataHandler {
     }
 
     public UserInfo updateUserInfo(String eMail, String from, UserInfo userInfo) throws UserServiceException {
-        vaildator.isValidMandantory("email", eMail);
-        vaildator.isValidMandantory("from", from);
+        vaildator.isValidMandantory("email", eMail)
+                .isValidMandantory("from", from)
+                .isValidOption("nickname", userInfo.getNickName())
+                .isValidOption("email", userInfo.getEMail())
+                .isValidOption("from", userInfo.getOAuthSite())
+                .isValidOption("oauthId", userInfo.getOauthId())
+                .isValidOption("image", userInfo.getImage());
+
 
         if (userInfoService.getUserinfoByEmailAndOAuthSite(eMail, from) == null) {
             throw new UserServiceException(HttpStatus.NOT_FOUND, "User Information to modify not found");
