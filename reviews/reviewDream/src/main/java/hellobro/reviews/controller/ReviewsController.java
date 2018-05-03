@@ -38,9 +38,10 @@ public class ReviewsController {
                                                @PathVariable("bid") String bookid,
                                                @RequestParam(value = "type", required = false) String type,
                                                @RequestParam(value = "isbn", required = false) String[] isbn,
+                                               @RequestParam(value = "hidden", required = false) char hidden,
                                                @RequestParam(value = "offset", required = false) Integer offset,
                                                @RequestParam(value = "limit", required = false) Integer limit) {
-        return getReview(userId, bookid, type, isbn, offset, limit);
+        return getReview(userId, bookid, type, isbn, hidden, offset, limit);
     }
 
     @RequestMapping(value = {"/review"}, method = RequestMethod.GET)
@@ -49,9 +50,10 @@ public class ReviewsController {
                                                 @RequestParam(value = "bookid", required = false) String bookid,
                                                 @RequestParam(value = "type", required = false) String type,
                                                 @RequestParam(value = "isbn", required = false) String[] isbn,
+                                                @RequestParam(value = "hidden", required = false) char hidden,
                                                 @RequestParam(value = "offset", required = false) Integer offset,
                                                 @RequestParam(value = "limit", required = false) Integer limit) {
-        return getReview(userId, bookid, type, isbn, offset, limit);
+        return getReview(userId, bookid, type, isbn, hidden, offset, limit);
     }
 	@RequestMapping(value = {"/review/{reviewId}"}, method = RequestMethod.GET)
 	@ResponseStatus(value = HttpStatus.OK)
@@ -91,7 +93,10 @@ public class ReviewsController {
         JsonObject json = (JsonObject) jsonParser.parse(body);
         userId = verifyString("USER_ID", userId, json);
         bookId = verifyString("BOOK_ID", bookId, json);
-        return insertReview(userId, bookId, json.get("TYPE").getAsString(), json.get("TEXT").getAsString());
+        return insertReview(userId, bookId,
+                json.get("TYPE").getAsString(),
+                json.get("TEXT").getAsString(),
+                json.get("USER_HIDDEN").getAsCharacter());
     }
 
     @RequestMapping(value = {"user/{uid}/review", "book/{bid}/review", "/review/{rId}"}, method = RequestMethod.PUT)
@@ -104,7 +109,10 @@ public class ReviewsController {
         userId = verifyString("USER_ID", userId, json);
         bookId = verifyString("BOOK_ID", bookId, json);
         reviewId = verifyString("ID", reviewId, json);
-        return updateReview(reviewId, userId, bookId, json.get("TYPE").getAsString(), json.get("TEXT").getAsString());
+        return updateReview(reviewId, userId, bookId,
+                json.get("TYPE").getAsString(),
+                json.get("TEXT").getAsString(),
+                json.get("USER_HIDDEN").getAsCharacter());
     }
 
     @RequestMapping(value = {"user/{uid}/review", "book/{bid}/review", "/review/{rId}"}, method = RequestMethod.DELETE)
@@ -130,12 +138,12 @@ public class ReviewsController {
         return checkValue;
     }
 
-    private ResponseEntity<String> getReview(String userId, String bookId, String type, String[] isbn, Integer offset, Integer limit) {
+    private ResponseEntity<String> getReview(String userId, String bookId, String type, String[] isbn, char userHidden, Integer offset, Integer limit) {
         if (offset == null)
             offset = DEFAULT_OFFSET;
         if (limit == null)
             limit = DEFAULT_LIMIT;
-        ArrayList<Object> reviews = (ArrayList) dao.select(userId, bookId, type, isbn, offset, limit);
+        ArrayList<Object> reviews = (ArrayList) dao.select(userId, bookId, type, isbn, userHidden, offset, limit);
         JsonArray jsonArray = gson.toJsonTree(reviews).getAsJsonArray();
         return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
     }
@@ -154,12 +162,12 @@ public class ReviewsController {
     }
 
 
-    private ResponseEntity<Boolean> insertReview(String userId, String bookId, String type, String text) {
-        return new ResponseEntity<>(dao.insert(userId, bookId, type, text), HttpStatus.OK);
+    private ResponseEntity<Boolean> insertReview(String userId, String bookId, String type, String text, char userHidden) {
+        return new ResponseEntity<>(dao.insert(userId, bookId, type, text, userHidden), HttpStatus.OK);
     }
 
-    private ResponseEntity<Boolean> updateReview(String reviewId, String userId, String bookId, String type, String text) {
-        return new ResponseEntity<>(dao.update(reviewId, userId, bookId, type, text), HttpStatus.OK);
+    private ResponseEntity<Boolean> updateReview(String reviewId, String userId, String bookId, String type, String text, char userHidden) {
+        return new ResponseEntity<>(dao.update(reviewId, userId, bookId, type, text, userHidden), HttpStatus.OK);
     }
 
     private ResponseEntity<Boolean> deleteReview(String reviewId, String userId, String bookId) {
