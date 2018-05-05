@@ -49,7 +49,10 @@ public class DataVaildator {
     }
 
     public DataVaildator isValidOption(String param, String value) throws UserServiceException {
-        if (value.length() > checkMaxSize(param))
+        if (StringUtils.isEmpty(value))
+            return  this;
+
+            if (value.length() > checkMaxSize(param))
             throw new UserServiceException(HttpStatus.BAD_REQUEST, String.format("%s [%s] data size exceed maxSize", param, value));
 
         return this;
