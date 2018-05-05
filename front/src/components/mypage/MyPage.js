@@ -10,15 +10,15 @@ class MyPage extends React.Component {
 		this.moveMainView = () => {
             this.app.moveMainView();
         }
-	}
-
-	getInfo() {
-		this.myState.getState();
-        this.myContents.refresh();
-	}
+    }
+    
+    componentDidMount() {
+        this.refresh();
+    }
 
     refresh() {
-        this.getInfo();
+        this.myState.getState();
+        this.myContents.refresh();
     }
 
     render(){

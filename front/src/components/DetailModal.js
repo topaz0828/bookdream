@@ -19,6 +19,8 @@ class DetailModal extends React.Component {
 		this.modifyTextarea.hide();
 		this.deleteContentsButton.hide();
 		this.confirmDeleteButton.hide();
+		this.reviewView = $('#reviewView');
+		this.impressionView = $('#impressionView');
 	}
 
 	show(info) {
@@ -29,6 +31,8 @@ class DetailModal extends React.Component {
 		this.detailModifyButton.hide();
 		this.deleteContentsButton.hide();
 		this.modifyTextarea.val('');
+		this.reviewView.hide();
+		this.impressionView.hide();
 		// this.detailNoti.text('');
 
 		var self = this;
@@ -46,8 +50,12 @@ class DetailModal extends React.Component {
 			}
 
 			if ('C' === info.type) {
+				self.impressionView.html('<p>' + res.TEXT + '</p>');
+				self.impressionView.show();
 				self.modifyTextarea.attr('maxLength', '200');
 			} else {
+				self.reviewView.val(res.TEXT);
+				self.reviewView.show();
 				self.modifyTextarea.removeAttr('maxLength');
 			}
 			self.modal.modal({backdrop: 'static'});
@@ -82,7 +90,7 @@ class DetailModal extends React.Component {
 			data: JSON.stringify(data)
 		}).done(function(res) {
 			self.modal.modal('hide');
-			self.state.info.parent.refresh();
+			self.props.app.refresh();
 		}).fail(function(data) {
 			self.detailNoti.text('저장되지 않았습니다. 다시 시도해 주세요.');
 		});
@@ -95,7 +103,7 @@ class DetailModal extends React.Component {
 			url: '/api/contents/delete?contentsId=' + this.state.info.contentsId
 		}).done(function(res) {
 			self.modal.modal('hide');
-			self.state.info.parent.refresh();
+			self.props.app.refresh();
 		}).fail(function(data) {
 			self.detailNoti.text('삭제하지 못 했습니다.');
 		});
@@ -117,7 +125,11 @@ class DetailModal extends React.Component {
 						</div>
 						<div className="modal-body">
 							<div id='detailText'>
-								<textarea  className='form-control' style={{height:'300px', resize:'none', cursor:'default'}} value={this.state.contents} readOnly></textarea>
+								<textarea id='reviewView' className='form-control' style={{height:'300px', resize:'none', cursor:'default'}} readOnly></textarea>
+								<div>
+									<blockquote id='impressionView'>
+									</blockquote>
+								</div>
 								<div align='right' style={{paddingTop: '10px', paddingRight: '10px'}}>
 									<img name='profile_image' src={this.state.info.profileImage} className='profile_image'/>&nbsp;
 									{this.state.info.nickname} 

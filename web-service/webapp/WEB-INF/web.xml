@@ -25,6 +25,7 @@
     <servlet-mapping>
         <servlet-name>exof-servlet</servlet-name>
         <url-pattern>/api/*</url-pattern>
+        <url-pattern>/mypage</url-pattern>
     </servlet-mapping>
 
     <filter>

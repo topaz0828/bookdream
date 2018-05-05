@@ -54,6 +54,7 @@ class State extends React.Component {
 					<img id='profile_image' src={this.state.image} style={{width: '100px', height: '100px'}}/>
 					<div align='right' style={{paddingTop: '5px'}}>
 						<a id='change_profile_image'>change image</a>
+						<div style={{color: '#898989', fontSize: '13px'}}>max 512KB</div>
 						<img id='profile_image_progress_bar' src='/css/processing.gif' hidden/>
 					</div>
 				</div>

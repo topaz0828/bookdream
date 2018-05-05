@@ -7,26 +7,18 @@ class Card extends React.Component {
 		this.showDetailModal = () => {
 			this.props.parent.app.showDetailModal(this.data);
 		}
-		// this.colorClass = 'thumbnail alert-success';
-		// if (this.props.type === 'R') {
-		// 	this.colorClass = 'thumbnail alert-warning';
-		// }
+
 		this.onMouseOver = () => {
-			// this.thumbnameDiv.className = 'thumbnail';
 			this.thumbnameDiv.style.cursor = 'pointer';
 		}
 		this.onMouseOut = () => {
-			// this.thumbnameDiv.className = this.colorClass;
 			this.thumbnameDiv.style.cursor = 'arrow';
 		}
-		//<span name='updateDate'>{this.props.updateDate}</span>
 	}
 
 	render() {
-		// var className = 'thumbnail ' + this.colorClass;
-		var className = 'thumbnail bookdream-card';
 		return (
-			<div ref={ref => this.thumbnameDiv = ref} className={className} onClick={this.showDetailModal} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
+			<div ref={ref => this.thumbnameDiv = ref} className={'thumbnail bookdream-card'} onClick={this.showDetailModal} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
 				<div className='caption'>
 					<div style={{paddingBottom:'10px'}}>
 						<table width='100%'>

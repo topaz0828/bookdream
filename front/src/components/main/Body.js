@@ -38,30 +38,27 @@ class Body extends React.Component {
 	}
 
 	refresh() {
+		this.setState({list : []});
 		this.isLastPage = false;
 		this.isRefresh = true;
 		this.getList({isbn: this.isbn, range: this.range, pageIndex: 0, pageSize: this.pageSize});
 	}
 
 	getListBySearchInput(query) {
+		this.setState({list : []});
 		this.isLastPage = false;
 		this.isRefresh = true;
 		this.getList({query: query, range: this.range, pageIndex: 0, pageSize: this.pageSize});
 	}
 
 	getList(data) {
-		if ($('#mainView').is(":visible") && this.range === 'my') {
-			return;
-		} else if (!$('#mainView').is(":visible") && this.range === 'all') {
-			return;
-		}
-
 		if (this.isLastPage) {
 			return;
 		}
 
 		this.isLoading = true;
 		var self = this;
+
 		$.ajax({
 			type: 'GET',
 			url: '/api/search/contents-list',
@@ -73,7 +70,7 @@ class Body extends React.Component {
 			var newList = [];
 			for (var i in res.list) {
 				var d = res.list[i];
-				//console.log(d);
+				// console.log(d);
 				
 				var profileImage = '/css/default_profile.png';
 				if (d.PROFILE_IMAGE && d.PROFILE_IMAGE.length > 0) {
@@ -95,10 +92,10 @@ class Body extends React.Component {
 				});
 			}
 
-			self.setState({list : newList});
 			self.isLoading = false;
 			++self.pageIndex;
 			self.isLastPage = res.list.length < self.pageSize;
+			self.setState({list : newList});
 		}).fail(function(data) {
 			self.isLoading = false;
 			if (data.status == 401) {
@@ -139,7 +136,6 @@ class Body extends React.Component {
 	}
 
 	render() {
-		var currentRows = $('#' + this.contentsDivId).children();
 		var contentsCount = 0;
 		var colInfoArray = [];
 		var self = this;
@@ -162,6 +158,7 @@ class Body extends React.Component {
 				</div>
 			);
 		} else {
+			var currentRows = $('#' + this.contentsDivId).children();
 			return (
 				<div id={self.contentsDivId} style={{paddingTop:'20px', maxWidth:'1200px'}}>
 					{
@@ -199,7 +196,6 @@ class Body extends React.Component {
 					<div className='row' key={'row-' + contentsCount}>
 					{
 						colInfoArray.slice(0, this.lastColIndex + 1).map(function(data) {
-							console.log(self.lastColIndex);
 							return self.makeContentsCard(data);
 						})
 					}

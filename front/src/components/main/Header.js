@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Router, Link } from 'react-router-dom'
 
 class Header extends React.Component {
 	constructor(props) {
@@ -30,8 +31,12 @@ class Header extends React.Component {
 
 	render() {
 		return (
-			<div className='row'>
-				<div className='col-sm-6 col-md-3' align='center'><h1>Marker</h1><h6><strong>Mark</strong> the moments of your life.</h6></div>
+			<div className='row' style={{maxWidth: '1300px'}}>
+				<div className='col-sm-6 col-md-3' align='center'>
+					<span onClick={this.refreshBody} style={{cursor: 'default'}}>
+						<h1>Marker</h1><h6><strong>Mark</strong> the moments of your life.</h6>
+					</span>
+				</div>
 				<div className='col-sm-12 col-md-6' style={{paddingTop: '40px'}} align='center'>
 					<div className="input-group" style={{maxWidth: '450px'}}>
 						<input id='searchContentsInput' type="text" className="form-control" aria-describedby="sizing-addon2"/>

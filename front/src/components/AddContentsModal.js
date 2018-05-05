@@ -123,7 +123,7 @@ class AddContentsModal extends React.Component {
 				}
 			}
 			
-			$('input[name=impressionInput]').val('');
+			$('textarea[name=impressionInput]').val('');
 			$('#reviewInput').val('');
 			var self = this;
 			$.ajax({
@@ -132,8 +132,7 @@ class AddContentsModal extends React.Component {
 				data: JSON.stringify(data),
 			}).done(function() {
 				self.close();
-				self.contentsView.refresh();
-				self.myPageView.refresh();
+				self.props.app.refresh();
 			}).fail(function() {
 				alert('Server error.');
 				self.close();

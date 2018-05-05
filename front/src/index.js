@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App';
+import Root from './Root';
+
+export { default as Contents } from './components/main/Contents';
+export { default as MyPage } from './components/mypage/MyPage';
 
 const rootElement = document.getElementById('root');
-ReactDOM.render(<App/>, rootElement);
+ReactDOM.render(<Root/>, rootElement);
