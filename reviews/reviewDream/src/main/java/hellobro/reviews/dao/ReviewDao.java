@@ -20,12 +20,13 @@ public class ReviewDao {
     private SqlSession sqlSession;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public List<Object> select(String userId, String bookId, String type, String[] isbn, Integer offset, Integer limit) {
+    public List<Object> select(String userId, String bookId, String type, String[] isbn, char userHidden, Integer offset, Integer limit) {
         Map<String, Object> map = new HashMap<>();
         map.put("USER_ID", userId);
         map.put("BOOK_ID", bookId);
         map.put("TYPE", type);
         map.put("ISBN", isbn);
+        map.put("USER_HIDDEN", userHidden);
         map.put("offset", offset);
         map.put("limit", limit);
         log.info("select parameter {}", map);
@@ -61,12 +62,13 @@ public class ReviewDao {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Boolean insert(String userId, String bookId, String type, String text) {
+    public Boolean insert(String userId, String bookId, String type, String text, char userHidden) {
         Map<String, Object> map = new HashMap<>();
         map.put("USER_ID", userId);
         map.put("BOOK_ID", bookId);
         map.put("TYPE", type);
         map.put("TEXT", text);
+        map.put("USER_HIDDEN", userHidden);
         try {
             sqlSession.insert("insert", map);
         } catch (Exception e) {
@@ -78,13 +80,14 @@ public class ReviewDao {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Boolean update(String reviewId, String userId, String bookId, String type, String text) {
+    public Boolean update(String reviewId, String userId, String bookId, String type, String text, char userHidden) {
         Map<String, Object> map = new HashMap<>();
         map.put("ID", reviewId);
         map.put("USER_ID", userId);
         map.put("BOOK_ID", bookId);
         map.put("TYPE", type);
         map.put("TEXT", text);
+        map.put("USER_HIDDEN", userHidden);
         try {
             log.info("update {}", map);
             sqlSession.update("update", map);
