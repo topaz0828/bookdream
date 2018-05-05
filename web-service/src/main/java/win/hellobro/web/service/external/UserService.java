@@ -144,7 +144,7 @@ public class UserService {
 	}
 
 	@Service
-	public void updateProfileImage(String email, OAuthSite from, String profileUrl) throws Exception {
+	public boolean updateProfileImage(String email, OAuthSite from, String profileUrl) throws Exception {
 		QueryStringEncoder encoder = new QueryStringEncoder("/user");
 		encoder.addParam("email", email);
 		encoder.addParam("from", from.val());
@@ -162,12 +162,16 @@ public class UserService {
 		try (Client client = this.clientPool.get()) {
 			FullHttpResponse response = client.sendAndWait(saveRequest);
 
-			if (response.status().code() != HttpResponseStatus.OK.code()) {
+			if (response.status().code() == HttpResponseStatus.OK.code()) {
+				return true;
+			} else {
 				LOG.error("=====> UserService Fail to update profile image. status:{}", response.status().code());
 			}
 		} catch (Exception e) {
 			LOG.error("Fail to update profile image.", e);
 		}
+
+		return false;
 	}
 
 	@Shutdown

@@ -20,6 +20,7 @@ import win.hellobro.web.UserInfo;
 import win.hellobro.web.component.part.QueryStringToMap;
 import win.hellobro.web.service.external.DuplicateException;
 
+import javax.mail.Session;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -123,6 +128,7 @@ public class User {
 			if (tempFile.exists()) {
 				String fileName = UUID.randomUUID().toString();
 				File target = new File(this.profileImageDir +  fileName);
+
 				try (FileInputStream source = new FileInputStream(tempFile);
 				     FileOutputStream profile = new FileOutputStream(target)) {
 					StreamUtil.write(source, profile);
@@ -132,7 +138,10 @@ public class User {
 					LOG.error("File to save profile image file.", e);
 					return "";
 				} finally {
-					tempFile.delete();
+					if (!tempFile.delete()) {
+						LOG.error("File to delete temp file. {}", tempFile);
+						tempFile.deleteOnExit();
+					}
 				}
 			}
 		}
@@ -159,14 +168,32 @@ public class User {
 			try {
 				UserInfo user = SessionRepository.getUserInfo();
 				String imageUrl = this.saveProfileImage();
-				this.profileImageUpdater.call(user.getEmail(), user.getOauthSite(), imageUrl);
 
-				response.getWriter().write(imageUrl);
+				boolean isSuccess = this.profileImageUpdater.call(user.getEmail(), user.getOauthSite(), imageUrl);
+				if (isSuccess) {
+					deleteImageFile(SessionRepository.getUserInfo().getImage());
+					SessionRepository.getUserInfo().setImage(imageUrl);
+				} else {
+					deleteImageFile(imageUrl);
+				}
+
+				response.getWriter().write(SessionRepository.getUserInfo().getImage());
 			} catch (Exception e) {
 				LOG.error("Fail to update profile image.", e);
 			}
 		} else {
 			response.getWriter().write(this.profileTempUrl + todayDir + "/" + part.getFile().getName());
+		}
+	}
+
+	private void deleteImageFile(String imageUrl) {
+		String[] pathArray = imageUrl.split("/");
+		String fileName = pathArray[pathArray.length - 1];
+		File imageFile = new File(this.profileImageDir, fileName);
+
+		if (imageFile.exists() && !imageFile.delete()) {
+			LOG.error("file to delete old image file. {}", imageFile);
+			imageFile.deleteOnExit();
 		}
 	}
 

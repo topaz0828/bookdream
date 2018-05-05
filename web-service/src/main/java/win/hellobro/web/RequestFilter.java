@@ -27,11 +27,15 @@ public class RequestFilter implements ServicePathExtractor, Filter {
 
 	@Override
 	public String extract(HttpServletRequest httpServletRequest) {
+		String uri = httpServletRequest.getRequestURI();
 		String requestPath = httpServletRequest.getPathInfo();
-		if (!notLoginPath.contains(requestPath)) {
+
+		if (uri.contains("/mypage")) {
+			return "/non-api/send-index-page";
+		} else if (uri.contains("/api") && !notLoginPath.contains(requestPath)) {
 			UserInfo info = SessionRepository.getUserInfo();
 			if (UserInfo.NOT_FOUND_USER.equals(info)) {
-				return "/error/send-unauthorized";
+				return "/non-api/send-unauthorized";
 			}
 		}
 
