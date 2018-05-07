@@ -19,6 +19,10 @@ class App extends React.Component {
 		this.detailModal.show(info);
 	}
 
+	showAddModal() {
+		this.addModal.show();
+	}
+
 	refresh() {
 		if (this.contents) {
 			this.contents.refresh();
@@ -33,7 +37,7 @@ class App extends React.Component {
 				<Route exact path="/" component={(props) => ( <Contents app={this} ref={(ref) => {this.contents = ref;}}/>)}/>
                 <Route path="/mypage" component={(props) => ( <MyPage app={this} ref={(ref) => {this.myPage = ref;}}/>)}/>
 				<DetailModal ref={(ref) => {this.detailModal = ref;}} app={this}/>
-				<AddContentsModal app={this}/>
+				<AddContentsModal ref={(ref) => {this.addModal = ref;}} app={this}/>
 			</div>
         );
     }

@@ -4,6 +4,7 @@ class AddContentsModal extends React.Component {
 	constructor(props) {
 		super(props)
 		this.app = props.app;
+		this.state = {impressionTextCounter: '0/200', reviewTextCounter: '0/∞'};
 	}
 
 	componentDidMount() {
@@ -15,6 +16,9 @@ class AddContentsModal extends React.Component {
 			if (events.keyCode == 13) {
 				this.findBook();
 			}
+		});
+		$('#addContentsModal').on('shown.bs.modal', function () {
+			$('#searchBookInput').focus()
 		});
 		$('#searchBookButton').on('click', () => {
 			this.findBook();
@@ -41,6 +45,18 @@ class AddContentsModal extends React.Component {
 		this.selectedBook = null;
 	}
 
+	showTextCount() {
+		this.setState({impressionTextCounter: this.refs.impressionInput.value.length + '/200',
+						reviewTextCounter: this.refs.reviewInput.value.length + '/∞'});
+	}
+
+	show() {
+		this.reset();
+		this.showTextCount();
+		$('#addContentsModal').modal({backdrop: 'static'});
+		this.searchBookInput.focus();
+	}
+
 	findBook() {
 		var self = this;
 		var inputValue = this.searchBookInput.val();
@@ -58,19 +74,10 @@ class AddContentsModal extends React.Component {
 				ul.setAttribute('role', 'menu');
 				ul.style.width = '100%';
 				for (var i in res) {
-					var a = document.createElement('a');
-					a.setAttribute('role', 'menuitem');
-					a.setAttribute('tabIndex', '-1');
-					a.style.fontSize = '17px';
-					a.style.cursor = 'pointer';
-					a.textContent = res[i].title;
-					a.searchInfo = res[i];
-					$(a).click(function(event) {
-						self.selectBook(event.target.searchInfo);
-					});
 					var li = document.createElement('li');
 					li.setAttribute('role', 'presentation');
-					$(li).append(a);
+					self.makeSearchResultRow(li, res[i]);
+
 					$(ul).append(li);
 				}
 
@@ -82,69 +89,95 @@ class AddContentsModal extends React.Component {
 		}
 	}
 
+	makeSearchResultRow(parent, book) {
+		var self = this;
+		var a = document.createElement('a');
+		a.setAttribute('role', 'menuitem');
+		a.setAttribute('tabIndex', '-1');
+		a.style.fontSize = '17px';
+		a.style.cursor = 'pointer';
+		a.textContent = book.title;
+		a.searchInfo = book;
+		$(a).click(function(event) {
+			self.selectBook(event.target.searchInfo);
+		});
+		$(parent).append(a);
+	}
+
 	selectBook(book) {
-		// console.log(book);
 		this.selectedBook = book;
 		this.selectedBookView.html('<table>' + 
 										'<tr><td style="padding-left: 20px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + 
 										'<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' +
 									'</table>');
-	
-		this.searchBookInput.val('');
 		this.searchResultDropdown.removeClass('open');
 	}
 
 	save() {
-		if (this.selectedBook != null) {
-			var url, data = {};
-			data.book = this.selectedBook;
-			this.selectedBook = null;
-
-			if (this.impressionButton.hasClass('active')) {
-				data.impression = [];
-				url = '/api/contents/impression';
-				var impressionInput = $('textarea[name=impressionInput]');
-				
-				for (var i in impressionInput) {
-					var text = impressionInput[i].value;
-					if (text && text.length > 0) {
-						data.impression.push(text);
-					}
-				}
-
-				if (data.impression.length == 0) {
-					return;
-				}
-			} else {
-				url = '/api/contents/review';
-				data.review = $('#reviewInput').val();
-				if (data.review.length ==  0) {
-					return;
-				}
-			}
-			
-			$('textarea[name=impressionInput]').val('');
-			$('#reviewInput').val('');
-			var self = this;
-			$.ajax({
-				type: 'POST',
-				url: url,
-				data: JSON.stringify(data),
-			}).done(function() {
-				self.close();
-				self.props.app.refresh();
-			}).fail(function() {
-				alert('Server error.');
-				self.close();
-			});
+		if (this.selectedBook) {
+			this.saveImpression();
+			this.saveReview();
 		}
 	}
 
-	close() {
+	saveImpression() {
+		var data = {};
+		data.book = this.selectedBook;
+		data.impression = [];
+		
+		var impressionInput = $('textarea[name=impressionInput]');		
+		for (var i in impressionInput) {
+			var text = impressionInput[i].value;
+			if (text && text.length > 0) {
+				data.impression.push(text);
+			}
+		}
+
+		if (data.impression.length == 0) {
+			return;
+		}
+
+		var self = this;
+		$.ajax({
+			type: 'POST',
+			url: '/api/contents/impression',
+			data: JSON.stringify(data),
+		}).done(function() {
+			$('#addContentsModal').modal('hide');
+			self.props.app.refresh();
+		}).fail(function() {
+			alert('Server error.');
+		});
+	}
+
+	saveReview() {
+		var data = {};
+		data.book = this.selectedBook;
+		data.review = $('#reviewInput').val();
+		if (data.review.length ==  0) {
+			return;
+		}
+
+		var self = this;
+		$.ajax({
+			type: 'POST',
+			url: '/api/contents/review',
+			data: JSON.stringify(data),
+		}).done(function() {
+			$('#addContentsModal').modal('hide');
+			self.props.app.refresh();
+		}).fail(function() {
+			alert('Server error.');
+		});
+	}
+
+	reset() {
 		this.selectedBook = null;
-		this.selectedBookView.empty()
+		this.selectedBookView.empty();
 		this.searchBookInput.val('');
 		this.searchResultDropdown.removeClass('open');
+		$('textarea[name=impressionInput]').val('');
+		$('#reviewInput').val('');
 	}
 
 	renderInputView() {
@@ -173,17 +206,20 @@ class AddContentsModal extends React.Component {
 				</div>
 				<div style={{paddingTop: '10px', paddingBottom: '10px'}}>
 					<ul className="nav nav-tabs">
-						<li role="presentation" className="active" id='impressionButton'><a href="#">Impression</a></li>
-						<li role="presentation" id='reviewButton'><a href="#">Review</a></li>
+						<li role="presentation" className="active" id='impressionButton'><a>Impression</a></li>
+						<li role="presentation" id='reviewButton'><a>Review</a></li>
 					</ul>
 				</div>
-				<div id='impressionBack' className='form-group'>
+				<div id='impressionBack' className='form-group' style={{textAlign: 'right'}}>
 					<div className='form-group'>
-						<textarea name='impressionInput' className='form-control' placeholder='감명깊게 읽은 문구를 적어주세요' style={{height:'150px', resize:'none'}} maxLength='200'></textarea>
+						<textarea ref='impressionInput' name='impressionInput' className='form-control' placeholder='감명깊게 읽은 문구를 적어주세요' style={{height:'150px', resize:'none'}} maxLength='200' 
+							onChange={() => this.showTextCount()}></textarea>
+						{this.state.impressionTextCounter}&nbsp;&nbsp;
 					</div>
 				</div>
-				<div id='reviewBack' hidden='true' className='form-group'>
-					<textarea id='reviewInput' className='form-control' placeholder='후기를 적어주세요' style={{height:'300px', resize:'none'}}></textarea>
+				<div id='reviewBack' hidden='true' className='form-group' style={{textAlign: 'right'}}>
+					<textarea ref='reviewInput' id='reviewInput' className='form-control' placeholder='후기를 적어주세요' style={{height:'300px', resize:'none'}} onChange={() => this.showTextCount()}></textarea>
+					{this.state.reviewTextCounter}&nbsp;&nbsp;
 				</div>
 			</div>
 		);
@@ -203,8 +239,8 @@ class AddContentsModal extends React.Component {
 							{this.renderImpressionAndReviewView()}
 						</div>
 						<div className="modal-footer">
-							<button type="button" className="btn btn-default" data-dismiss="modal" onClick={() => this.close()}>Close</button>
-							<button type="button" className="btn btn-primary" data-dismiss="modal" onClick={() => this.save()}>Save</button>
+							<button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+							<button type="button" className="btn btn-primary" onClick={() => this.save()}>Save</button>
 						</div>
 					</div>
 				</div>

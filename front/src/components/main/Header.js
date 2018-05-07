@@ -26,7 +26,7 @@ class Header extends React.Component {
 	}
 
 	openAddModal() {
-		$('#addContentsModal').modal({backdrop: 'static'});
+		this.contents.app.showAddModal();
 	}
 
 	render() {
@@ -57,7 +57,7 @@ class Header extends React.Component {
 							<span className='glyphicon glyphicon-refresh' aria-hidden='true'></span>
 						</button>
 						&nbsp;&nbsp;
-						<button type='button' className='btn btn-default' onClick={this.openAddModal}>
+						<button type='button' className='btn btn-default' onClick={() => {this.openAddModal()}}>
 							<span className='glyphicon glyphicon-plus' aria-hidden='true'></span>
 						</button>
 						&nbsp;&nbsp;

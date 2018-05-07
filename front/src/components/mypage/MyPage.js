@@ -24,7 +24,7 @@ class MyPage extends React.Component {
     render(){
         return (
     		<div align='center'>
-    			<Header moveMainView={this.moveMainView}/>
+    			<Header moveMainView={this.moveMainView} mypage={this}/>
     			<State ref={(ref) => {this.myState = ref;}}/>
     			<Body range='my' ref={(ref) => {this.myContents = ref;}} parent={this}/>
             </div>
