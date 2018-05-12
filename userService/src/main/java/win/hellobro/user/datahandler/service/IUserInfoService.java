@@ -7,7 +7,7 @@ import java.util.List;
 public interface IUserInfoService {
     List<UserInfo> getAllUserInfo(int start, int pageCount);
 
-    UserInfo getUserinfoById(String ID);
+    UserInfo getUserinfoById(String id);
 
     boolean addUserinfo(UserInfo user);
 
@@ -21,5 +21,5 @@ public interface IUserInfoService {
 
     boolean isExistNickName(String eMail);
 
-    UserInfo updateUserInfo(String eMail, String from, UserInfo userInfo);
+    UserInfo updateUserInfo(String id, UserInfo userInfo);
 }

@@ -43,8 +43,9 @@ public class UserInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "user [ID:" + id + "EMAIL:" + eMail + "NICKNAME:" +
-                nickName + "OAUTH_SITE:" + OAuthSite + "UPDATE_DATE" + updateDate + "IMAGE" + image + "]";
+        return "user [ID:" + id + "EMAIL:" + eMail + "NICKNAME:" + nickName
+                + "OAUTH_SITE:" + OAuthSite + "UPDATE_DATE"
+                + updateDate + "OAUTH_ID" + oauthId +"IMAGE" + image + "]";
     }
 
 

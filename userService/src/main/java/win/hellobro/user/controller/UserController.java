@@ -40,6 +40,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
     @RequestMapping(value = "user", method = RequestMethod.GET)
     public UserInfo getUserInfoByEmailnFrom(@RequestParam(name = "email") String eMail,
                                             @RequestParam(name = "from") String from) throws UserServiceException {
@@ -72,11 +73,10 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "user", method = RequestMethod.PATCH)
-    public UserInfo updateUserInfo(@RequestParam(name = "email") String eMail,
-                                   @RequestParam(name = "from") String from,
+    @RequestMapping(value = "user/{ID}", method = RequestMethod.PATCH)
+    public UserInfo updateUserInfo(@PathVariable String ID,
                                    @RequestBody UserInfo userInfo) throws UserServiceException {
-        return userDataHandle.updateUserInfo(eMail, from, userInfo);
+        return userDataHandle.updateUserInfo(ID, userInfo);
     }
 
     @RequestMapping(value = "users", method = RequestMethod.DELETE)

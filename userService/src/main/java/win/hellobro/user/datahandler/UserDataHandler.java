@@ -27,7 +27,7 @@ public class UserDataHandler {
     private final static String DELIMETER = ":";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDataHandler.class);
-    private Map<String, UserInfo> userMap = new ConcurrentHashMap<>();
+   // private Map<String, UserInfo> userMap = new ConcurrentHashMap<>();
 
     @Autowired
     private IUserInfoService userInfoService;
@@ -36,10 +36,10 @@ public class UserDataHandler {
     private DataVaildator vaildator;
 
 
-    public UserInfo getUserInfo(String ID) throws UserServiceException {
-        vaildator.isValidMandantory("id", ID);
+    public UserInfo getUserInfo(String id) throws UserServiceException {
+        vaildator.isValidMandantory("id", id);
 
-        UserInfo userInfo = userInfoService.getUserinfoById(ID);
+        UserInfo userInfo = userInfoService.getUserinfoById(id);
         if (userInfo == null) {
             throw new UserServiceException(HttpStatus.NOT_FOUND, "ID is not found");
         }
@@ -48,18 +48,18 @@ public class UserDataHandler {
 
     public UserInfo getUserInfo(String eMail, String from) throws UserServiceException {
         vaildator.isValidMandantory("email", eMail).isValidMandantory("from", from);
-
+/*
         String key = makeKey(eMail, from);
         if (userMap.get(key) != null) {
             return userMap.get(key);
-        } else {
+        } else {*/
             UserInfo userInfo = userInfoService.getUserinfoByEmailAndOAuthSite(eMail, from);
             if (userInfo == null) {
                 throw new UserServiceException(HttpStatus.NOT_FOUND, "Account is not found");
             }
-            userMap.put(key, userInfo);
+ //           userMap.put(key, userInfo);
             return userInfo;
-        }
+      //  }
 
     }
 
@@ -73,18 +73,18 @@ public class UserDataHandler {
         return userInfo;
     }
 
-    public void addUserInfo(String ID, String nickName, String eMail, String from, String image, String oauthId) throws UnsupportedEncodingException, UserServiceException {
-        vaildator.isValidMandantory("id", ID)
+    public void addUserInfo(String id, String nickName, String eMail, String from, String image, String oauthId) throws UnsupportedEncodingException, UserServiceException {
+        vaildator.isValidMandantory("id", id)
                 .isValidMandantory("nickname", nickName)
                 .isValidMandantory("email", eMail)
                 .isValidMandantory("from", from)
                 .isValidMandantory("oauthId", oauthId)
                 .isValidOption("image", image);
 
-        UserInfo user = mappingUser(ID, nickName, eMail, from, image, oauthId);
+        UserInfo user = mappingUser(id, nickName, eMail, from, image, oauthId);
         Boolean result = userInfoService.addUserinfo(user);
         if (result) {
-            userMap.put(makeKey(eMail, from), user);
+      //      userMap.put(makeKey(eMail, from), user);
         } else {
             throw new UserServiceException(HttpStatus.BAD_REQUEST, "already existing account");
         }
@@ -94,10 +94,11 @@ public class UserDataHandler {
         vaildator.isValidMandantory("email", eMail)
                 .isValidMandantory("from", from);
 
-        String Key = makeKey(eMail, from);
+        // 수정 요망
+      /*  String Key = makeKey(eMail, from);
         if (userMap.containsKey(Key)) {
             userMap.remove(Key);
-        }
+        }*/
         if (!userInfoService.deleteUserInfo(eMail, from))
             throw new UserServiceException(HttpStatus.BAD_REQUEST, "cannot remove userinfo");
 
@@ -109,7 +110,7 @@ public class UserDataHandler {
         return userInfoService.getAllUserInfo(Integer.parseInt(start), Integer.parseInt(end));
     }
 
-    private UserInfo mappingUser(String ID, String nickName, String eMail, String from, String image, String oauthId)
+    private UserInfo mappingUser(String id, String nickName, String eMail, String from, String image, String oauthId)
             throws UnsupportedEncodingException {
 
         UserInfo user = new UserInfo();
@@ -117,7 +118,7 @@ public class UserDataHandler {
         user.setOauthId(oauthId);
         user.setNickName(nickName);
         user.setEMail(eMail);
-        user.setId(ID);
+        user.setId(id);
         user.setImage(URLDecoder.decode(image, "utf8"));
         return user;
     }
@@ -135,9 +136,8 @@ public class UserDataHandler {
         }
     }
 
-    public UserInfo updateUserInfo(String eMail, String from, UserInfo userInfo) throws UserServiceException {
-        vaildator.isValidMandantory("email", eMail)
-                .isValidMandantory("from", from)
+    public UserInfo updateUserInfo(String id, UserInfo userInfo) throws UserServiceException {
+        vaildator.isValidMandantory("id", id)
                 .isValidOption("nickname", userInfo.getNickName())
                 .isValidOption("email", userInfo.getEMail())
                 .isValidOption("from", userInfo.getOAuthSite())
@@ -145,17 +145,18 @@ public class UserDataHandler {
                 .isValidOption("image", userInfo.getImage());
 
 
-        if (userInfoService.getUserinfoByEmailAndOAuthSite(eMail, from) == null) {
+        if (userInfoService.getUserinfoById(id) == null) {
             throw new UserServiceException(HttpStatus.NOT_FOUND, "User Information to modify not found");
         }
-        UserInfo modifiedUser = userInfoService.updateUserInfo(eMail, from, userInfo);
-        if (!StringUtils.isEmpty(modifiedUser)) {
+        UserInfo modifiedUser = userInfoService.updateUserInfo(id, userInfo);
+        // 수정 요망.
+      /*  if (!StringUtils.isEmpty(modifiedUser)) {
             String Key = makeKey(eMail, from);
             if (userMap.containsKey(Key)) {
                 userMap.remove(Key);
                 userMap.put(makeKey(modifiedUser.getEMail(), modifiedUser.getOAuthSite()), modifiedUser);
             }
-        }
+        }*/
         return modifiedUser;
     }
 }

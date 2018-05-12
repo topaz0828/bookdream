@@ -24,8 +24,8 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
-    public UserInfo getUserinfoById(String ID) {
-        return userInfoDAO.getUserInfoById(ID);
+    public UserInfo getUserinfoById(String id) {
+        return userInfoDAO.getUserInfoById(id);
     }
 
 
@@ -50,8 +50,8 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
-    public UserInfo updateUserInfo(String eMail, String from, UserInfo userInfo) {
-        return userInfoDAO.updateUserinfo(eMail, from, userInfo);
+    public UserInfo updateUserInfo(String id, UserInfo userInfo) {
+        return userInfoDAO.updateUserinfo(id, userInfo);
     }
 
 

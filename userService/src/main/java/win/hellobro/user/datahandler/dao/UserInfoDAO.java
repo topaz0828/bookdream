@@ -33,8 +33,8 @@ public class UserInfoDAO implements IUserInfoDAO {
     }
 
     @Override
-    public UserInfo getUserInfoById(String ID) {
-        return entityManager.find(UserInfo.class, ID);
+    public UserInfo getUserInfoById(String id) {
+        return entityManager.find(UserInfo.class, id);
 
     }
 
@@ -46,9 +46,9 @@ public class UserInfoDAO implements IUserInfoDAO {
     }
 
     @Override
-    public UserInfo updateUserinfo(String eMail, String from, UserInfo aftUser) {
-        String hql = "FROM UserInfo users WHERE users.eMail = :EMAIL AND users.OAuthSite = :OAUTH_SITE";
-        UserInfo user = (UserInfo) entityManager.createQuery(hql).setParameter("EMAIL", eMail).setParameter("OAUTH_SITE", from).getSingleResult();
+    public UserInfo updateUserinfo(String id, UserInfo aftUser) {
+        String hql = "FROM UserInfo users WHERE users.id = :id";
+        UserInfo user = (UserInfo) entityManager.createQuery(hql).setParameter("id",id).getSingleResult();
 
         user.setEMail(StringUtils.isEmpty(aftUser.getEMail()) ? user.getEMail() : aftUser.getEMail());
         user.setNickName(StringUtils.isEmpty(aftUser.getNickName()) ? user.getNickName() : aftUser.getNickName());

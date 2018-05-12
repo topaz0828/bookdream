@@ -8,11 +8,11 @@ public interface IUserInfoDAO {
 
     List<UserInfo> getAllUserInfoDAO(int start, int pageCount);
 
-    UserInfo getUserInfoById(String ID);
+    UserInfo getUserInfoById(String id);
 
     void addUserInfo(UserInfo user);
 
-    void deleteUserlInfo(String eMail, String ID);
+    void deleteUserlInfo(String eMail, String id);
 
     boolean isExistNickName(String nickName);
 
@@ -24,7 +24,7 @@ public interface IUserInfoDAO {
 
 	UserInfo getUserInfoByOauthIdAndOAuthSite(String oauthId, String OAuth_Site);
 
-    UserInfo updateUserinfo(String eMail, String from, UserInfo userInfo);
+    UserInfo updateUserinfo(String id, UserInfo userInfo);
 }
 
 
