@@ -23,7 +23,7 @@ public class FbApiClient {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static FbAccessToken getAccessToken(String uri, String clientId, String redirectUri, String clientSecret, String code) throws Exception {
+	public static OAuthAccessToken getAccessToken(String uri, String clientId, String redirectUri, String clientSecret, String code) throws Exception {
 		URI targetUri = new URI(uri);
 		QueryStringEncoder queryStringEncoder = new QueryStringEncoder(targetUri.getPath());
 		queryStringEncoder.addParam("client_id", clientId);
@@ -43,7 +43,7 @@ public class FbApiClient {
 		}
 
 		String body = response.content().toString(Charset.forName("UTF-8"));
-		return new FbAccessToken(JSON_MAPPER.readValue(body, Map.class));
+		return new OAuthAccessToken(JSON_MAPPER.readValue(body, Map.class));
 	}
 
 	@SuppressWarnings("unchecked")

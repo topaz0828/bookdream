@@ -1,11 +1,10 @@
-package win.hellobro.web.service;
+package win.hellobro.web.presentation;
 
 import io.netty.util.internal.StringUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.balam.exof.module.listener.RequestContext;
-import team.balam.exof.module.service.ServiceWrapper;
 import team.balam.exof.module.service.annotation.Inbound;
 import team.balam.exof.module.service.annotation.Service;
 import team.balam.exof.module.service.annotation.ServiceDirectory;
@@ -16,6 +15,7 @@ import win.hellobro.web.UserInfo;
 import win.hellobro.web.component.BookApiClient;
 import win.hellobro.web.component.BookSearchResult;
 import win.hellobro.web.component.part.QueryStringToMap;
+import win.hellobro.web.service.ReviewService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -27,17 +27,14 @@ public class Finder {
 	private static final Logger LOG = LoggerFactory.getLogger(Finder.class);
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
-	@Variable private String kakaoApiUri;
-	@Variable private String kakaoApiKey;
+	@Variable
+	private String kakaoApiUri;
 
-	@Service("/external/review-service/searchMyContentsList")
-	private ServiceWrapper myContentsGetter;
+	@Variable
+	private String kakaoApiKey;
 
-	@Service("/external/review-service/searchContentsList")
-	private ServiceWrapper allContentsGetter;
-
-	@Service("/external/review-service/getReviewOrImpression")
-	private ServiceWrapper contentsGetter;
+	@ServiceDirectory("/service/review")
+	private ReviewService reviewService;
 
 	@Service("book")
 	@Inbound({HttpGet.class, QueryStringToMap.class})
@@ -84,9 +81,9 @@ public class Finder {
 
 		try {
 			if ("my".equals(range)) {
-				resultList = this.myContentsGetter.call(user.getId(), isbn, pageIndex, pageSize);
+				resultList = reviewService.getMyContents(user.getId(), isbn, pageIndex, pageSize);
 			} else {
-				resultList = this.allContentsGetter.call(user.getId(), isbn, pageIndex, pageSize);
+				resultList = reviewService.getAllContents(user.getId(), isbn, pageIndex, pageSize);
 			}
 
 			response.setCharacterEncoding("UTF-8");
@@ -106,7 +103,7 @@ public class Finder {
 		String id = (String) param.get("id");
 
 		try {
-			String result = this.contentsGetter.call(id);
+			String result = reviewService.getContentsDetail(id);
 			response.getWriter().write(result);
 		} catch (Exception e) {
 			LOG.error("fail to get contents.", e);

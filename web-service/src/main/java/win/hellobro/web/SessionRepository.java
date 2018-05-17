@@ -60,6 +60,6 @@ public class SessionRepository {
 
 	public static void remove(Type type) {
 		HttpServletRequest request = RequestContext.getServletRequest();
-		request.removeAttribute(type.name());
+		request.getSession().removeAttribute(type.name());
 	}
 }

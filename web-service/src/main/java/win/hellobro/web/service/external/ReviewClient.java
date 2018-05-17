@@ -16,19 +16,17 @@ import org.slf4j.LoggerFactory;
 import team.balam.exof.client.Client;
 import team.balam.exof.client.ClientPool;
 import team.balam.exof.client.component.HttpClientCodec;
-import team.balam.exof.module.service.annotation.Service;
 import team.balam.exof.module.service.annotation.ServiceDirectory;
 import team.balam.exof.module.service.annotation.Shutdown;
 import team.balam.exof.module.service.annotation.Startup;
 import team.balam.exof.module.service.annotation.Variable;
-import win.hellobro.web.service.vo.BookInfo;
+import win.hellobro.web.presentation.vo.BookInfo;
 
 import java.nio.charset.Charset;
-import java.util.List;
 
 @ServiceDirectory(internal = true)
-public class ReviewService {
-	private static final Logger LOG = LoggerFactory.getLogger(ReviewService.class);
+public class ReviewClient {
+	private static final Logger LOG = LoggerFactory.getLogger(ReviewClient.class);
 
 	@Variable private String address;
 	@Variable private int readTimeout;
@@ -48,17 +46,7 @@ public class ReviewService {
 				.build();
 	}
 
-	@Service
-	public String searchContentsList(String userId, String isbn, String pageIndex, String pageSize) {
-		return this.sendSearchRequest(userId, isbn, pageIndex, pageSize, false);
-	}
-
-	@Service
-	public String searchMyContentsList(String userId, String isbn, String pageIndex, String pageSize) {
-		return this.sendSearchRequest(userId, isbn, pageIndex, pageSize, true);
-	}
-
-	private String sendSearchRequest(String userId, String isbn, String pageIndex, String pageSize, boolean isMyContents) {
+	public String sendSearchRequest(String userId, String isbn, String pageIndex, String pageSize, boolean isMyContents) {
 		QueryStringEncoder query = new QueryStringEncoder("/review");
 		query.addParam("offset", pageIndex);
 		query.addParam("limit", pageSize);
@@ -89,35 +77,7 @@ public class ReviewService {
 		return "{\"isbn\":" + "\"" + isbn + "\", \"list\":[]}";
 	}
 
-	@Service
-	public boolean saveReview(String userId, BookInfo bookInfo, String review) {
-		long bookId;
-		try {
-			bookId = this.getBookId(bookInfo);
-		} catch (Exception e) {
-			return false;
-		}
-
-		return this.saveReviewAndImpression(userId, bookId, review, "R");
-	}
-
-	@Service
-	public boolean saveImpression(String userId, BookInfo bookInfo, List<String> impression) {
-		long bookId;
-		try {
-			bookId = this.getBookId(bookInfo);
-		} catch (Exception e) {
-			return false;
-		}
-
-		for (String text : impression) {
-			this.saveReviewAndImpression(userId, bookId, text, "C");
-		}
-
-		return true;
-	}
-
-	private long getBookId(BookInfo bookInfo) throws Exception {
+	public long getBookId(BookInfo bookInfo) throws Exception {
 		QueryStringEncoder encoder = new QueryStringEncoder("/book-id");
 		encoder.addParam("isbn", bookInfo.getIsbn());
 		HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, encoder.toString());
@@ -167,7 +127,7 @@ public class ReviewService {
 		}
 	}
 
-	private boolean saveReviewAndImpression(String userId, long bookId, String text, String type) {
+	public boolean saveReviewAndImpression(String userId, long bookId, String text, String type) {
 		byte[] content = RequestConverter.convert(bookId, userId, text, type);
 
 		FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/review");
@@ -189,12 +149,10 @@ public class ReviewService {
 		return false;
 	}
 
-	@Service
 	public int getReviewCount(String userId) {
 		return this.getCount(userId, "R"); // review
 	}
 
-	@Service
 	public int getImpressionCount(String userId) {
 		return this.getCount(userId, "C"); // comment
 	}
@@ -220,7 +178,6 @@ public class ReviewService {
 		return 0;
 	}
 
-	@Service
 	public boolean updateContents(String userId, long bookId, String type, long reviewId, String text) {
 		byte[] content = RequestConverter.convert(bookId, userId, text, type);
 
@@ -243,7 +200,6 @@ public class ReviewService {
 		return false;
 	}
 
-	@Service
 	public String getReviewOrImpression(String reviewId) {
 		HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/review/" + reviewId);
 		request.headers().set(HttpHeaderNames.HOST, this.address);
@@ -262,7 +218,6 @@ public class ReviewService {
 		return "{}";
 	}
 
-	@Service
 	public void deleteContents(String contentsId, String userId) {
 		byte[] body = RequestConverter.convert(contentsId, userId);
 

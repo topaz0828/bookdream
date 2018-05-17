@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum OAuthSite {
-	FACEBOOK("facebook");
+	FACEBOOK("facebook"),
+	GOOGLE("google");
 
 	private static final Map<String, OAuthSite> MAP = new HashMap<>();
 	private String value;

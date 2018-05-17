@@ -1,4 +1,4 @@
-package win.hellobro.web.service;
+package win.hellobro.web.presentation;
 
 import io.netty.handler.codec.http.QueryStringEncoder;
 import io.netty.util.internal.StringUtil;
@@ -14,9 +14,9 @@ import team.balam.exof.module.service.component.http.HttpGet;
 import win.hellobro.web.OAuthSite;
 import win.hellobro.web.SessionRepository;
 import win.hellobro.web.UserInfo;
-import win.hellobro.web.component.FbAccessToken;
 import win.hellobro.web.component.FbApiClient;
 import win.hellobro.web.component.FbUserInfo;
+import win.hellobro.web.component.OAuthAccessToken;
 import win.hellobro.web.component.part.QueryStringToMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +42,7 @@ public class FacebookSignIn {
 
 	@Service("oauth-uri")
 	@Inbound(HttpGet.class)
-	public void getOAuthUri(HttpServletRequest request) throws IOException {
+	public void getOAuthUri() throws IOException {
 		String state = SessionRepository.createOAuthState();
 		String oauthUri = this.loginUri +
 				"client_id=" + this.appId +
@@ -62,12 +62,12 @@ public class FacebookSignIn {
 
 		if (originalState == null || !originalState.equals(callbackParam.get("state"))) {
 			LOG.error("Session state not equals. {} / {}", originalState, callbackParam.get("state"));
-			response.getWriter().write("You can't sign in.");
+			response.sendRedirect("/");
 			return;
 		}
 
 		try {
-			FbAccessToken accessToken = FbApiClient.getAccessToken(this.accessTokenUri,
+			OAuthAccessToken accessToken = FbApiClient.getAccessToken(this.accessTokenUri,
 					this.appId, this.redirectUri, this.clientSecretKey, (String) callbackParam.get("code"));
 
 			FbUserInfo facebookUser = FbApiClient.getUserInfo(this.userInfoUri, accessToken.getAccessToken());
@@ -81,18 +81,19 @@ public class FacebookSignIn {
 				}
 
 				SessionRepository.saveUserInfo(userInfo);
-				response.sendRedirect("/");
 			} else if (UserInfo.NOT_FOUND_USER.equals(userInfo)) {
 				moveSignUpPage(facebookUser);
+				return;
 			} else {
 				LOG.error("Login process is not normal");
-				response.sendRedirect("/signin.html");
 			}
 		} catch (Exception e) {
 			String message = "Fail to login by facebook.";
 			LOG.error(message, e);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
 		}
+
+		response.sendRedirect("/");
 	}
 
 	private static void moveSignUpPage(FbUserInfo facebookUser) throws IOException {

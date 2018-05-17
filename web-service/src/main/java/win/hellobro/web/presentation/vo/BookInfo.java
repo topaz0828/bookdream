@@ -1,4 +1,4 @@
-package win.hellobro.web.service.vo;
+package win.hellobro.web.presentation.vo;
 
 import java.util.Map;
 

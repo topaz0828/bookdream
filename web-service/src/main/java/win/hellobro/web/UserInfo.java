@@ -13,7 +13,7 @@ public class UserInfo implements Serializable {
 	private String id;
 	private String nickName;
 	private String email;
-	private OAuthSite oauthSite;
+	private String oauthSite;
 	private String oauthId;
 	private String image;
 
@@ -42,11 +42,11 @@ public class UserInfo implements Serializable {
 	}
 
 	public OAuthSite getOauthSite() {
-		return oauthSite;
+		return OAuthSite.get(oauthSite);
 	}
 
 	public void setOauthSite(OAuthSite oauthSite) {
-		this.oauthSite = oauthSite;
+		this.oauthSite = oauthSite.val();
 	}
 
 	public void setOauthId(String oauthId) {
@@ -58,7 +58,10 @@ public class UserInfo implements Serializable {
 	}
 
 	public void setOauthSite(String oauthSite) {
-		this.oauthSite = OAuthSite.get(oauthSite);
+		if (OAuthSite.get(oauthSite) == null) {
+			throw new IllegalArgumentException("oauth site is wrong. " + oauthSite);
+		}
+		this.oauthSite = oauthSite;
 	}
 
 	public String getImage() {

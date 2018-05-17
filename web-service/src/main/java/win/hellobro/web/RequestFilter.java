@@ -11,31 +11,19 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 public class RequestFilter implements ServicePathExtractor, Filter {
-	//로그인 상태가 아니라도 접근할 수 있는 페이지
-	private static Set<String> notLoginPath = new HashSet<>();
-
-	public RequestFilter() {
-		notLoginPath.add("/user/profile-image");
-		notLoginPath.add("/user/signUp");
-		notLoginPath.add("/signin/facebook/oauth-uri");
-		notLoginPath.add("/signin/facebook/callback");
-	}
-
 	@Override
 	public String extract(HttpServletRequest httpServletRequest) {
 		String uri = httpServletRequest.getRequestURI();
 		String requestPath = httpServletRequest.getPathInfo();
 
 		if (uri.contains("/mypage")) {
-			return "/non-api/send-index-page";
-		} else if (uri.contains("/api") && !notLoginPath.contains(requestPath)) {
 			UserInfo info = SessionRepository.getUserInfo();
 			if (UserInfo.NOT_FOUND_USER.equals(info)) {
-				return "/non-api/send-unauthorized";
+				return "/non-api/move-main";
+			} else {
+				return "/non-api/move-my-page";
 			}
 		}
 

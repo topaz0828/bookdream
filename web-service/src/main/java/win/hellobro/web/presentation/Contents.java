@@ -1,10 +1,9 @@
-package win.hellobro.web.service;
+package win.hellobro.web.presentation;
 
 import io.netty.util.internal.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.balam.exof.module.listener.RequestContext;
-import team.balam.exof.module.service.ServiceWrapper;
 import team.balam.exof.module.service.annotation.Inbound;
 import team.balam.exof.module.service.annotation.Service;
 import team.balam.exof.module.service.annotation.ServiceDirectory;
@@ -15,28 +14,20 @@ import team.balam.exof.module.service.component.http.JsonToMap;
 import team.balam.exof.module.service.component.http.QueryStringToMap;
 import win.hellobro.web.SessionRepository;
 import win.hellobro.web.UserInfo;
-import win.hellobro.web.service.vo.BookInfo;
+import win.hellobro.web.presentation.vo.BookInfo;
+import win.hellobro.web.service.ReviewService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @ServiceDirectory
 public class Contents {
 	private static final Logger LOG = LoggerFactory.getLogger(User.class);
 
-
-	@Service("/external/review-service/updateContents")
-	private ServiceWrapper contentsUpdater;
-
-	@Service("/external/review-service/saveImpression")
-	private ServiceWrapper impressionSaver;
-
-	@Service("/external/review-service/saveReview")
-	private ServiceWrapper reviewSaver;
-
-	@Service("/external/review-service/deleteContents")
-	private ServiceWrapper contentsRemover;
+	@ServiceDirectory("/service/review")
+	private ReviewService reviewService;
 
 	@SuppressWarnings("unchecked")
 	@Service("impression")
@@ -46,11 +37,12 @@ public class Contents {
 
 		UserInfo user = SessionRepository.getUserInfo();
 		BookInfo book = new BookInfo((Map<String, Object>) request.get("book"));
+		List<String> impression = (List<String>) request.get("impression");
 
-		LOG.info("save impression. book[{}] impression:{}", book.getTitle(), request.get("impression"));
+		LOG.info("save impression. book[{}] impression:{}", book.getTitle(), impression);
 
 		try {
-			boolean isSuccess = this.impressionSaver.call(user.getId(), book, request.get("impression"));
+			boolean isSuccess = reviewService.saveImpression(user.getId(), book, impression);
 			if (!isSuccess) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
@@ -73,7 +65,7 @@ public class Contents {
 		HttpServletResponse response = RequestContext.getServletResponse();
 
 		try {
-			boolean isSuccess = this.reviewSaver.call(user.getId(), book, review);
+			boolean isSuccess = reviewService.saveReview(user.getId(), book, review);
 			if (!isSuccess) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
@@ -95,8 +87,11 @@ public class Contents {
 		}
 
 		try {
-			boolean isSuccess = this.contentsUpdater.call(user.getId(), request.get("bookId"), request.get("type"),
-					request.get("contentsId"), request.get("contents"));
+			long bookId = Long.parseLong(request.get("bookId").toString());
+			long contentsId = Long.parseLong(request.get("contentsId").toString());
+
+			boolean isSuccess = reviewService.updateContents(user.getId(), bookId, (String) request.get("type"),
+					contentsId, (String) request.get("contents"));
 			if (!isSuccess) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
@@ -118,7 +113,7 @@ public class Contents {
 		}
 
 		try {
-			this.contentsRemover.call(contentsId, userId);
+			reviewService.removeContents(contentsId, userId);
 		} catch (Exception e) {
 			LOG.error("Fail to delete contents.", e);
 			RequestContext.getServletResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

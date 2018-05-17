@@ -3,7 +3,7 @@ package win.hellobro.web.service.external;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import win.hellobro.web.service.vo.BookInfo;
+import win.hellobro.web.presentation.vo.BookInfo;
 
 import java.io.IOException;
 import java.io.StringWriter;
