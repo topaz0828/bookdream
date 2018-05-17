@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services>
-    <serviceDirectory class="win.hellobro.web.service.User" path="/user">
+    <serviceDirectory class="win.hellobro.web.presentation.User" path="/user">
         <variable name="tempDir" value="./webapp/temp/"/>
-        <variable name="profileImageDir" value="./webapp/image/profile/"/>
-        <!--<variable name="profileBaseUrl" value="https://book.hellobro.win/image/profile/"/>-->
         <!--<variable name="profileTempUrl" value="https://book.hellobro.win/temp/profile/"/>-->
-        <variable name="profileBaseUrl" value="http://localhost:3003/image/profile/"/>
         <variable name="profileTempUrl" value="http://localhost:3003/temp/profile/"/>
     </serviceDirectory>
 
-    <serviceDirectory class="win.hellobro.web.service.Finder" path="/search">
+    <serviceDirectory class="win.hellobro.web.presentation.Finder" path="/search">
         <variable name="kakaoApiUri" value="https://dapi.kakao.com/v2/search/book"/>
         <variable name="kakaoApiKey" value="KakaoAK 7b15cef8dfbdedf8cd3fb26ae3262097"/>
     </serviceDirectory>
 
-    <serviceDirectory class="win.hellobro.web.service.FacebookSignIn" path="/signin/facebook">
+    <serviceDirectory class="win.hellobro.web.presentation.FacebookSignIn" path="/signin/facebook">
         <variable name="loginUri" value="https://www.facebook.com/v2.12/dialog/oauth?"/>
         <variable name="appId" value="242352022831116"/>
         <variable name="clientSecretKey" value="0c6e534a8701920835150e679aed2191"/>
@@ -24,20 +21,35 @@
         <variable name="userInfoUri" value="https://graph.facebook.com/me"/>
     </serviceDirectory>
 
-    <serviceDirectory class="win.hellobro.web.service.Contents" path="/contents">
+    <serviceDirectory class="win.hellobro.web.presentation.GoogleSignIn" path="/signin/google">
+        <variable name="loginUri" value="https://accounts.google.com/o/oauth2/auth?"/>
+        <variable name="clientId" value="247231006443-ne2931ck6viitu7g2ac56jd3o48o7e1k.apps.googleusercontent.com"/>
+        <variable name="clientSecret" value="Zs3sN75gi0wd70wIFb9UHNpV"/>
+
+        <variable name="redirectUri" value="http://localhost:3003/api/signin/google/callback"/>
+        <variable name="accessTokenUri" value="https://www.googleapis.com/oauth2/v4/token"/>
     </serviceDirectory>
 
-    <serviceDirectory class="win.hellobro.web.service.external.UserService" path="/external/user-service">
+    <serviceDirectory class="win.hellobro.web.presentation.Contents" path="/contents"/>
+    <serviceDirectory class="win.hellobro.web.presentation.NonApiResponseSender" path="/non-api"/>
+
+    <serviceDirectory class="win.hellobro.web.service.UserService" path="/service/user">
+        <variable name="profileImageDir" value="./webapp/image/profile/"/>
+        <!--<variable name="profileBaseUrl" value="https://book.hellobro.win/image/profile/"/>-->
+        <variable name="profileBaseUrl" value="http://localhost:3003/image/profile/"/>
+    </serviceDirectory>
+
+    <serviceDirectory class="win.hellobro.web.service.ReviewService" path="/service/review"/>
+
+    <serviceDirectory class="win.hellobro.web.service.external.UserClient" path="/external/user-service">
         <variable name="address" value="127.0.0.1:9004"/>
         <variable name="readTimeout" value="5000"/>
         <variable name="maxPoolSize" value="1"/>
     </serviceDirectory>
 
-    <serviceDirectory class="win.hellobro.web.service.external.ReviewService" path="/external/review-service">
+    <serviceDirectory class="win.hellobro.web.service.external.ReviewClient" path="/external/review-service">
         <variable name="address" value="127.0.0.1:8080"/>
         <variable name="readTimeout" value="5000"/>
         <variable name="maxPoolSize" value="1"/>
     </serviceDirectory>
-
-    <serviceDirectory class="win.hellobro.web.service.NonApiResponseSender" path="/non-api"/>
 </services>

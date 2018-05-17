@@ -33,7 +33,6 @@
             }).done(function(res) {
                 document.location = '/';
             }).fail(function(res) {
-            console.log(res);
                 if (res.status == 409) {
                     if (res.responseText === 'email') {
                         $('#email_noti').text('이메일이 중복되었습니다.');
@@ -42,13 +41,13 @@
                     }
                 } else if (res.status == 400) {
                     alert('잘못된 요청입니다.');
-                    document.location = '/signin.html';
+                    document.location = '/';
                 } else if (res.status == 404) {
                     alert('다시 시도해주세요.');
-                    document.location = '/signin.html';
+                    document.location = '/';
                 } else {
                     alert('server error.');
-                    document.location = '/signin.html';
+                    document.location = '/';
                 }
             });
         }
