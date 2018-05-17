@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import State from './State';
+import ModifyModal from './ModifyModal';
 import Body from '../main/Body';
 
 class MyPage extends React.Component {
@@ -20,6 +21,10 @@ class MyPage extends React.Component {
         this.myState.getState();
         this.myContents.refresh();
     }
+    
+    modifyMyInfo() {
+        this.modifyModal.show(this.myState.getMyInfo());
+    }
 
     render(){
         return (
@@ -27,6 +32,7 @@ class MyPage extends React.Component {
     			<Header moveMainView={this.moveMainView} mypage={this}/>
     			<State ref={(ref) => {this.myState = ref;}}/>
     			<Body range='my' ref={(ref) => {this.myContents = ref;}} parent={this}/>
+                <ModifyModal ref={(ref) => {this.modifyModal = ref;}} mypage={this} />
             </div>
         );
     }

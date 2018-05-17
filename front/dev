@@ -1,0 +1,1 @@
+cp webpack.config.js.dev webpack.config.js;webpack

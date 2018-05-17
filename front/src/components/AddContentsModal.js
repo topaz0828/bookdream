@@ -2,7 +2,7 @@ import React from 'react';
 
 class AddContentsModal extends React.Component {
 	constructor(props) {
-		super(props)
+		super(props);
 		this.app = props.app;
 		this.state = {impressionTextCounter: '0/200', reviewTextCounter: '0/∞'};
 	}
@@ -51,6 +51,7 @@ class AddContentsModal extends React.Component {
 	}
 
 	show() {
+		
 		this.reset();
 		this.showTextCount();
 		$('#addContentsModal').modal({backdrop: 'static'});
@@ -113,10 +114,15 @@ class AddContentsModal extends React.Component {
 		this.searchResultDropdown.removeClass('open');
 	}
 
-	save() {
+	save(isClose) {
 		if (this.selectedBook) {
 			this.saveImpression();
 			this.saveReview();
+			this.props.app.refresh();
+
+			if (isClose) {
+				$('#addContentsModal').modal('hide');
+			}
 		}
 	}
 
@@ -125,7 +131,7 @@ class AddContentsModal extends React.Component {
 		data.book = this.selectedBook;
 		data.impression = [];
 		
-		var impressionInput = $('textarea[name=impressionInput]');		
+		var impressionInput = $('textarea[name=impressionInput]');
 		for (var i in impressionInput) {
 			var text = impressionInput[i].value;
 			if (text && text.length > 0) {
@@ -142,9 +148,9 @@ class AddContentsModal extends React.Component {
 			type: 'POST',
 			url: '/api/contents/impression',
 			data: JSON.stringify(data),
+			async: false
 		}).done(function() {
-			$('#addContentsModal').modal('hide');
-			self.props.app.refresh();
+			$('textarea[name=impressionInput]').val('');
 		}).fail(function() {
 			alert('Server error.');
 		});
@@ -163,21 +169,21 @@ class AddContentsModal extends React.Component {
 			type: 'POST',
 			url: '/api/contents/review',
 			data: JSON.stringify(data),
+			async: false
 		}).done(function() {
-			$('#addContentsModal').modal('hide');
-			self.props.app.refresh();
+			$('#reviewInput').val('');
 		}).fail(function() {
 			alert('Server error.');
 		});
 	}
 
 	reset() {
-		this.selectedBook = null;
-		this.selectedBookView.empty();
+		// this.selectedBook = null;
+		// this.selectedBookView.empty();
 		this.searchBookInput.val('');
 		this.searchResultDropdown.removeClass('open');
-		$('textarea[name=impressionInput]').val('');
-		$('#reviewInput').val('');
+		// $('textarea[name=impressionInput]').val('');
+		// $('#reviewInput').val('');
 	}
 
 	renderInputView() {
@@ -206,8 +212,8 @@ class AddContentsModal extends React.Component {
 				</div>
 				<div style={{paddingTop: '10px', paddingBottom: '10px'}}>
 					<ul className="nav nav-tabs">
-						<li role="presentation" className="active" id='impressionButton'><a>Impression</a></li>
-						<li role="presentation" id='reviewButton'><a>Review</a></li>
+						<li role="presentation" className="active" id='impressionButton'><a>감명깊게 읽은 문구</a></li>
+						<li role="presentation" id='reviewButton'><a>후기</a></li>
 					</ul>
 				</div>
 				<div id='impressionBack' className='form-group' style={{textAlign: 'right'}}>
@@ -239,8 +245,9 @@ class AddContentsModal extends React.Component {
 							{this.renderImpressionAndReviewView()}
 						</div>
 						<div className="modal-footer">
-							<button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-							<button type="button" className="btn btn-primary" onClick={() => this.save()}>Save</button>
+							<button type="button" className="btn btn-default" data-dismiss="modal">닫기</button>
+							<button type="button" className="btn btn-primary" onClick={() => this.save(true)}>저장 후 닫기</button>
+							<button type="button" className="btn btn-primary" onClick={() => this.save(false)}>저장</button>
 						</div>
 					</div>
 				</div>

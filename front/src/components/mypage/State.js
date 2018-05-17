@@ -12,26 +12,6 @@ class State extends React.Component {
 		};
 	}
 
-	componentDidMount() {
-		var uploader = new ss.SimpleUpload({
-        button: 'change_profile_image',
-        url: '/api/user/profile-image?direct=y',
-        name: 'profileImage',
-        maxSize: 1024,
-        onSubmit: function(filename, extension) {
-            $('#profile_image_progress_bar').show();
-            $('#change_profile_image').hide();
-        },
-        onComplete: function(filename, response) {
-        	if (response) {
-        		$('#profile_image').attr('src', response);
-            }
-            $('#profile_image_progress_bar').hide();
-            $('#change_profile_image').show();
-        }
-    });
-	}
-
 	getState() {
 		var self = this;
 		$.get("/api/user/profile", function(data) {
@@ -47,16 +27,25 @@ class State extends React.Component {
 		});
 	}
 
+	getMyInfo() {
+		return {email: this.state.email, nickname: this.state.nickname, image: this.state.image};
+	}
+
+	setMyInfo(email, nickname, image) {
+		this.setState({
+			email: email ? email : this.state.email,
+			nickname: nickname ? nickname : this.state.nickname,
+			image: image ? image : this.state.image,
+			reviewCount: this.state.reviewCount,
+			impressionCount: this.state.impressionCount
+		});
+	}
+
 	render() {
 		return (
 			<div className='row' style={{paddingTop: '30px', paddingBottom: '30px'}}>
 				<div className='col-sm-6 col-md-6' align='right' style={{paddingTop: '30px', paddingRight: '50px'}}>
 					<img id='profile_image' src={this.state.image} style={{width: '100px', height: '100px'}}/>
-					<div align='right' style={{paddingTop: '5px'}}>
-						<a id='change_profile_image'>change image</a>
-						<div style={{color: '#898989', fontSize: '13px'}}>max 512KB</div>
-						<img id='profile_image_progress_bar' src='/css/processing.gif' hidden/>
-					</div>
 				</div>
 				<div className='col-sm-6 col-md-6' style={{paddingLeft: '30px'}}>
 					<table width='100%'>

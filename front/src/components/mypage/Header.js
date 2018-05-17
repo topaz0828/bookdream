@@ -10,6 +10,10 @@ class Header extends React.Component {
 		this.props.mypage.app.showAddModal();
 	}
 
+	modifyMyInfo() {
+		this.props.mypage.modifyMyInfo();
+	}
+
 	render() {
 		return (
 			<div className='row' style={{maxWidth: '1300px'}}>
@@ -26,6 +30,10 @@ class Header extends React.Component {
 							<span className='glyphicon glyphicon-log-out' aria-hidden='true'></span>
 						</button>
 						&nbsp;&nbsp;&nbsp;&nbsp;
+						<button type='button' className='btn btn-default' onClick={() => this.modifyMyInfo()}>
+							<span className='glyphicon glyphicon-pencil' aria-hidden='true'></span>
+						</button>
+						&nbsp;&nbsp;
 						<button type='button' className='btn btn-default' onClick={() => this.openAddModal()}>
 							<span className='glyphicon glyphicon-plus' aria-hidden='true'></span>
 						</button>

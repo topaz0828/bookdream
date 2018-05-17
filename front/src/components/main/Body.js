@@ -63,7 +63,7 @@ class Body extends React.Component {
 			type: 'GET',
 			url: '/api/search/contents-list',
 			dataType: 'json',
-			data: data,
+			data: data
 		}).done(function(res) {
 			self.isbn = res.isbn;
 			

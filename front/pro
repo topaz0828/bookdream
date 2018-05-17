@@ -1,0 +1,1 @@
+cp webpack.config.js.real webpack.config.js;webpack

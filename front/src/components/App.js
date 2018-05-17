@@ -5,10 +5,11 @@ import Contents from './main/Contents'
 import MyPage from './mypage/MyPage';
 import DetailModal from './DetailModal';
 import AddContentsModal from './AddContentsModal';
+import SignInModal from './SignInModal';
 
 class App extends React.Component {
 	moveMyPage() {
-		document.location = "/mypage";
+		this.checkJoinStatus(() => {document.location = "/mypage";});
 	}
 
 	moveMainView() {
@@ -20,7 +21,25 @@ class App extends React.Component {
 	}
 
 	showAddModal() {
-		this.addModal.show();
+		this.checkJoinStatus(() => this.addModal.show());
+	}
+
+	checkJoinStatus(callback) {
+		var self =  this;
+		$.ajax({
+			type: 'GET',
+			url: '/api/user/login-status'
+		}).done(function() {
+			callback();
+		}).fail(function(res) {
+			if (res.status == 401) {
+				self.showSignInModal();
+			}
+		})
+	}
+
+	showSignInModal() {
+		this.refs.signInModal.show();
 	}
 
 	refresh() {
@@ -38,6 +57,7 @@ class App extends React.Component {
                 <Route path="/mypage" component={(props) => ( <MyPage app={this} ref={(ref) => {this.myPage = ref;}}/>)}/>
 				<DetailModal ref={(ref) => {this.detailModal = ref;}} app={this}/>
 				<AddContentsModal ref={(ref) => {this.addModal = ref;}} app={this}/>
+				<SignInModal ref='signInModal'/>
 			</div>
         );
     }
