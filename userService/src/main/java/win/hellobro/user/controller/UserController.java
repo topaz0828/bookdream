@@ -32,11 +32,12 @@ public class UserController {
         return userDataHandle.getUserInfo(ID);
     }
 
-    @RequestMapping(value = "check", method = RequestMethod.GET)
-    public ResponseEntity<Void> existEmailOrNickName(@RequestParam(name = "email", required = false) String eMail,
+    @RequestMapping(value = {"check/{id}", "check"}, method = RequestMethod.GET)
+    public ResponseEntity<Void> existEmailOrNickName(@PathVariable(name = "id", required = false) String id,
+                                                     @RequestParam(name = "email", required = false) String eMail,
                                                      @RequestParam(name = "nickname", required = false) String nickName) throws UserServiceException {
 
-        userDataHandle.existEmailOrNickName(eMail, nickName);
+        userDataHandle.existEmailOrNickName(id, eMail, nickName);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -48,12 +49,12 @@ public class UserController {
         return userDataHandle.getUserInfo(eMail, from);
     }
 
-	@RequestMapping(value = "user/oauth", method = RequestMethod.GET)
-	public UserInfo getUserInfoByOauthIdnFrom(@RequestParam(name = "oauthId") String eMail,
-	                                        @RequestParam(name = "from") String from) throws UserServiceException {
+    @RequestMapping(value = "user/oauth", method = RequestMethod.GET)
+    public UserInfo getUserInfoByOauthIdnFrom(@RequestParam(name = "oauthId") String eMail,
+                                              @RequestParam(name = "from") String from) throws UserServiceException {
 
-		return userDataHandle.getUserInfoByOAuthIdAndFrom(eMail, from);
-	}
+        return userDataHandle.getUserInfoByOAuthIdAndFrom(eMail, from);
+    }
 
 
     @RequestMapping(value = "users", method = RequestMethod.GET)

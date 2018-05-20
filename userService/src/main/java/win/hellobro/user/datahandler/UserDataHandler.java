@@ -128,10 +128,13 @@ public class UserDataHandler {
     }
 
 
-    public void existEmailOrNickName(String eMail, String nickName) throws UserServiceException {
-        if (userInfoService.isExistEmail(eMail)) {
+    public void existEmailOrNickName(String id, String eMail, String nickName) throws UserServiceException {
+        if(StringUtils.isEmpty(eMail) && StringUtils.isEmpty(nickName))
+            throw new UserServiceException(HttpStatus.BAD_REQUEST, "must be input eMail or nickName");
+
+        if (userInfoService.isExistEmail(id, eMail)) {
             throw new UserServiceException(HttpStatus.CONFLICT, "Already a Existing eMail");
-        } else if (userInfoService.isExistNickName(nickName)) {
+        } else if (userInfoService.isExistNickName(id, nickName)) {
             throw new UserServiceException(HttpStatus.CONFLICT, "Already a Existing NickName");
         }
     }

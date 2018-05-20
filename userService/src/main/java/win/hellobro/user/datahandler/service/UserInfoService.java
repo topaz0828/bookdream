@@ -40,13 +40,13 @@ public class UserInfoService implements IUserInfoService {
 	}
 
 	@Override
-    public boolean isExistEmail(String eMail) {
-        return userInfoDAO.isExistEmail(eMail);
+    public boolean isExistEmail(String id, String eMail) {
+        return userInfoDAO.isExistEmail(id, eMail);
     }
 
     @Override
-    public boolean isExistNickName(String nickName) {
-        return userInfoDAO.isExistNickName(nickName);
+    public boolean isExistNickName(String id, String nickName) {
+        return userInfoDAO.isExistNickName(id, nickName);
     }
 
     @Override
