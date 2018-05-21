@@ -6,3 +6,21 @@
     border-radius: 50%;
     width: 30px; height: 30px;
 }
+
+.facebook-login-button {
+    background-color: #006BAA;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    width: 200px; height: 40px;
+}
+
+.google-login-button {
+    background-color: #FFFFFF;
+    border: 1px solid #909090;
+    font-size: 16px;
+    width: 200px; height: 40px;
+}

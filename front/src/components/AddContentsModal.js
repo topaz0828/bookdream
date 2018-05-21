@@ -74,11 +74,13 @@ class AddContentsModal extends React.Component {
 				ul.className = 'dropdown-menu';
 				ul.setAttribute('role', 'menu');
 				ul.style.width = '100%';
+				ul.style.maxHeight = '500px';
+				ul.style.overflowY = 'auto';
 				for (var i in res) {
 					var li = document.createElement('li');
 					li.setAttribute('role', 'presentation');
-					self.makeSearchResultRow(li, res[i]);
 
+					self.makeSearchResultRow(li, res[i]);
 					$(ul).append(li);
 				}
 
@@ -95,21 +97,30 @@ class AddContentsModal extends React.Component {
 		var a = document.createElement('a');
 		a.setAttribute('role', 'menuitem');
 		a.setAttribute('tabIndex', '-1');
-		a.style.fontSize = '17px';
+		a.style.fontSize = '15px';
 		a.style.cursor = 'pointer';
-		a.textContent = book.title;
-		a.searchInfo = book;
-		$(a).click(function(event) {
-			self.selectBook(event.target.searchInfo);
+		
+		var div = document.createElement('div');
+		div.innerHTML = '<img src="' + book.thumbnail + '" style="border:1px solid black; max-width: 80px;"/>';
+		div.innerHTML += '<span style="max-width: 450px; display: inline-block; white-space: normal; padding-left: 5px;">' + book.title + '</span>'
+		div.searchInfo = book;
+		$(div).click(function(event) {
+			if (event.target.localName === 'div') {
+				self.selectBook(event.target.searchInfo);
+			} else {
+				self.selectBook($(event.target).parent()[0].searchInfo);
+			}
 		});
-		$(parent).append(a);
+		a.appendChild(div);
+
+		parent.appendChild(a);
 	}
 
 	selectBook(book) {
 		this.selectedBook = book;
 		this.selectedBookView.html('<table>' + 
-										'<tr><td style="padding-left: 20px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + 
-										'<td style="padding-left:20px;"><h4>' + book.title + '</h4>' + book.author + ' (' + book.publisher + ')</td></tr>' +
+										'<tr><td style="padding-left: 10px;"><img src="' + book.thumbnail + '" style="border:1px solid black;"/></td>' + 
+										'<td style="padding-left:10px;"><h5>' + book.title + '</h5>' + book.author + ' (' + book.publisher + ')</td></tr>' +
 									'</table>');
 		this.searchResultDropdown.removeClass('open');
 	}
@@ -178,12 +189,8 @@ class AddContentsModal extends React.Component {
 	}
 
 	reset() {
-		// this.selectedBook = null;
-		// this.selectedBookView.empty();
 		this.searchBookInput.val('');
 		this.searchResultDropdown.removeClass('open');
-		// $('textarea[name=impressionInput]').val('');
-		// $('#reviewInput').val('');
 	}
 
 	renderInputView() {

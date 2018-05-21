@@ -31,9 +31,16 @@ class SignInModal extends React.Component {
                             <h5>Mark the moments of your life.</h5>
                         </div>
                         <div className="modal-body" style={{textAlign: 'center'}}>
-                            <button type="button"className="btn btn-default btn-lg" onClick={this.signInFacebook} style={{width: '200px'}}>Facebook</button>
+                            <button type="button" className='facebook-login-button' onClick={this.signInFacebook}>facebook</button>
                             <div style={{height: '10px'}}></div>
-                            <button type="button"className="btn btn-default btn-lg" onClick={this.signInGoogle} style={{width: '200px'}}>Google</button>
+                            <button className='google-login-button' onClick={this.signInGoogle} style={{width: '200px'}}>
+                                <font color='#008DE8'>G</font>
+                                <font color='#FF073B'>o</font>
+                                <font color='#FFB54E'>o</font>
+                                <font color='#008DE8'>g</font>
+                                <font color='#00AB64'>l</font>
+                                <font color='#FF073B'>e</font>
+                            </button>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-default" data-dismiss="modal">닫기</button>

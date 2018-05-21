@@ -29,7 +29,7 @@ public class BookApiClient {
 	}
 
 	public static List<BookSearchResult> search(String apiUri, String apiKey, String query) throws Exception {
-		return search(apiUri, apiKey, query, 20);
+		return search(apiUri, apiKey, query, 30);
 	}
 
 	/**
