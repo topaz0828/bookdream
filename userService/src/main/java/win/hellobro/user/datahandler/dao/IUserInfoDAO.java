@@ -14,9 +14,9 @@ public interface IUserInfoDAO {
 
     void deleteUserlInfo(String eMail, String id);
 
-    boolean isExistNickName(String nickName);
+    boolean isExistNickName(String id, String nickName);
 
-    boolean isExistEmail(String eMail);
+    boolean isExistEmail(String id, String eMail);
 
     boolean existEMailAndOAuthSite(String eMail, String OAuth_Site);
 
