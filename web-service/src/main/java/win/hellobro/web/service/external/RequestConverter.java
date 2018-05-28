@@ -38,6 +38,7 @@ class RequestConverter {
 		data.put("USER_ID", userId);
 		data.put("TYPE", type);
 		data.put("TEXT", text);
+		data.put("USER_HIDDEN", "N");
 		return toJson(data);
 	}
 

@@ -123,8 +123,8 @@ class DetailModal extends React.Component {
 	}
 
 	saveToClipboardContentsUrl() {
-		// copy("https://book.hellobro.win#t=c&i=" + this.state.contentsId);
-		copy('http://localhost:3003#t=c&i=' + this.state.contentsId);
+		copy("https://book.hellobro.win#t=c&i=" + this.state.contentsId);
+		// copy('http://localhost:3003#t=c&i=' + this.state.contentsId);
 		this.detailNoti.text('클립보드에 저장되었습니다.');
 	}
 
