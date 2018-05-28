@@ -68,7 +68,9 @@
     </select>
 
     <select id="selectOne" resultType="map">
-        SELECT * FROM BOOK_REVIEW WHERE ID = #{id}
+        SELECT R.*, U.IMAGE AS PROFILE_IMAGE, U.NICKNAME, B.TITLE
+        FROM BOOK_REVIEW R, USER_INFO U, BOOK_INFO B
+        WHERE R.USER_ID=U.ID AND R.BOOK_ID=B.ID AND R.ID = #{id}
     </select>
 
 

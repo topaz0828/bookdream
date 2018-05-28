@@ -107,12 +107,6 @@ public class FacebookSignIn {
 
 		SessionRepository.saveSignUpInfo(user);
 
-		QueryStringEncoder signUpParam = new QueryStringEncoder("/signup.html");
-		signUpParam.addParam("email", facebookUser.getEmail());
-		signUpParam.addParam("name", facebookUser.getName());
-		signUpParam.addParam("picture", facebookUser.getPicture());
-
-		HttpServletResponse response = RequestContext.getServletResponse();
-		response.sendRedirect(signUpParam.toString());
+		User.sendSignUpUrl(facebookUser.getEmail(), facebookUser.getName(), facebookUser.getPicture());
 	}
 }

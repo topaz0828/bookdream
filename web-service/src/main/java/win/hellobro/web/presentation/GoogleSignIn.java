@@ -118,12 +118,6 @@ public class GoogleSignIn {
 		userInfo.setId(UUID.randomUUID().toString().replaceAll("-", ""));
 		SessionRepository.saveSignUpInfo(userInfo);
 
-		QueryStringEncoder signUpParam = new QueryStringEncoder("/signup.html");
-		signUpParam.addParam("email", userInfo.getEmail());
-		signUpParam.addParam("name", userInfo.getNickName());
-		signUpParam.addParam("picture", userInfo.getImage());
-
-		HttpServletResponse response = RequestContext.getServletResponse();
-		response.sendRedirect(signUpParam.toString());
+		User.sendSignUpUrl(userInfo.getEmail(), userInfo.getNickName(), userInfo.getImage());
 	}
 }

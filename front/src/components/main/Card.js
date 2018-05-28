@@ -5,7 +5,7 @@ class Card extends React.Component {
 		super(props);
 		this.data = this.props.data;
 		this.showDetailModal = () => {
-			this.props.parent.app.showDetailModal(this.data);
+			this.props.parent.app.showDetailModal(this.data.contentsId);
 		}
 
 		this.onMouseOver = () => {

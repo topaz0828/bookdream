@@ -50,6 +50,7 @@ public class ReviewClient {
 		QueryStringEncoder query = new QueryStringEncoder("/review");
 		query.addParam("offset", pageIndex);
 		query.addParam("limit", pageSize);
+		query.addParam("hidden", "n");
 		if (!StringUtil.isNullOrEmpty(isbn)) {
 			query.addParam("isbn", isbn);
 		}

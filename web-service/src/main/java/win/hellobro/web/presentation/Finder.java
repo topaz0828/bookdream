@@ -103,8 +103,8 @@ public class Finder {
 		String id = (String) param.get("id");
 
 		try {
-			String result = reviewService.getContentsDetail(id);
-			response.getWriter().write(result);
+			Map<String, Object> reviewData = reviewService.getContentsDetail(SessionRepository.getUserInfo().getId(), id);
+			response.getWriter().write(JSON_MAPPER.writeValueAsString(reviewData));
 		} catch (Exception e) {
 			LOG.error("fail to get contents.", e);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

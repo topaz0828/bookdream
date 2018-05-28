@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -223,5 +224,10 @@ public class User {
 		if (userInfo == UserInfo.NOT_FOUND_USER) {
 			RequestContext.getServletResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);
 		}
+	}
+
+	static void sendSignUpUrl(String email, String name, String picture) throws IOException {
+		HttpServletResponse response = RequestContext.getServletResponse();
+		response.sendRedirect("/#t=su&e=" + email + "&n=" + URLEncoder.encode(name, "UTF-8") + "&p=" + picture);
 	}
 }

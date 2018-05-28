@@ -1,16 +1,16 @@
 package win.hellobro.web.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 import team.balam.exof.module.service.annotation.ServiceDirectory;
 import win.hellobro.web.presentation.vo.BookInfo;
 import win.hellobro.web.service.external.ReviewClient;
 
 import java.util.List;
+import java.util.Map;
 
 @ServiceDirectory
 public class ReviewService {
-	private static final Logger LOG = LoggerFactory.getLogger(ReviewService.class);
+	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
 	@ServiceDirectory("/external/review-service")
 	private ReviewClient reviewClient;
@@ -23,8 +23,18 @@ public class ReviewService {
 		return reviewClient.sendSearchRequest(userId, isbn, pageIndex, pageSize, true);
 	}
 
-	public String getContentsDetail(String reviewId) {
-		return reviewClient.getReviewOrImpression(reviewId);
+	public Map<String, Object> getContentsDetail(String userId, String reviewId) throws Exception {
+		String json = reviewClient.getReviewOrImpression(reviewId);
+		Map<String, Object> data = JSON_MAPPER.readValue(json, Map.class);
+		String reviewUserId = (String) data.get("USER_ID");
+
+		if (userId.equals(reviewUserId)) {
+			data.put("MY", "y");
+		} else {
+			data.put("MY", "n");
+		}
+
+		return data;
 	}
 
 	public ContentsCountVo getContentsCount(String userId) {

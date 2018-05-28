@@ -1,9 +1,10 @@
 import React from 'react';
+import copy from 'copy-to-clipboard';
 
 class DetailModal extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {info: {title: '', nickname: ''}, contents: ''};
+		this.state = {title: '', nickname: '', profileImage:'', contents: ''};
 	}
 
 	componentDidMount() {
@@ -23,7 +24,7 @@ class DetailModal extends React.Component {
 		this.impressionView = $('#impressionView');
 	}
 
-	show(info) {
+	show(contentsId) {
 		this.detailText.show();
 		this.modifyTextarea.hide();
 		this.detailSaveButton.hide();
@@ -33,23 +34,28 @@ class DetailModal extends React.Component {
 		this.modifyTextarea.val('');
 		this.reviewView.hide();
 		this.impressionView.hide();
-		// this.detailNoti.text('');
+		this.detailNoti.text('');
 
 		var self = this;
 		$.ajax({
 			type: 'GET',
-			url: '/api/search/contents?id=' + info.contentsId,
+			url: '/api/search/contents?id=' + contentsId,
 			dataType: 'json'
 		}).done(function(res) {
-			//console.log(res);
-			self.setState({info: info, contents: res.TEXT});
+			setTimeout(() => self.setState({title: res.TITLE, 
+				nickname: res.NICKNAME, 
+				profileImage:res.PROFILE_IMAGE, 
+				contents: res.TEXT,
+				contentsId: contentsId,
+				bookId: res.BOOK_ID,
+				type: res.TYPE}));
 			
-			if ('y' === info.my) {
+			if ('y' === res.MY) {
 				self.detailModifyButton.show();
 				self.deleteContentsButton.show();
 			}
 
-			if ('C' === info.type) {
+			if ('C' === res.TYPE) {
 				self.impressionView.html('<p>' + res.TEXT.replace(/(?:\r\n|\r|\n)/g, '<br>') + '</p>');
 				self.impressionView.show();
 				self.modifyTextarea.attr('maxLength', '200');
@@ -78,9 +84,9 @@ class DetailModal extends React.Component {
 			return;
 		}
 
-		var data = {bookId: this.state.info.bookId, 
-				type: this.state.info.type, 
-				contentsId: this.state.info.contentsId, 
+		var data = {bookId: this.state.bookId, 
+				type: this.state.type, 
+				contentsId: this.state.contentsId, 
 				contents: contents};
 
 		var self = this;
@@ -101,7 +107,7 @@ class DetailModal extends React.Component {
 		var self = this;
 		$.ajax({
 			type: 'DELETE',
-			url: '/api/contents/delete?contentsId=' + this.state.info.contentsId,
+			url: '/api/contents/delete?contentsId=' + this.state.contentsId,
 			async: false
 		}).done(function(res) {
 			self.modal.modal('hide');
@@ -116,6 +122,12 @@ class DetailModal extends React.Component {
 		this.confirmDeleteButton.show();
 	}
 
+	saveToClipboardContentsUrl() {
+		// copy("https://book.hellobro.win#t=c&i=" + this.state.contentsId);
+		copy('http://localhost:3003#t=c&i=' + this.state.contentsId);
+		this.detailNoti.text('클립보드에 저장되었습니다.');
+	}
+
 	render() {
 		return (
 			<div className="modal fade" id="detailModal" tabIndex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
@@ -123,7 +135,7 @@ class DetailModal extends React.Component {
 					<div className="modal-content">
 						<div className="modal-header">
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							<h4 className="modal-title" id="detailModalLabel">{this.state.info.title}</h4>
+							<h4 className="modal-title" id="detailModalLabel">{this.state.title}</h4>
 						</div>
 						<div className="modal-body">
 							<div id='detailText'>
@@ -133,12 +145,12 @@ class DetailModal extends React.Component {
 									</blockquote>
 								</div>
 								<div align='right' style={{paddingTop: '10px', paddingRight: '10px'}}>
-									<img name='profile_image' src={this.state.info.profileImage} className='profile_image'/>&nbsp;
-									{this.state.info.nickname} 
+									<img name='profile_image' src={this.state.profileImage} className='profile_image'/>&nbsp;
+									{this.state.nickname} 
 								</div>
 							</div>
 							<textarea id='modifyTextarea' className='form-control' style={{height:'300px', resize:'none'}}></textarea>
-							<div align='right' style={{paddingTop: '10px'}} id='detailNoti'></div> 
+							<div align='right' style={{paddingTop: '10px', color: 'red'}} id='detailNoti'></div> 
 						</div>
 						<div className="modal-footer">
 							<button id='confirmDeleteButton' type="button" className='btn btn-danger' onClick={() => this.delete()}>확인</button>
@@ -146,6 +158,7 @@ class DetailModal extends React.Component {
 							&nbsp;&nbsp;&nbsp;&nbsp;
 							<button id='detailModifyButton' type="button" className='btn btn-default' onClick={() => this.showModify()}>수정</button>
 							<button id='detailSaveButton' type="button" className='btn btn-default' onClick={() => this.save()}>저장</button>
+							<button type="button" className='btn btn-default' onClick={() => this.saveToClipboardContentsUrl()}>공유</button>
 							<button type="button" className="btn btn-default" data-dismiss="modal">닫기</button>
 						</div>
 					</div>
