@@ -13,28 +13,22 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ReviewDao {
-    private static final Logger log = LoggerFactory.getLogger(ReviewDao.class);
+public class ReviewLikeDao {
+    private static final Logger log = LoggerFactory.getLogger(ReviewLikeDao.class);
 
     @Autowired
     private SqlSession sqlSession;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public List<Object> select(String userId, String bookId, String type, String[] isbn, Character userHidden, Integer offset, Integer limit) {
+    public List<Object> select(String userId, String reiewId, String type, Integer offset, Integer limit) {
         Map<String, Object> map = new HashMap<>();
         map.put("USER_ID", userId);
-        map.put("BOOK_ID", bookId);
+        map.put("BOOK_REVIEW_ID", reiewId);
         map.put("TYPE", type);
-        map.put("ISBN", isbn);
-        map.put("USER_HIDDEN", userHidden);
         map.put("offset", offset);
         map.put("limit", limit);
         log.info("select parameter {}", map);
         return sqlSession.selectList("select", map);
-    }
-
-    public Map<String, Object> selectOne(String reviewId) {
-	    return sqlSession.selectOne("selectOne", reviewId);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -44,31 +38,21 @@ public class ReviewDao {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Integer countByUserId(String userId, String type) {
+    public Integer countByUserId(String userId, String reviewId, String type) {
         Map<String, Object> map = new HashMap<>();
         map.put("USER_ID", userId);
+        map.put("BOOK_REVIEW_ID", reviewId);
         map.put("TYPE", type);
         log.info("countByUserId {}", map);
         return sqlSession.selectOne("countByUserId", map);
     }
-
+    
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Integer countByBookId(String bookId, String type) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("BOOK_ID", bookId);
-        map.put("TYPE", type);
-        log.info("countByBookId {}", map);
-        return sqlSession.selectOne("countByBookId", map);
-    }
-
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Boolean insert(String userId, String bookId, String type, String text, Character userHidden) {
+    public Boolean insert(String userId, String reviewId, String type) {
         Map<String, Object> map = new HashMap<>();
         map.put("USER_ID", userId);
-        map.put("BOOK_ID", bookId);
+        map.put("BOOK_REVIEW_ID", reviewId);
         map.put("TYPE", type);
-        map.put("TEXT", text);
-        map.put("USER_HIDDEN", userHidden);
         try {
             sqlSession.insert("insert", map);
         } catch (Exception e) {
@@ -80,14 +64,11 @@ public class ReviewDao {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Boolean update(String reviewId, String userId, String bookId, String type, String text, Character userHidden) {
+    public Boolean update(String userId, String reviewId, String type) {
         Map<String, Object> map = new HashMap<>();
-        map.put("ID", reviewId);
         map.put("USER_ID", userId);
-        map.put("BOOK_ID", bookId);
+        map.put("BOOK_REVIEW_ID", reviewId);
         map.put("TYPE", type);
-        map.put("TEXT", text);
-        map.put("USER_HIDDEN", userHidden);
         try {
             log.info("update {}", map);
             sqlSession.update("update", map);
@@ -99,20 +80,15 @@ public class ReviewDao {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Boolean delete(String reviewId, String userId, String bookId) {
+    public Boolean delete(String userId, String reviewId) {
         try {
-            if (reviewId != null && userId != null) {
-                log.info("delete reviewId={}, userId={}", reviewId, userId);
-                HashMap<String, Object> param = new HashMap<>();
-                param.put("ID", reviewId);
-                param.put("USER_ID", userId);
-                sqlSession.delete("delete", param);
-            } else if (userId != null) {
+            if (userId != null) {
                 log.info("deleteByUserId userId={}", userId);
-                sqlSession.delete("deleteByUserId", userId);
-            } else if (bookId != null) {
-                log.info("deleteByBookId bookId={}", bookId);
-                sqlSession.delete("deleteByBookId", bookId);
+                sqlSession.delete("deleteByUsehiddenrId", userId);
+            }
+            if (reviewId != null) {
+                log.info("delete reviewId={}", reviewId);
+                sqlSession.delete("delete", reviewId);
             }
         } catch (Exception e) {
             log.error("delete Exception{}", e);

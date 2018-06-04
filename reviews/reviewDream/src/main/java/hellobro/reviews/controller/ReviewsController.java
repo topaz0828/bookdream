@@ -38,7 +38,7 @@ public class ReviewsController {
                                                @PathVariable("bid") String bookid,
                                                @RequestParam(value = "type", required = false) String type,
                                                @RequestParam(value = "isbn", required = false) String[] isbn,
-                                               @RequestParam(value = "hidden", required = false) char hidden,
+                                               @RequestParam(value = "hidden", required = false) Character hidden,
                                                @RequestParam(value = "offset", required = false) Integer offset,
                                                @RequestParam(value = "limit", required = false) Integer limit) {
         return getReview(userId, bookid, type, isbn, hidden, offset, limit);
@@ -50,7 +50,7 @@ public class ReviewsController {
                                                 @RequestParam(value = "bookid", required = false) String bookid,
                                                 @RequestParam(value = "type", required = false) String type,
                                                 @RequestParam(value = "isbn", required = false) String[] isbn,
-                                                @RequestParam(value = "hidden", required = false) char hidden,
+                                                @RequestParam(value = "hidden", required = false) Character hidden,
                                                 @RequestParam(value = "offset", required = false) Integer offset,
                                                 @RequestParam(value = "limit", required = false) Integer limit) {
         return getReview(userId, bookid, type, isbn, hidden, offset, limit);
@@ -138,7 +138,7 @@ public class ReviewsController {
         return checkValue;
     }
 
-    private ResponseEntity<String> getReview(String userId, String bookId, String type, String[] isbn, char userHidden, Integer offset, Integer limit) {
+    private ResponseEntity<String> getReview(String userId, String bookId, String type, String[] isbn, Character userHidden, Integer offset, Integer limit) {
         if (offset == null)
             offset = DEFAULT_OFFSET;
         if (limit == null)
@@ -162,11 +162,11 @@ public class ReviewsController {
     }
 
 
-    private ResponseEntity<Boolean> insertReview(String userId, String bookId, String type, String text, char userHidden) {
+    private ResponseEntity<Boolean> insertReview(String userId, String bookId, String type, String text, Character userHidden) {
         return new ResponseEntity<>(dao.insert(userId, bookId, type, text, userHidden), HttpStatus.OK);
     }
 
-    private ResponseEntity<Boolean> updateReview(String reviewId, String userId, String bookId, String type, String text, char userHidden) {
+    private ResponseEntity<Boolean> updateReview(String reviewId, String userId, String bookId, String type, String text, Character userHidden) {
         return new ResponseEntity<>(dao.update(reviewId, userId, bookId, type, text, userHidden), HttpStatus.OK);
     }
 

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hellobro.reviews.dao.ReviewDao">
+
+    <select id="selectAll" resultType="map">
+        SELECT * FROM BOOK_REVIEW
+        LIMIT #{offset}, #{limit};
+    </select>
+
+    <!--SELECT r.ID, r.USER_ID, r.BOOK_ID, r.TYPE, r.TEXT, r.`UPDATE_DATE`, b.`AUTHOR`, b.`CATEGORY_ID`, b.`DESCRIPTION`, b.`IMAGE`, b.`ISBN`, b.`PAGES`, b.`PRICE`, b.`PUB_ID`, b.`RARITY`, b.`TITLE`, b.`TRANSLATOR`-->
+    <select id="select" parameterType="map" resultType="map">
+        SELECT r.ID, u.`NICKNAME`, r.BOOK_ID, r.TYPE, r.TEXT, r.`UPDATE_DATE`, b.`AUTHOR`, b.`CATEGORY_ID`,
+        b.`DESCRIPTION`, b.`IMAGE`, b.`ISBN`, b.`PAGES`, b.`PRICE`, b.`PUB_ID`, b.`RARITY`, b.`TITLE`, b.`TRANSLATOR`
+        FROM `BOOK_REVIEW` r, `BOOK_INFO` b, `USER_INFO` u
+        WHERE r.`BOOK_ID` = b.`ID` AND r.`USER_ID` = u.`ID`
+        <if test="BOOK_ID != null">
+            AND r.BOOK_ID = #{BOOK_ID}
+        </if>
+        <if test="USER_ID != null">
+            AND r.USER_ID = #{USER_ID}
+        </if>
+        <if test="TYPE != null">
+            AND r.TYPE = #{TYPE}
+        </if>
+        <if test="ISBN != null">
+            AND b.ISBN IN
+            <foreach collection="ISBN" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY UPDATE_DATE DESC
+        LIMIT #{offset}, #{limit};
+    </select>
+
+    <select id="select2" parameterType="map" resultType="map">
+        SELECT *
+        FROM BOOK_REVIEW AS r
+        LEFT JOIN BOOK_INFO AS b
+        ON r.BOOK_ID = b.ID
+        WHERE true
+        <if test="BOOK_ID != null">
+            AND r.BOOK_ID = #{BOOK_ID}
+        </if>
+        <if test="USER_ID != null">
+            AND r.USER_ID = #{USER_ID}
+        </if>
+        <if test="TYPE != null">
+            AND r.TYPE = #{TYPE}
+        </if>
+        <if test="ISBN != null">
+            AND b.ISBN IN (#{ISBN})
+        </if>
+        LIMIT #{offset}, #{limit};
+    </select>
+
+    <select id="selectComment" resultType="map">
+        SELECT * FROM BOOK_REVIEW
+        WHERE TYPE = "C"
+        LIMIT #{offset}, #{limit};
+    </select>
+
+    <select id="selectReview" resultType="map">
+        SELECT * FROM BOOK_REVIEW
+        WHERE TYPE = "R"
+        LIMIT #{offset}, #{limit};
+    </select>
+
+    <select id="selectOne" resultType="map">
+        SELECT * FROM BOOK_REVIEW WHERE ID = #{id}
+    </select>
+
+
+    <select id="like-count" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BOOK_REVIEW_LIKE
+        <if test="TYPE != null">
+            WHERE TYPE = #{TYPE}
+        </if>
+    </select>
+
+    <select id="like-countByUserId" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BOOK_REVIEW_LIKE
+        WHERE USER_ID = #{USER_ID}
+        <if test="TYPE != null">
+            AND TYPE = #{TYPE}
+        </if>
+    </select>
+
+    <select id="like-countByReviewId" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BOOK_REVIEW_LIKE
+        WHERE BOOK_REVIEW_ID = #{BOOK_REVIEW_ID}
+        <if test="TYPE != null">
+            AND TYPE = #{TYPE}
+        </if>
+    </select>
+
+
+    <insert id="insert">
+        INSERT INTO BOOK_REVIEW ( USER_ID, BOOK_ID, TYPE, TEXT )
+        VALUES ( #{USER_ID}, #{BOOK_ID}, #{TYPE} , #{TEXT} )
+    </insert>
+
+
+    <update id="update">
+        UPDATE BOOK_REVIEW
+        SET USER_ID = #{USER_ID}, BOOK_ID = #{BOOK_ID}, TYPE = #{TYPE}, TEXT = #{TEXT}
+        WHERE ID = #{ID} LIMIT 1
+    </update>
+
+
+    <delete id="delete">
+        DELETE FROM BOOK_REVIEW WHERE ID = #{ID}
+    </delete>
+
+    <delete id="deleteByUserID">
+        DELETE FROM BOOK_REVIEW USER_ID = #{USER_ID}
+    </delete>
+
+    <delete id="deleteByBookID">
+        DELETE FROM BOOK_REVIEW BOOK_ID = #{BOOK_ID}
+    </delete>
+
+</mapper>
